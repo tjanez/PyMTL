@@ -1,0 +1,24 @@
+CODE_ID	NAME
+1	Comedy
+2	Action
+3	Triler
+4	Erotika
+5	Documentary
+6	Horror
+7	Music
+8	Drama
+9	TV nadaljevanke
+10	Romance
+11	Adventure
+12	Crime
+13	Family
+14	Fantazijski
+15	Muzikal
+16	Šport
+17	Vojni
+18	ZF
+19	Vestern
+20	Zgodovinski
+21	Animirani in risani
+22	Biografski
+23	Izobraževanje
