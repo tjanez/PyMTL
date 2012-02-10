@@ -24,7 +24,8 @@ from ERMRec.config import *
 
 class RawDataPreprocessor:
 
-    """A class for transforming the raw iTivi movie data to an Orange Table.
+    """A class for transforming the raw iTivi movie data to an Orange data
+    table.
       
     """
     
@@ -40,12 +41,16 @@ class RawDataPreprocessor:
         (movie_id, attr_id, attr_value).
         Store the list of triplets in the self._database variable.
         
+        Keyword arguments:
+        raw_data_file -- string representing the path to the raw iTivi movie
+            data
+        
         """
         with open(raw_data_file) as raw_data:
             self._database = []
             for i, line in enumerate(raw_data):
                 if i == 0:
-                    # skip the first line as it contains attribute information
+                    # skip the first line as it contains attribute descriptions
                     continue
                 line = line.rstrip()
                 # split lines into 3 parts: movie id, attribute id,
@@ -159,7 +164,7 @@ class RawDataPreprocessor:
          
         """
         movies = dict()
-        # iterate over all whole database
+        # iterate over the whole database
         for movie_id, attr_id, attr_value in self._database:
             # create (or retrieve) an Orange instance corresponding to the movie
             if movie_id not in movies:
