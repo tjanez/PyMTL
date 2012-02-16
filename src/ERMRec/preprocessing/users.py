@@ -18,7 +18,8 @@
 # Author(s): Tadej Janez <tadej.janez@fri.uni-lj.si>
 #
 
-import os, re
+import math, os, re
+import matplotlib.pyplot as plt
 
 import Orange
 
@@ -115,6 +116,8 @@ class RawDataPreprocessor:
                  if  len(table) >= m}
         logging.debug("Kept {} users who have more than {} ratings".\
                       format(len(users), m))
+        # store m for later use
+        self._m = m
         # compute binarized ratings for users
         for table in users.itervalues():
             self._compute_binarized_ratings(table)
@@ -134,10 +137,37 @@ class RawDataPreprocessor:
             os.makedirs(dir_path)
         else:
             for file in os.listdir(dir_path):
-                if re.search(r"user\d+\.tab", file):
+                if re.search(r"^user\d+\.tab$", file):
                     os.remove(os.path.join(dir_path, file))
         for user_id, table in self._users_datatables.iteritems():
             table.save(os.path.join(dir_path, "user{:0>5}.tab".format(user_id)))
+    
+    def plot_histogram(self, save_path):
+        """Compute and plot a histogram for the number of ratings of each user.
+        Save the histogram to the given file path.
+        
+        Keyword arguments:
+        save_path -- string representing the path of the file where to save the
+            histogram
+         
+        """
+        n_instances = [len(table) for table in
+                       self._users_datatables.itervalues()]
+        n, bars, _ = plt.hist(n_instances, bins=50, facecolor="green",
+                              alpha=0.75)
+        # save the histogram data to a file for latter inspection 
+        with open(save_path+".data", 'w') as hist_data:
+            hist_data.write("# of ratings:   # of users:\n")
+            for n_rat, n_users in zip(bars, n):
+                hist_data.write("{: >13.1f}   {: >11}\n".format(n_rat, n_users))
+        y_max = math.ceil(1.2*max(n))
+        plt.xlabel("Number of ratings")
+        plt.ylabel("Number of users")
+        plt.title("Histogram for users with at least {} ratings".\
+                  format(self._m))
+        plt.ylim(0, y_max)
+        plt.grid(True)
+        plt.savefig(save_path)
     
 if __name__ == "__main__":
     # compute the location of the raw data file from current file's location
@@ -146,8 +176,10 @@ if __name__ == "__main__":
     raw_data_file = os.path.join(path_prefix, "data/itivi_raw/ratings.csv")
     movies_file = os.path.join(path_prefix, "data/movies.tab")
     
-    # process the raw data file
+    min_ins = 100
+    save_dir = os.path.join(path_prefix, "data/users-m{}".format(min_ins))
     preprocessor = RawDataPreprocessor(raw_data_file)
-    preprocessor.create_datatables(10, movies_file)
-    preprocessor.save_datatables(os.path.join(path_prefix, "data/users-m10"))
+    preprocessor.create_datatables(min_ins, movies_file)
+    preprocessor.save_datatables(save_dir)
+    preprocessor.plot_histogram(os.path.join(save_dir, "histogram.png"))
     
