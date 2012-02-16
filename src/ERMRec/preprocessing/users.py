@@ -25,6 +25,39 @@ import Orange
 
 from ERMRec.config import *
 
+def _all_ratings_same(table):
+    """Check if the ratings in the given Orange data table are all the same.
+    Read the numerical ratings from the "Rating (raw)" attribute.
+    Return True if all numerical ratings are the same, and False otherwise
+    
+    Keyword arguments:
+    table -- Orange.data.Table with movie instances and ratings
+      
+    """
+    for i in range(len(table) - 1):
+        if table[i+1]["Rating (raw)"] != table[i]["Rating (raw)"]:
+            return False
+    return True
+
+def _compute_binarized_ratings(table):
+    """Compute the binarized ratings for the given Orange data table.
+    Read numerical ratings from the "Rating (raw)" attribute and store
+    the binarized ratings to the "Rating" attribute.
+    Give the "like" value to instances which exceed (or are equal to) the
+    average rating (over all instances in the data table). Otherwise, give
+    instances the "dislike" value.
+    
+    Keyword arguments:
+    table -- Orange.data.Table with movie instances and ratings
+    
+    """
+    avg_rat = 1.* sum([int(ins["Rating (raw)"]) for ins in table]) / len(table)
+    for ins in table:
+        if ins["Rating (raw)"] >= avg_rat:
+            ins["Rating"] = "like"
+        else:
+            ins["Rating"] = "dislike"
+
 class RawDataPreprocessor:
 
     """A class for transforming the raw iTivi users' ratings to a series of
@@ -49,26 +82,6 @@ class RawDataPreprocessor:
                 # timestamp (irrelevant), rating
                 movie_id, user_id, _, rating = line.split('\t', 3)
                 self._database.append((movie_id, user_id, rating))
-    
-    def _compute_binarized_ratings(self, table):
-        """Compute the binarized ratings for the given Orange data table.
-        Read numerical ratings from the "Rating (raw)" attribute and store
-        the binarized ratings to the "Rating" attribute.
-        Give the "like" value to instances which exceed the average rating (over
-        all instances in the data table). Otherwise, give instances the
-        "dislike" value.
-        
-        Keyword arguments:
-        table -- Orange.data.Table with movie instances and ratings
-        
-        """
-        avg_rat = 1.* sum([int(ins["Rating (raw)"]) for ins in table]) / \
-                    len(table)
-        for ins in table:
-            if ins["Rating (raw)"] >= avg_rat:
-                ins["Rating"] = "like"
-            else:
-                ins["Rating"] = "dislike"
     
     def create_datatables(self, m, movies_file):
         """Create Orange data tables for all users who have at least m ratings.
@@ -113,14 +126,20 @@ class RawDataPreprocessor:
         logging.debug("Total number of users: {}".format(len(users)))
         # only keep users with at least m ratings
         users = {user_id : table for user_id, table in users.iteritems()
-                 if  len(table) >= m}
+                 if len(table) >= m}
         logging.debug("Kept {} users who have more than {} ratings".\
                       format(len(users), m))
         # store m for later use
         self._m = m
+        # discard users with ratings that are all the same
+        len_before = len(users)
+        users = {user_id : table for user_id, table in users.iteritems()
+                 if not _all_ratings_same(table)}
+        logging.debug("Discared {} users with ratings that are all the same".\
+                      format(len_before - len(users)))
         # compute binarized ratings for users
         for table in users.itervalues():
-            self._compute_binarized_ratings(table)
+            _compute_binarized_ratings(table)
         self._users_datatables = users
     
     def save_datatables(self, dir_path):
@@ -176,7 +195,7 @@ if __name__ == "__main__":
     raw_data_file = os.path.join(path_prefix, "data/itivi_raw/ratings.csv")
     movies_file = os.path.join(path_prefix, "data/movies.tab")
     
-    min_ins = 100
+    min_ins = 10
     save_dir = os.path.join(path_prefix, "data/users-m{}".format(min_ins))
     preprocessor = RawDataPreprocessor(raw_data_file)
     preprocessor.create_datatables(min_ins, movies_file)
