@@ -19,7 +19,7 @@
 # Author(s): Tadej Janez <tadej.janez@fri.uni-lj.si>
 #
 
-import bisect, os, random, re
+import bisect, os, random, re, time
 import cPickle as pickle
 from collections import OrderedDict
 
@@ -301,11 +301,13 @@ class UsersPool:
             fold_scores[i] = {bl : dict() for bl in base_learners.iterkeys()}
             for bl in base_learners:
                 for l in learners:
+                    start = time.clock()
                     user_models = learners[l](self._users, base_learners[bl])
                     fold_scores[i][bl][l] = self._test_users(user_models,
                                                              measures)
+                    end = time.clock()
                     logging.debug("Finished fold: {}, base learner: {}, " \
-                                  "learner: {}".format(i, bl, l))
+                        "learner: {} in {:.2f}s".format(i, bl, l, end-start))
         # compute the average measure scores over all folds
         self._scores = _compute_avg_scores(fold_scores)
     
@@ -420,8 +422,13 @@ if __name__ == "__main__":
     pool = UsersPool(users_data_path, rnd_seed)
     
     base_learners = OrderedDict()
+    base_learners["majority"] = Orange.classification.majority.MajorityLearner()
     base_learners["bayes"] = Orange.classification.bayes.NaiveLearner()
-    base_learners["c45"] = Orange.classification.tree.C45Learner()
+#    base_learners["c45"] = Orange.classification.tree.C45Learner()
+    from orange_learners import CustomC45Learner
+    # custom C4.5 learner which allows us to specify the minimal number of
+    # examples in leaves as a proportion of the size of the data set
+    base_learners["c45_custom"] = CustomC45Learner(min_objs_prop=0.01)
     # by default, Random Forest uses 100 trees in the forest and
     # the square root of the number of features as the number of randomly drawn
     # features among which it selects the best one to split the data sets in
@@ -451,7 +458,7 @@ if __name__ == "__main__":
     pool.pickle(pickle_path)
     
 
-    pool = unpickle(pickle_path)
+#    pool = unpickle(pickle_path)
     # divide users into bins according to the number of ratings they have
     if test:
         bin_edges = [10, 15, 20]
