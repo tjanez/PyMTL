@@ -20,6 +20,8 @@
 
 import Orange
 
+from ERMRec.config import *
+
 class MergeAllLearner:
     
     """Learning strategy that merges all users, regardless of whether they
@@ -45,6 +47,8 @@ class MergeAllLearner:
                 merged_data = Orange.data.Table(user.get_learn_data())
             else:
                 merged_data.extend(user.get_learn_data())
+        logging.debug("Merged data has {} attributes and {} examples.".format(
+            len(merged_data.domain.attributes), len(merged_data)))
         model = base_learner(merged_data)
         for user_id in users.iterkeys():
             user_models[user_id] = model
