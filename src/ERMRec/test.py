@@ -30,8 +30,19 @@ from ERMRec import stat
 from ERMRec import learning
 from ERMRec.plotting import BarPlotDesc, plot_multiple
 
-def unpickle(file_path):
-    """Unpickle a UsersPool object from a file.
+def pickle_obj(obj, file_path):
+    """Pickle the given object to the given file_path.
+    
+    Keyword arguments:
+    file_path -- string representing the path to the file where to pickle
+        the object
+    
+    """
+    with open(file_path, "wb") as pkl_file:
+        pickle.dump(obj, pkl_file, pickle.HIGHEST_PROTOCOL)
+
+def unpickle_obj(file_path):
+    """Unpickle an object from the given file_path.
     Return the reference to the unpickled object.
     
     Keyword arguments:
@@ -107,6 +118,23 @@ class User:
         if self._active_fold == None:
             raise ValueError("There is no active fold!")
         return self._test
+    
+    def get_hash(self):
+        """Return a hash value based on user's id, data table and
+        cross-validation random indices. 
+        
+        """
+        h1 = hash(self.id)
+        # Note: Using "hash(self._data)" does not work as Orange gives different
+        # hash values to data tables, even if they are loaded from the same
+        # file;
+        # A work-around is to use hash values of individual examples and merge
+        # them together with left bit-shifts and xor
+        h2 = 0
+        for ex in self._data:
+            h2 = ((h2 << 1) & 0xffffffff) ^ hash(ex)
+        h3 = hash(tuple(self._cv_indices))
+        return h1 ^ h2 ^ h3
 
 def _compute_avg_scores(fold_scores):
     """Compute the average scores of the given fold scores.
@@ -147,6 +175,33 @@ def _compute_avg_scores(fold_scores):
                                                             len(u_scores)
     return avg_scores
 
+class TestingResults:
+
+    """Contains data of testing a particular base learning method on the pool
+    of users.
+    
+    """
+    
+    def __init__(self, name, user_hashes, avg_scores):
+        """Initialize a TestingResults object. Store the given arguments as
+        attributes.
+        
+        Arguments:
+        name -- string representing the base learner's name
+        user_hashes -- OrderedDictionary with keys corresponding to users' ids
+            and values to users' hashes
+        avg_scores -- three-dimensional dictionary with:
+            first key corresponding to the learner's name,
+            second key corresponding to the user's id,
+            third key corresponding to the scoring measure's name,
+            value corresponding to the average value of the scoring measure
+        
+        """
+        self.name = name
+        self.user_hashes = user_hashes
+        self.avg_scores = avg_scores
+        
+
 class UsersPool:
     
     """Contains methods for testing various learning algorithms on the given
@@ -180,6 +235,9 @@ class UsersPool:
                 user = User(user_id, data_table)
                 self._users[user_id] = user
         self._random = random.Random(seed)
+        # dictionary that will hold the TestingResults objects, one for each
+        # tested base learner
+        self._test_res = OrderedDict()
     
     def _find_bin_edge(self, n):
         """Find the appropriate bin edge for the given number of ratings.
@@ -269,13 +327,12 @@ class UsersPool:
         Test the performance of the given learning algorithms with the given
         base learning algorithms and compute the testing results using the
         given scoring measures.
-        Save the average testing results (over all folds) in the self._scores
-        object, which is a a four-dimensional dictionary with:
-            first key corresponding to the base learner's name,
-            second key corresponding to the learner's name,
-            third key corresponding to the user's id,
-            fourth key corresponding to the scoring measure's name,
-            value corresponding to the average value of the scoring measure.
+        Compute the average scores over all folds and store them in
+        TestingResults objects, one for each base learner, along with users'
+        hashes (used for comparing the results of multiple experiments).
+        Store the created TestingResults objects in self._test_res, which is
+        a dictionary with keys corresponding to base learner's names and values
+        corresponding to their TestingResults objects. 
         
         Keyword arguments:
         learners -- ordered dictionary with items of the form (name, learner),
@@ -309,7 +366,79 @@ class UsersPool:
                     logging.debug("Finished fold: {}, base learner: {}, " \
                         "learner: {} in {:.2f}s".format(i, bl, l, end-start))
         # compute the average measure scores over all folds
-        self._scores = _compute_avg_scores(fold_scores)
+        avg_scores = _compute_avg_scores(fold_scores)
+        # get users' hashes
+        user_hashes = OrderedDict()
+        for user_id, user in self._users.iteritems():
+            user_hashes[user_id] = user.get_hash()
+        # store the average scores of each base learner in a separate
+        # TestingResults object
+        for bl in avg_scores.iterkeys():
+            self._test_res[bl] = TestingResults(bl, user_hashes, avg_scores[bl])
+    
+    def pickle_test_results(self, pickle_path_fmt):
+        """Pickle the TestingResults objects in self._test_res to the given
+        location.
+        
+        pickle_path_fmt -- string representing a template for the pickle paths;
+            it must contain exactly one pair of braces ({}), where the base
+            learner's name will be put
+        
+        """
+        for bl, tr in self._test_res.iteritems():
+            pickle_path = pickle_path_fmt.format(bl)
+            pickle_obj(tr, pickle_path)
+            logging.debug("Successfully pickled the results of base learner: " \
+                          "{} to file: {}".format(bl, pickle_path))
+            
+    def find_pickled_test_results(self, pickle_path_fmt):
+        """Find previously pickled TestingResults objects in the given location,
+        unpickle them and store them in the self._test_res dictionary.
+        
+        pickle_path_fmt -- string representing a template that was used for
+            for the pickle paths; it must contain exactly one pair of braces
+            ({}), which were replaced with the base learner's name
+        
+        """
+        dir_name, file_name = os.path.split(pickle_path_fmt)
+        # check if pickle_path_fmt has the right format
+        match = re.search(r"^(.*){}(.*)$", file_name)
+        if not match:
+            raise ValueError("The given pickle_path_fmt does not have an " \
+                "appropriate format.")
+        re_template = r"^{}(.+){}$".format(match.group(1), match.group(2)) 
+        for file in sorted(os.listdir(dir_name)):
+            match = re.search(re_template, file)
+            if match:
+                bl = match.group(1)
+                if bl not in self._test_res:
+                    file_path = os.path.join(dir_name, file)
+                    tr = unpickle_obj(file_path)
+                    if not isinstance(tr, TestingResults):
+                        raise TypeError("Object loaded from file: {} is not " \
+                            "of type TestingResults.".format(file_path))
+                    self._test_res[bl] = tr
+                    logging.debug("Successfully unpickled the results of base" \
+                        " learner: {} from file: {}".format(bl, file_path))
+                else:
+                    logging.info("Results of base learner: {} are already " \
+                        "loaded".format(bl))
+        
+    def check_test_results_compatible(self):
+        """Check if all TestingResults objects in the self._test_res dictionary
+        had the same users, users' data tables and cross-validation indices.
+        
+        """
+        bls = tuple(self._test_res.iterkeys())
+        if len(bls) <= 1:
+            return True
+        # select the first base learner as the reference base learner
+        ref = bls[0]
+        for user_id, hash in self._test_res[ref].user_hashes.iteritems():
+            for bl in bls[1:]:
+                if self._test_res[bl].user_hashes[user_id] != hash:
+                    return False
+        return True
     
     def _compute_bin_stats(self, base_learner, learner, measure):
         """Compute the statistics (average, std. deviation and 95% confidence
@@ -331,8 +460,9 @@ class UsersPool:
             bin = self._bins[bin_edge]
             # get the scores of users in the current bin for the given base
             # learner, learner and scoring measure
-            scores = numpy.array([self._scores[base_learner][learner][id][measure]
-                                  for id in bin])
+            bl_avg_scores = self._test_res[base_learner].avg_scores
+            scores = numpy.array([bl_avg_scores[learner][id][measure] for id
+                                  in bin])
             avgs.append(stat.mean(scores))
             stds.append(stat.unbiased_std(scores))
             ci95s.append(stat.ci95(scores))
@@ -357,8 +487,8 @@ class UsersPool:
             learners
         learners -- list of strings representing the names of learners
         measures -- list of strings representing names of the scoring measures
-        path_prefix -- string representing the prefix of the path where to save
-            the generated plots
+        results_path -- string representing the path where to save the generated
+            plots
         colors -- dictionary mapping from learners' names to the colors that
             should represent them in the plots
         
@@ -379,26 +509,14 @@ class UsersPool:
                     plot_desc_ci95[bl].append(BarPlotDesc(self._bin_edges, avgs,
                         self._bin_edges[1] - self._bin_edges[0], ci95s, l,
                         color=colors[l], ecolor=colors[l]))
-            plot_multiple(plot_desc_sd, path_prefix+"-{}-avg-SD.pdf".\
+            plot_multiple(plot_desc_sd, results_path+"/{}-avg-SD.pdf".\
                     format(m), title="Avg. results for groups of users (error" \
                     " bars show std. dev.)", subplot_title_fmt="Learner: {}",
                     xlabel="Number of ratings", ylabel=m)
-            plot_multiple(plot_desc_ci95, path_prefix+"-{}-avg-CI.pdf".\
+            plot_multiple(plot_desc_ci95, results_path+"/{}-avg-CI.pdf".\
                     format(m), title="Avg. results for groups of users (error" \
                     " bars show 95% conf. intervals)", subplot_title_fmt=\
                     "Learner: {}", xlabel="Number of ratings", ylabel=m)
-    
-    def pickle(self, file_path):
-        """Pickle yourself to the given file_path.
-        
-        Keyword arguments:
-        file_path -- string representing the path to the file where to pickle
-            the object
-        
-        """
-        with open(file_path, "wb") as pkl_file:
-            pickle.dump(self, pkl_file, pickle.HIGHEST_PROTOCOL)
-    
 
 if __name__ == "__main__":
     # a boolean indicating which pool of users to use
@@ -410,12 +528,16 @@ if __name__ == "__main__":
     path_prefix = os.path.abspath(os.path.join(cur_dir, "../../"))
     if test:
         users_data_path = os.path.join(path_prefix, "data/users-test")
-        pickle_path = os.path.join(path_prefix, "results/users-test.pkl")
-        results_prefix = os.path.join(path_prefix, "results/users-test")
+        results_path = os.path.join(path_prefix, "results/users-test")
+        if not os.path.exists(results_path):
+            os.makedirs(results_path)
+        pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
     else:
         users_data_path = os.path.join(path_prefix, "data/users-m10")
-        pickle_path = os.path.join(path_prefix, "results/users-m10.pkl")
-        results_prefix = os.path.join(path_prefix, "results/users-m10")
+        results_path = os.path.join(path_prefix, "results/users-m10")
+        if not os.path.exists(results_path):
+            os.makedirs(results_path)
+        pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
         
     # create a pool of users
     rnd_seed = 51
@@ -424,25 +546,25 @@ if __name__ == "__main__":
     base_learners = OrderedDict()
     base_learners["majority"] = Orange.classification.majority.MajorityLearner()
     base_learners["bayes"] = Orange.classification.bayes.NaiveLearner()
-#    base_learners["c45"] = Orange.classification.tree.C45Learner()
+    #base_learners["c45"] = Orange.classification.tree.C45Learner()
     from orange_learners import CustomC45Learner
     # custom C4.5 learner which allows us to specify the minimal number of
     # examples in leaves as a proportion of the size of the data set
     base_learners["c45_custom"] = CustomC45Learner(min_objs_prop=0.01)
-    # by default, Random Forest uses 100 trees in the forest and
-    # the square root of the number of features as the number of randomly drawn
-    # features among which it selects the best one to split the data sets in
-    # tree nodes
-    base_learners["rnd_forest"] = Orange.ensemble.forest.RandomForestLearner()
-    # by default, kNN sets parameter k to the square root of the numbers of
-    # instances
-    base_learners["knn"] = Orange.classification.knn.kNNLearner()
-    base_learners["knn5"] = Orange.classification.knn.kNNLearner(k=5)
-    from Orange.classification import svm
-    # these SVM parameters were manually obtained by experimenting in Orange
-    # Canvas using data in user02984.tab
-    base_learners["svm_RBF"] = svm.SVMLearner(svm_type=svm.SVMLearner.C_SVC,
-        kernel_type=svm.SVMLearner.RBF, C=100.0, gamma=0.01, cache_size=500)
+#    # by default, Random Forest uses 100 trees in the forest and
+#    # the square root of the number of features as the number of randomly drawn
+#    # features among which it selects the best one to split the data sets in
+#    # tree nodes
+#    base_learners["rnd_forest"] = Orange.ensemble.forest.RandomForestLearner()
+#    # by default, kNN sets parameter k to the square root of the numbers of
+#    # instances
+#    base_learners["knn"] = Orange.classification.knn.kNNLearner()
+#    base_learners["knn5"] = Orange.classification.knn.kNNLearner(k=5)
+#    from Orange.classification import svm
+#    # these SVM parameters were manually obtained by experimenting in Orange
+#    # Canvas using data in user02984.tab
+#    base_learners["svm_RBF"] = svm.SVMLearner(svm_type=svm.SVMLearner.C_SVC,
+#        kernel_type=svm.SVMLearner.RBF, C=100.0, gamma=0.01, cache_size=500)
     
     measures = OrderedDict()
     measures["CA"] = Orange.evaluation.scoring.CA
@@ -455,10 +577,14 @@ if __name__ == "__main__":
     # test all combinations of learners and base learners (compute the testing
     # results with the defined measures) and save the results
     pool.test_users(learners, base_learners, measures)
-    pool.pickle(pickle_path)
+    pool.pickle_test_results(pickle_path_fmt)
     
-
-#    pool = unpickle(pickle_path)
+#    # find previously computed testing results and check if they were computed
+#    # using the same data tables and cross-validation indices
+#    pool.find_pickled_test_results(pickle_path_fmt)
+#    if not pool.check_test_results_compatible():
+#        raise ValueError("Test results for different base learners are not " \
+#                         "compatible.")
     # divide users into bins according to the number of ratings they have
     if test:
         bin_edges = [10, 15, 20]
@@ -467,5 +593,5 @@ if __name__ == "__main__":
     pool.divide_users_to_bins(bin_edges)
     
     pool.visualize_results(list(base_learners.iterkeys()),
-        list(learners.iterkeys()), list(measures.iterkeys()), results_prefix,
+        list(learners.iterkeys()), list(measures.iterkeys()), results_path,
         colors={"NoMerging": "blue", "MergeAll": "green"})
