@@ -52,6 +52,7 @@ class CustomC45Learner(C45Learner):
         len(instances) and pass all the arguments and keyword arguments to the
         super class' __call__ method.
         
+        Arguments:
         instances -- Orange data table
         
         """
