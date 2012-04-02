@@ -305,6 +305,7 @@ class UsersPool:
         
         """
         scores = dict()
+        comp_errors = {m_name : 0 for m_name in measures.iterkeys()}
         for user_id, user in self._users.iteritems():
             results = Orange.evaluation.testing.test_on_data([models[user_id]],
                                 user.get_test_data())
@@ -315,11 +316,17 @@ class UsersPool:
                     # m_func returned False; probably AUC cannot be computed
                     # because all instances belong to the same class
                     m_score = None
-                    logging.info("Scoring measure {} for user {} could not "\
-                        "computed.".format(m_name, user_id))
+                    comp_errors[m_name] += 1
                 else:
                     m_score = m_scores[0]
                 scores[user_id][m_name] = m_score
+        # report the number of errors when computing the scoring measures
+        n = len(self._users)
+        for m_name, m_errors in comp_errors.iteritems():
+            if m_errors > 0:
+                logging.info("Scoring measure {} could not be computed for {}" \
+                    " out of {} users ({:.1f}%)".format(m_name, m_errors, n,
+                    1.*m_errors/n))
         return scores
     
     def test_users(self, learners, base_learners, measures):
