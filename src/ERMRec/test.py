@@ -27,7 +27,7 @@ import numpy, Orange
 
 from ERMRec.config import *
 from ERMRec import stat
-from ERMRec import learning
+from ERMRec.learning import prefiltering, learning
 from ERMRec.plotting import BarPlotDesc, plot_multiple
 
 def pickle_obj(obj, file_path):
@@ -527,7 +527,7 @@ class UsersPool:
 
 if __name__ == "__main__":
     # a boolean indicating which pool of users to use
-    test = False
+    test = True
     
     # compute the location of other files/directories from the current file's
     # location
@@ -541,7 +541,7 @@ if __name__ == "__main__":
         pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
     else:
         users_data_path = os.path.join(path_prefix, "data/users-m10")
-        results_path = os.path.join(path_prefix, "results/users-m10")
+        results_path = os.path.join(path_prefix, "results/users-m10new")
         if not os.path.exists(results_path):
             os.makedirs(results_path)
         pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
@@ -551,13 +551,13 @@ if __name__ == "__main__":
     pool = UsersPool(users_data_path, rnd_seed)
     
     base_learners = OrderedDict()
-    base_learners["majority"] = Orange.classification.majority.MajorityLearner()
+#    base_learners["majority"] = Orange.classification.majority.MajorityLearner()
     base_learners["bayes"] = Orange.classification.bayes.NaiveLearner()
-    #base_learners["c45"] = Orange.classification.tree.C45Learner()
-    from orange_learners import CustomC45Learner
-    # custom C4.5 learner which allows us to specify the minimal number of
-    # examples in leaves as a proportion of the size of the data set
-    base_learners["c45_custom"] = CustomC45Learner(min_objs_prop=0.01)
+#    #base_learners["c45"] = Orange.classification.tree.C45Learner()
+#    from orange_learners import CustomC45Learner
+#    # custom C4.5 learner which allows us to specify the minimal number of
+#    # examples in leaves as a proportion of the size of the data set
+#    base_learners["c45_custom"] = CustomC45Learner(min_objs_prop=0.01)
 #    # by default, Random Forest uses 100 trees in the forest and
 #    # the square root of the number of features as the number of randomly drawn
 #    # features among which it selects the best one to split the data sets in
@@ -578,8 +578,10 @@ if __name__ == "__main__":
     measures["AUC"] = Orange.evaluation.scoring.AUC
     
     learners = OrderedDict()
-    learners["NoMerging"] = learning.NoMergingLearner()
-    learners["MergeAll"] = learning.MergeAllLearner()
+#    learners["NoMerging"] = learning.NoMergingLearner()
+#    learners["MergeAll"] = learning.MergeAllLearner()
+    no_filter = prefiltering.NoFilter()
+    learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
     
     # test all combinations of learners and base learners (compute the testing
     # results with the defined measures) and save the results
@@ -601,4 +603,4 @@ if __name__ == "__main__":
     
     pool.visualize_results(list(base_learners.iterkeys()),
         list(learners.iterkeys()), list(measures.iterkeys()), results_path,
-        colors={"NoMerging": "blue", "MergeAll": "green"})
+        colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"})

@@ -220,7 +220,7 @@ def generalized_cross_validation(learner, data1, data2, folds, rand_seed1,
             second key corresponding to the name of the testing set,
             value corresponding to the average prediction error of the model
                 trained on the learning set and tested on instances from the
-                testing set  
+                testing set
     
     Arguments:
     learner -- Orange learner
