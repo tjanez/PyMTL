@@ -413,9 +413,9 @@ if __name__ == "__main__":
 #    p_value = compute_significance(errors1, errors2)
 #    print "p-value of of rejection of H_0: avg(errors1) >= avg(errors2): ", p_value
     
-#    # TEST flatten()
-#    l = [1, [2, 3, [4, 5, 6], 7], [8, 9]]
-#    fl = flatten(l)
-#    print "Original list: ", l
-#    print "Flattened list: ", fl
+    # TEST flatten()
+    l = [1, [2, 3, [4, 5, 6], 7], [8, 9]]
+    fl = flatten(l)
+    print "Original list: ", l
+    print "Flattened list: ", fl
     
