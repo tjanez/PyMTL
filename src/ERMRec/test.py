@@ -72,6 +72,10 @@ class User:
         self._data = data
         self._active_fold = None
     
+    def __str__(self):
+        """Return a "pretty" representation of the user by indicating its id."""
+        return self.id
+    
     def get_data_size(self):
         """Return the number of examples in the user's data table."""
         return len(self._data)
@@ -239,6 +243,13 @@ class UsersPool:
         # tested base learner
         self._test_res = OrderedDict()
     
+    def __str__(self):
+        """Return a "pretty" representation of the pool of users by indicating
+        their ids."""
+        
+        return "{} users: ".format(len(self._users)) + \
+            ",".join(sorted(self._users.iterkeys()))
+    
     def _find_bin_edge(self, n):
         """Find the appropriate bin edge for the given number of ratings.
         If the given value is smaller than the leftmost bin edge, an error is
@@ -326,7 +337,7 @@ class UsersPool:
             if m_errors > 0:
                 logging.info("Scoring measure {} could not be computed for {}" \
                     " out of {} users ({:.1f}%)".format(m_name, m_errors, n,
-                    1.*m_errors/n))
+                    100.*m_errors/n))
         return scores
     
     def test_users(self, learners, base_learners, measures):
