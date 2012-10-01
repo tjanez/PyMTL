@@ -28,7 +28,7 @@ import numpy, Orange
 from ERMRec.config import *
 from ERMRec import stat
 from ERMRec.learning import prefiltering, learning
-from ERMRec.plotting import BarPlotDesc, plot_multiple
+from ERMRec.plotting import BarPlotDesc, LinePlotDesc, plot_multiple
 
 def pickle_obj(obj, file_path):
     """Pickle the given object to the given file_path.
@@ -487,10 +487,10 @@ class UsersPool:
         return avgs, stds, ci95s
         
     def visualize_results(self, base_learners, learners, measures, path_prefix,
-                          colors):
+                          colors, plot_type="line"):
         """Visualize the results of the given learning algorithms with the given
-        base learning algorithms and the given scoring measures.
-        with the given scoring measures on the pool of users.
+        base learning algorithms and the given scoring measures on the pool of
+        users.
         Compute the averages, std. deviations and 95% conf. intervals on bins
         of users for all combinations of learners, base learners and scoring
         measures.
@@ -500,15 +500,18 @@ class UsersPool:
         The same big plots are drawn for averages and 95% conf. intervals.
         Save the drawn plots to the files with the given path prefix.
         
-        Keyword arguments:
-        base_learners -- list of strings representing the names of base
-            learners
+        Arguments:
+        base_learners -- list of strings representing the names of base learners
         learners -- list of strings representing the names of learners
         measures -- list of strings representing names of the scoring measures
-        results_path -- string representing the path where to save the generated
-            plots
+        path_prefix -- string representing the prefix of the path where to save
+            the generated plots
         colors -- dictionary mapping from learners' names to the colors that
             should represent them in the plots
+            
+        Keyword arguments:
+        plot_type -- string indicating the type of the plot to draw (currently,
+            only types "bar" and "line" are supported)
         
         """
         for m in measures:
@@ -521,12 +524,21 @@ class UsersPool:
                 plot_desc_ci95[bl] = []
                 for l in learners:
                     avgs, stds, ci95s = self._compute_bin_stats(bl, l, m)
-                    plot_desc_sd[bl].append(BarPlotDesc(self._bin_edges, avgs,
-                        self._bin_edges[1] - self._bin_edges[0], stds, l,
-                        color=colors[l], ecolor=colors[l]))
-                    plot_desc_ci95[bl].append(BarPlotDesc(self._bin_edges, avgs,
-                        self._bin_edges[1] - self._bin_edges[0], ci95s, l,
-                        color=colors[l], ecolor=colors[l]))
+                    if plot_type == "line":
+                        plot_desc_sd[bl].append(LinePlotDesc(self._bin_edges,
+                            avgs, stds, l, color=colors[l], ecolor=colors[l]))
+                        plot_desc_ci95[bl].append(LinePlotDesc(self._bin_edges,
+                            avgs, ci95s, l, color=colors[l], ecolor=colors[l]))
+                    elif plot_type == "bar":
+                        plot_desc_sd[bl].append(BarPlotDesc(self._bin_edges,
+                            avgs, self._bin_edges[1] - self._bin_edges[0], stds,
+                            l, color=colors[l], ecolor=colors[l]))
+                        plot_desc_ci95[bl].append(BarPlotDesc(self._bin_edges,
+                            avgs, self._bin_edges[1] - self._bin_edges[0],
+                            ci95s, l, color=colors[l], ecolor=colors[l]))
+                    else:
+                        raise ValueError("Unsupported plot type: '{}'".\
+                                         format(plot_type))
             plot_multiple(plot_desc_sd, results_path+"/{}-avg-SD.pdf".\
                     format(m), title="Avg. results for groups of users (error" \
                     " bars show std. dev.)", subplot_title_fmt="Learner: {}",
@@ -589,8 +601,8 @@ if __name__ == "__main__":
     measures["AUC"] = Orange.evaluation.scoring.AUC
     
     learners = OrderedDict()
-#    learners["NoMerging"] = learning.NoMergingLearner()
-#    learners["MergeAll"] = learning.MergeAllLearner()
+    learners["NoMerging"] = learning.NoMergingLearner()
+    learners["MergeAll"] = learning.MergeAllLearner()
     no_filter = prefiltering.NoFilter()
     learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
     
@@ -614,4 +626,5 @@ if __name__ == "__main__":
     
     pool.visualize_results(list(base_learners.iterkeys()),
         list(learners.iterkeys()), list(measures.iterkeys()), results_path,
-        colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"})
+        colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
+        plot_type="line")

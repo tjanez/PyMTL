@@ -53,13 +53,41 @@ class BarPlotDesc:
         self.color = color
         self.ecolor = ecolor
         self.label = label
+    
+        
+class LinePlotDesc:
+    
+    """A class containing a line plot description."""
+    
+    def __init__(self, x, y, yerr, label, color="blue", ecolor="red"):
+        """Initialize a LinePlotDesc object. Store the given parameters as
+        attributes.
+        
+        Arguments:
+        x -- list of line's x points
+        y -- list of line's y points
+        yerr -- list of values representing the heights of the +/- error bars
+        label -- string representing bar plot's label to be used in the legend
+        
+        Keyword arguments:
+        color -- string representing the color of the bars
+        ecolor -- string representing the color of error bars
+        
+        """
+        self.x = x
+        self.y = y
+        self.yerr = yerr
+        self.color = color
+        self.ecolor = ecolor
+        self.label = label
 
-def _bar_plot(axes, plot_descs, title="", xlabel="", ylabel=""):
-    """Draw the given bar plots on the given Axes object.
+def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel=""):
+    """Draw the given (bar or line) plots on the given Axes object.
     
     Arguments:
     axes -- matplotlib.axes.Axes object where to draw the plot
-    plot_descs -- list of BarPlotDesc objects, one for each learner
+    plot_descs -- list of BarPlotDesc or LinePlotDescobjects, one for each
+        learner
     
     Keyword arguments:
     title -- string representing plot's title
@@ -68,9 +96,15 @@ def _bar_plot(axes, plot_descs, title="", xlabel="", ylabel=""):
     
     """
     for pd in plot_descs:
-        axes.bar(pd.left_edges, pd.heights, width=pd.width, yerr=pd.yerr,
-                 color=pd.color, ecolor=pd.ecolor, label=pd.label,
-                 alpha=0.75)    
+        if isinstance(pd, BarPlotDesc):
+            axes.bar(pd.left_edges, pd.heights, width=pd.width, yerr=pd.yerr,
+                color=pd.color, ecolor=pd.ecolor, label=pd.label, alpha=0.75)
+        elif isinstance(pd, LinePlotDesc):
+            axes.errorbar(pd.x, pd.y, yerr=pd.yerr, color=pd.color,
+                ecolor=pd.ecolor, label=pd.label, alpha=0.75)
+        else:
+            raise ValueError("Unsupported plot type: '{}'".format(pd.__class__\
+                                                                  .__name__))
     axes.set_title(title, size="small")
     axes.set_xlabel(xlabel, size="small")
     axes.set_ylabel(ylabel, size="small")
@@ -90,7 +124,8 @@ def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
     Arguments:
     plot_descs_mult -- ordered dictionary with items of the form (name,
         plot_descs), where name is a string representing the base learner's name
-        and plot_descs is a list of BarPlotDesc objects, one for each learner
+        and plot_descs is a list of BarPlotDesc or LinePlotDesc objects, one for
+        each learner
     file_name -- string representing the path where to save the drawn figure
     
     Keyword arguments:
@@ -130,9 +165,9 @@ def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
     # convention.
     for i in range(1, nplots+1):
         axarr[i-1] = fig.add_subplot(nrows, ncols, i)
-    # draw bar plots to the subplots
+    # draw plots to the subplots
     for i, (bl, plot_descs) in enumerate(plot_descs_mult.iteritems()):
-        _bar_plot(axarr[i], plot_descs, title=subplot_title_fmt.format(bl),
+        _draw_subplot(axarr[i], plot_descs, title=subplot_title_fmt.format(bl),
                   xlabel=xlabel, ylabel=ylabel)
     # adjust figure parameters to make it look nicer
     fig.suptitle(title)
