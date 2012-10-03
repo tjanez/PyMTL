@@ -574,8 +574,11 @@ if __name__ == "__main__":
     pool = UsersPool(users_data_path, rnd_seed)
     
     base_learners = OrderedDict()
-#    base_learners["majority"] = Orange.classification.majority.MajorityLearner()
-    base_learners["bayes"] = Orange.classification.bayes.NaiveLearner()
+    from orange_learners import CustomMajorityLearner
+    # a custom Majority learner which circumvents a bug with the  return_type
+    # keyword argument
+    base_learners["majority"] = CustomMajorityLearner()
+#    base_learners["bayes"] = Orange.classification.bayes.NaiveLearner()
 #    #base_learners["c45"] = Orange.classification.tree.C45Learner()
 #    from orange_learners import CustomC45Learner
 #    # custom C4.5 learner which allows us to specify the minimal number of
@@ -611,12 +614,12 @@ if __name__ == "__main__":
     pool.test_users(learners, base_learners, measures)
     pool.pickle_test_results(pickle_path_fmt)
     
-#    # find previously computed testing results and check if they were computed
-#    # using the same data tables and cross-validation indices
-#    pool.find_pickled_test_results(pickle_path_fmt)
-#    if not pool.check_test_results_compatible():
-#        raise ValueError("Test results for different base learners are not " \
-#                         "compatible.")
+    # find previously computed testing results and check if they were computed
+    # using the same data tables and cross-validation indices
+    pool.find_pickled_test_results(pickle_path_fmt)
+    if not pool.check_test_results_compatible():
+        raise ValueError("Test results for different base learners are not " \
+                         "compatible.")
     # divide users into bins according to the number of ratings they have
     if test:
         bin_edges = [10, 15, 20]

@@ -20,7 +20,9 @@
 
 import math
 
+import Orange
 from Orange.classification.tree import C45Learner
+from Orange.classification.majority import MajorityLearner
 
 class CustomC45Learner(C45Learner):
     
@@ -59,6 +61,62 @@ class CustomC45Learner(C45Learner):
         self.base.minObjs = int(math.ceil(self.min_objs_prop * len(instances)))
         return super(CustomC45Learner, self).__call__(instances, *args,
                                                       **kwargs)
+
+class CustomMajorityLearner(MajorityLearner):
+    
+    """A version of the Orange's MajorityLearner that creates a
+    CustomDefaultClassifier instead of a DefaultClassifier in order to
+    circumvent a bug with the return_type keyword argument.
+    
+    """
+    
+    def __call__(self, *args, **kwargs):
+        """Pass all arguments and keyword arguments to the super class' __call__
+        method to create a new DefaultClassifier instance. Pass the created
+        DefaultClassifier instance to the CustomDefaultClassifier's __init__
+        method.
+        
+        """
+        default_classifier = super(CustomMajorityLearner, self).__call__(*args,
+                                                                    **kwargs)
+        return CustomDefaultClassifier(default_classifier)
+
+class CustomDefaultClassifier():
+    
+    """A custom DefaultClassifier that circumvents a bug with the return_type
+    keyword argument.
+    
+    """
+    
+    def __init__(self, default_classifier):
+        """Copy the given DefaultClassifier instance to an attribute.
+        
+        Arguments:
+        default_classifier -- a DefaultClassifier instance
+        
+        """
+        if not isinstance(default_classifier, Orange.core.DefaultClassifier):
+            raise ValueError("The default_classifier argument should be of " \
+                             "type 'DefaultClassifier'")
+        self.default_classifier = default_classifier
+    
+    def __call__(self, instance,
+                 result_type=Orange.classification.Classifier.GetValue,
+                 *args, **kwargs):
+        """Pass all arguments and keyword arguments to the internal
+        DefaultClassifier instance. Circumvent a bug in DefaultClassifier, which
+        doesn't accept the result_type as a keyword argument.
+        
+        Arguments:
+        instance -- an Orange.data.Instance instance
+        
+        Keyword arguments:
+        result_type -- Orange.classification.Classifier.GetValue or
+            Orange.classification.Classifier.GetProbabilities or
+            Orange.classification.Classifier.GetBoth
+        
+        """
+        return self.default_classifier(instance, result_type, *args, **kwargs)
 
 if __name__ == "__main__":
     import time, Orange
