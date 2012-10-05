@@ -18,9 +18,12 @@
 # Author(s): Tadej Janez <tadej.janez@fri.uni-lj.si>
 #
 
+import logging
+
 import Orange
 
-from ERMRec.config import *
+# create a child logger of the ERMRec logger
+logger = logging.getLogger("ERMRec.learning")
 
 class MergeAllLearner:
     
@@ -47,7 +50,7 @@ class MergeAllLearner:
                 merged_data = Orange.data.Table(user.get_learn_data())
             else:
                 merged_data.extend(user.get_learn_data())
-        logging.debug("Merged data has {} attributes and {} examples.".format(
+        logger.debug("Merged data has {} attributes and {} examples.".format(
             len(merged_data.domain.attributes), len(merged_data)))
         model = base_learner(merged_data)
         for user_id in users.iterkeys():

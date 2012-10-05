@@ -19,13 +19,37 @@
 # Author(s): Tadej Janez <tadej.janez@fri.uni-lj.si>
 #
 
-import bisect, os, random, re, time
+import bisect, logging, os, random, re, time
 import cPickle as pickle
 from collections import OrderedDict
 
 import numpy, Orange
 
-from ERMRec.config import *
+def configure_logging(level=logging.DEBUG, console_level=logging.DEBUG):
+    """Configure logging for the test module of ERMRec.
+    Return the created Logger instance.
+    
+    Keyword arguments:
+    level -- level of the created logger
+    console_level -- level of the console handler attached to the created logger 
+    
+    """
+    # set up logging
+    logger = logging.getLogger("ERMRec")
+    logger.setLevel(level)
+    # create console handler and set level to debug
+    ch = logging.StreamHandler()
+    ch.setLevel(console_level)
+    # create formatter
+    formatter = logging.Formatter('%(name)-15s %(levelname)-7s: %(message)s')
+    # add formatter to ch
+    ch.setFormatter(formatter)
+    # add ch to logger
+    logger.addHandler(ch)
+    return logger
+
+logger = configure_logging(level=logging.DEBUG)
+
 from ERMRec import stat
 from ERMRec.learning import prefiltering, learning
 from ERMRec.plotting import BarPlotDesc, LinePlotDesc, plot_multiple
@@ -160,15 +184,15 @@ def _compute_avg_scores(fold_scores):
     
     """
     avg_scores = dict()
-    for bl in fold_scores[0].iterkeys():
+    for bl in fold_scores[0]:
         avg_scores[bl] = dict()
-        for l in fold_scores[0][bl].iterkeys():
+        for l in fold_scores[0][bl]:
             avg_scores[bl][l] = dict()
-            for user_id in fold_scores[0][bl][l].iterkeys():
+            for user_id in fold_scores[0][bl][l]:
                 avg_scores[bl][l][user_id] = dict()
-                for m_name in fold_scores[0][bl][l][user_id].iterkeys():
+                for m_name in fold_scores[0][bl][l][user_id]:
                     u_scores = []
-                    for i in fold_scores.iterkeys():
+                    for i in fold_scores:
                         u_score = fold_scores[i][bl][l][user_id][m_name]
                         if u_score != None:
                             u_scores.append(u_score)
@@ -250,6 +274,31 @@ class UsersPool:
         return "{} users: ".format(len(self._users)) + \
             ",".join(sorted(self._users.iterkeys()))
     
+    def get_base_learners(self):
+        """Return a tuple with the names of the base learning algorithms that
+        have their results stored in the self._test_res TestingResults object.
+        
+        """
+        return tuple(self._test_res.iterkeys())
+    
+    def get_learners(self):
+        """Return a tuple with the names of the learning algorithms that have
+        have their results stored in the self._test_res TestingResults object.
+        
+        """
+        rnd_bl = self.get_base_learners()[0]
+        return tuple(self._test_res[rnd_bl].avg_scores.iterkeys())
+    
+    def get_measures(self):
+        """Return a tuple with the names of the scoring measures that have
+        their results stored in the self._test_res TestingResults object.
+        
+        """
+        rnd_bl = self.get_base_learners()[0]
+        rnd_l = self.get_learners()[0]
+        rnd_u = tuple(self._test_res[rnd_bl].avg_scores[rnd_l].iterkeys())[0]
+        return tuple(self._test_res[rnd_bl].avg_scores[rnd_l][rnd_u].iterkeys())
+    
     def _find_bin_edge(self, n):
         """Find the appropriate bin edge for the given number of ratings.
         If the given value is smaller than the leftmost bin edge, an error is
@@ -285,17 +334,17 @@ class UsersPool:
             # find the appropriate bin for the user
             bin_edge = self._find_bin_edge(user.get_data_size())
             self._bins[bin_edge].append(user_id)
-        logging.debug("Divided the users into {} bins".format(len(
+        logger.debug("Divided the users into {} bins".format(len(
                                                             self._bin_edges)))
-        logging.debug("Percent of users in each bin:")
+        logger.debug("Percent of users in each bin:")
         n_users = len(self._users)
         for i, bin_edge in enumerate(self._bin_edges[:-1]):
-            logging.debug("{: >3}  --  {: >3}: {:.1f}%".format(bin_edge,
+            logger.debug("{: >3}  --  {: >3}: {:.1f}%".format(bin_edge,
                 self._bin_edges[i+1], 100.*len(self._bins[bin_edge])/n_users))
             if len(self._bins[bin_edge]) < 2:
-                logging.warning("Bin '{: >3}--{: >3}' has less than 2 users".\
+                logger.warning("Bin '{: >3}--{: >3}' has less than 2 users".\
                     format(bin_edge, self._bin_edges[i+1]))
-        logging.debug("{: >3}  --  {: >3}: {:.1f}%".format(self._bin_edges[-1],
+        logger.debug("{: >3}  --  {: >3}: {:.1f}%".format(self._bin_edges[-1],
                 "inf", 100.*len(self._bins[self._bin_edges[-1]])/n_users))
     
     def _test_users(self, models, measures):
@@ -335,7 +384,7 @@ class UsersPool:
         n = len(self._users)
         for m_name, m_errors in comp_errors.iteritems():
             if m_errors > 0:
-                logging.info("Scoring measure {} could not be computed for {}" \
+                logger.info("Scoring measure {} could not be computed for {}" \
                     " out of {} users ({:.1f}%)".format(m_name, m_errors, n,
                     100.*m_errors/n))
         return scores
@@ -381,7 +430,7 @@ class UsersPool:
                     fold_scores[i][bl][l] = self._test_users(user_models,
                                                              measures)
                     end = time.clock()
-                    logging.debug("Finished fold: {}, base learner: {}, " \
+                    logger.debug("Finished fold: {}, base learner: {}, " \
                         "learner: {} in {:.2f}s".format(i, bl, l, end-start))
         # compute the average measure scores over all folds
         avg_scores = _compute_avg_scores(fold_scores)
@@ -391,7 +440,7 @@ class UsersPool:
             user_hashes[user_id] = user.get_hash()
         # store the average scores of each base learner in a separate
         # TestingResults object
-        for bl in avg_scores.iterkeys():
+        for bl in avg_scores:
             self._test_res[bl] = TestingResults(bl, user_hashes, avg_scores[bl])
     
     def pickle_test_results(self, pickle_path_fmt):
@@ -406,7 +455,7 @@ class UsersPool:
         for bl, tr in self._test_res.iteritems():
             pickle_path = pickle_path_fmt.format(bl)
             pickle_obj(tr, pickle_path)
-            logging.debug("Successfully pickled the results of base learner: " \
+            logger.debug("Successfully pickled the results of base learner: " \
                           "{} to file: {}".format(bl, pickle_path))
             
     def find_pickled_test_results(self, pickle_path_fmt):
@@ -436,25 +485,48 @@ class UsersPool:
                         raise TypeError("Object loaded from file: {} is not " \
                             "of type TestingResults.".format(file_path))
                     self._test_res[bl] = tr
-                    logging.debug("Successfully unpickled the results of base" \
+                    logger.debug("Successfully unpickled the results of base" \
                         " learner: {} from file: {}".format(bl, file_path))
                 else:
-                    logging.info("Results of base learner: {} are already " \
+                    logger.info("Results of base learner: {} are already " \
                         "loaded".format(bl))
         
     def check_test_results_compatible(self):
         """Check if all TestingResults objects in the self._test_res dictionary
         had the same users, users' data tables and cross-validation indices.
+        In addition check if all TestingResults objects had the same learning
+        algorithms and scoring measures.
         
         """
-        bls = tuple(self._test_res.iterkeys())
+        bls = self.get_base_learners()
         if len(bls) <= 1:
             return True
         # select the first base learner as the reference base learner
         ref = bls[0]
-        for user_id, hash in self._test_res[ref].user_hashes.iteritems():
-            for bl in bls[1:]:
-                if self._test_res[bl].user_hashes[user_id] != hash:
+        test_res_ref = self._test_res[ref]
+        for bl in bls[1:]:
+            test_res_bl = self._test_res[bl]
+            # check if users' ids and hashes match for all base learning
+            # algorithms
+            if len(test_res_bl.user_hashes) != len(test_res_ref.user_hashes):
+                return False
+            for id, h in test_res_ref.user_hashes.iteritems():
+                if test_res_bl.user_hashes[id] != h:
+                    return False
+            # check if learning algorithms match for all base learning
+            # algorithms
+            if len(test_res_bl.avg_scores) != len(test_res_ref.avg_scores):
+                return False
+            for l in test_res_ref.avg_scores:
+                if l not in test_res_bl.avg_scores:
+                    return False
+            # check if scoring measures match for all combinations of base
+            # learning algorithms and learning algorithms
+            for l in test_res_ref.avg_scores:
+                rnd_id = tuple(test_res_ref.avg_scores[l].iterkeys())[0]
+                set_ref = set(test_res_ref.avg_scores[l][rnd_id].iterkeys())
+                set_bl = set(test_res_bl.avg_scores[l][rnd_id].iterkeys())
+                if set_ref != set_bl:
                     return False
         return True
     
@@ -627,7 +699,11 @@ if __name__ == "__main__":
         bin_edges = range(10, 251, 10)
     pool.divide_users_to_bins(bin_edges)
     
-    pool.visualize_results(list(base_learners.iterkeys()),
-        list(learners.iterkeys()), list(measures.iterkeys()), results_path,
+    # select the base learners, learners and scoring measures for which to 
+    # visualize the testing results
+    bls = pool.get_base_learners()
+    ls = pool.get_learners()
+    ms = pool.get_measures()
+    pool.visualize_results(bls, ls, ms, results_path,
         colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
         plot_type="line")
