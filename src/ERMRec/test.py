@@ -41,7 +41,8 @@ def configure_logging(level=logging.DEBUG, console_level=logging.DEBUG):
     ch = logging.StreamHandler()
     ch.setLevel(console_level)
     # create formatter
-    formatter = logging.Formatter('%(name)-15s %(levelname)-7s: %(message)s')
+    formatter = logging.Formatter(fmt="[%(asctime)s] %(name)-15s " \
+                    "%(levelname)-7s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
     # add formatter to ch
     ch.setFormatter(formatter)
     # add ch to logger
@@ -629,8 +630,8 @@ if __name__ == "__main__":
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     path_prefix = os.path.abspath(os.path.join(cur_dir, "../../"))
     if test:
-        users_data_path = os.path.join(path_prefix, "data/users-test")
-        results_path = os.path.join(path_prefix, "results/users-test")
+        users_data_path = os.path.join(path_prefix, "data/users-test2")
+        results_path = os.path.join(path_prefix, "results/users-test2")
         if not os.path.exists(results_path):
             os.makedirs(results_path)
         pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
@@ -684,26 +685,26 @@ if __name__ == "__main__":
     # test all combinations of learners and base learners (compute the testing
     # results with the defined measures) and save the results
     pool.test_users(learners, base_learners, measures)
-    pool.pickle_test_results(pickle_path_fmt)
+#    pool.pickle_test_results(pickle_path_fmt)
     
-    # find previously computed testing results and check if they were computed
-    # using the same data tables and cross-validation indices
-    pool.find_pickled_test_results(pickle_path_fmt)
-    if not pool.check_test_results_compatible():
-        raise ValueError("Test results for different base learners are not " \
-                         "compatible.")
-    # divide users into bins according to the number of ratings they have
-    if test:
-        bin_edges = [10, 15, 20]
-    else:
-        bin_edges = range(10, 251, 10)
-    pool.divide_users_to_bins(bin_edges)
-    
-    # select the base learners, learners and scoring measures for which to 
-    # visualize the testing results
-    bls = pool.get_base_learners()
-    ls = pool.get_learners()
-    ms = pool.get_measures()
-    pool.visualize_results(bls, ls, ms, results_path,
-        colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
-        plot_type="line")
+#    # find previously computed testing results and check if they were computed
+#    # using the same data tables and cross-validation indices
+#    pool.find_pickled_test_results(pickle_path_fmt)
+#    if not pool.check_test_results_compatible():
+#        raise ValueError("Test results for different base learners are not " \
+#                         "compatible.")
+#    # divide users into bins according to the number of ratings they have
+#    if test:
+#        bin_edges = [10, 15, 20]
+#    else:
+#        bin_edges = range(10, 251, 10)
+#    pool.divide_users_to_bins(bin_edges)
+#    
+#    # select the base learners, learners and scoring measures for which to 
+#    # visualize the testing results
+#    bls = pool.get_base_learners()
+#    ls = pool.get_learners()
+#    ms = pool.get_measures()
+#    pool.visualize_results(bls, ls, ms, results_path,
+#        colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
+#        plot_type="line")
