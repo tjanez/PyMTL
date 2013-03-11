@@ -3,7 +3,7 @@
 # Contains classes and methods for testing and comparing various machine
 # learning algorithms on different sets of users and their ratings.
 #
-# Copyright (C) 2012 Tadej Janez
+# Copyright (C) 2012, 2013 Tadej Janez
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,11 +19,15 @@
 # Author(s): Tadej Janez <tadej.janez@fri.uni-lj.si>
 #
 
-import bisect, logging, os, random, re, time
+import bisect, hashlib, logging, os, random, re, time
 import cPickle as pickle
 from collections import OrderedDict
 
-import numpy, Orange
+import numpy as np
+from sklearn import metrics
+from sklearn import cross_validation
+
+from data import load_ratings_dataset
 
 def configure_logging(level=logging.DEBUG, console_level=logging.DEBUG):
     """Configure logging for the test module of ERMRec.
@@ -41,7 +45,7 @@ def configure_logging(level=logging.DEBUG, console_level=logging.DEBUG):
     ch = logging.StreamHandler()
     ch.setLevel(console_level)
     # create formatter
-    formatter = logging.Formatter(fmt="[%(asctime)s] %(name)-15s " \
+    formatter = logging.Formatter(fmt="[%(asctime)s] %(name)-15s "
                     "%(levelname)-7s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
     # add formatter to ch
     ch.setFormatter(formatter)
@@ -85,12 +89,12 @@ class User:
     
     """
     def __init__(self, id, data):
-        """Initialize a User object. Store the user's id and its data table to
-        private attributes.
+        """Initialize a User object. Store the user's id and its data to private
+        attributes.
         
         Arguments:
         id -- string representing user's id
-        data -- Orange data table corresponding to the user
+        data -- sklearn.datasets.Bunch object holding user's data
         
         """
         self.id = id
@@ -102,12 +106,12 @@ class User:
         return self.id
     
     def get_data_size(self):
-        """Return the number of examples in the user's data table."""
-        return len(self._data)
+        """Return the number of examples in the user's data object"""
+        return self._data.data.shape[0]
     
     def divide_data_into_folds(self, k, rand_seed):
         """Divide the user's data into the given number of folds.
-        Store the random indices in the self._cv_indices variable.
+        Store the random indices in the self._cv_folds variable.
         
         Keyword arguments:
         k -- integer representing the number of folds
@@ -117,9 +121,8 @@ class User:
         """
         self._k = k
         self._active_fold = None
-        self._cv_indices = Orange.core.MakeRandomIndicesCV(self._data, k,
-                stratified=Orange.core.MakeRandomIndices.StratifiedIfPossible,
-                randseed=rand_seed)
+        self._cv_folds = list(cross_validation.KFold(self.get_data_size(), k,
+            indices=False, shuffle=True, random_state=rand_seed))
     
     def set_active_fold(self, i):
         """Set the active fold to fold i.
@@ -133,37 +136,47 @@ class User:
         if not 0 <= i < self._k:
             raise ValueError("Fold {} doesn't exist!".format(i))
         self._active_fold = i
-        self._learn = self._data.select_ref(self._cv_indices, i, negate=True)
-        self._test = self._data.select_ref(self._cv_indices, i)
-    
+        learn_ind, test_ind = self._cv_folds[i]
+        self._learn = self._data.data[learn_ind], self._data.target[learn_ind]
+        self._test = self._data.data[test_ind], self._data.target[test_ind]
+
     def get_learn_data(self):
-        """Return the currently active learn data. """
+        """Return the currently active learn data as a tuple of instances and
+        their target values.
+        
+        """
         if self._active_fold == None:
             raise ValueError("There is no active fold!")
         return self._learn
     
     def get_test_data(self):
-        """Return the currently active test data. """
+        """Return the currently active test data as a tuple of instances and
+        their target values.
+        
+        """
         if self._active_fold == None:
             raise ValueError("There is no active fold!")
         return self._test
     
     def get_hash(self):
-        """Return a hash value based on user's id, data table and
+        """Return a SHA1 hex digest based on user's id, data and
         cross-validation random indices. 
         
+        NOTE: The hash built-in is not used since it doesn't work on mutable
+        object types such as NumPy arrays.
+        
         """
-        h1 = hash(self.id)
-        # Note: Using "hash(self._data)" does not work as Orange gives different
-        # hash values to data tables, even if they are loaded from the same
-        # file;
-        # A work-around is to use hash values of individual examples and merge
-        # them together with left bit-shifts and xor
-        h2 = 0
-        for ex in self._data:
-            h2 = ((h2 << 1) & 0xffffffff) ^ hash(ex)
-        h3 = hash(tuple(self._cv_indices))
-        return h1 ^ h2 ^ h3
+        h = hashlib.sha1()
+        h.update(self.id)
+        # self._data is a Bunch object and can't be put into h.update() since it
+        # isn't convertible to a buffer
+        h.update(self._data.data)
+        h.update(self._data.target)
+        # self._cv_folds is a list and can't be put into h.update()
+        for fold_learn, fold_test in self._cv_folds:
+            h.update(fold_learn)
+            h.update(fold_test)
+        return h.hexdigest()
 
 def _compute_avg_scores(fold_scores):
     """Compute the average scores of the given fold scores.
@@ -175,7 +188,7 @@ def _compute_avg_scores(fold_scores):
         value corresponding to the average value of the scoring measure.
     
     Keyword arguments:
-    fold_scores -- a five-dimensional dictionary with:
+    fold_scores -- five-dimensional dictionary with:
         first key corresponding to the fold number,
         second key corresponding to the base learner's name,
         third key corresponding to the learner's name,
@@ -200,8 +213,8 @@ def _compute_avg_scores(fold_scores):
                     # the number of scores for each user is not always the
                     # same since it could happen that in some folds a
                     # scoring measures could not be computed
-                    avg_scores[bl][l][user_id][m_name] = sum(u_scores) / \
-                                                            len(u_scores)
+                    avg_scores[bl][l][user_id][m_name] = (sum(u_scores) /
+                                                            len(u_scores))
     return avg_scores
 
 class TestingResults:
@@ -254,14 +267,14 @@ class UsersPool:
         
         """
         self._users = dict()
-        for file in os.listdir(users_data_path):
-            match = re.search(r"^user(\d+)\.tab$", file)
+        for file_ in os.listdir(users_data_path):
+            match = re.search(r"^user(\d+)\.tab$", file_)
             if match:
                 # get the first parenthesized subgroup of the match
                 user_id = match.group(1)
-                data_table = Orange.data.Table(os.path.join(users_data_path,
-                                                            file))
-                user = User(user_id, data_table)
+                data = load_ratings_dataset(os.path.join(users_data_path,
+                                                         file_))
+                user = User(user_id, data)
                 self._users[user_id] = user
         self._random = random.Random(seed)
         # dictionary that will hold the TestingResults objects, one for each
@@ -270,7 +283,9 @@ class UsersPool:
     
     def __str__(self):
         """Return a "pretty" representation of the pool of users by indicating
-        their ids."""
+        their ids.
+        
+        """
         
         return "{} users: ".format(len(self._users)) + \
             ",".join(sorted(self._users.iterkeys()))
@@ -360,32 +375,43 @@ class UsersPool:
         
         Keyword arguments:
         models -- dictionary mapping from users' ids to their models
-        measures -- ordered dictionary with items of the form (name,
-            measure), where name is a string representing the measure's name and
-            measure is an Orange scoring measure (e.g. "CA", AUC", ...)
+        measures -- list of strings representing measure's names (currently,
+            only CA and AUC are supported)
         
         """
         scores = dict()
-        comp_errors = {m_name : 0 for m_name in measures.iterkeys()}
+        comp_errors = {measure : 0 for measure in measures}
         for user_id, user in self._users.iteritems():
-            results = Orange.evaluation.testing.test_on_data([models[user_id]],
-                                user.get_test_data())
+            X_test, y_test = user.get_test_data()
+            y_pred = models[user_id].predict(X_test)
+            y_pred_proba = models[user_id].predict_proba(X_test)
             scores[user_id] = dict()
-            for m_name, m_func in measures.iteritems():
-                m_scores = m_func(results)
-                if m_scores == False:
-                    # m_func returned False; probably AUC cannot be computed
-                    # because all instances belong to the same class
-                    m_score = None
-                    comp_errors[m_name] += 1
+            for measure in measures:
+                if measure == "AUC":
+                    try:
+                        # the auc_score function only needs probability
+                        # estimates of the positive class
+                        score = metrics.auc_score(y_test, y_pred_proba[:, 1])
+                    except ValueError as e:
+                        if (e.args[0] == 
+                            "AUC is defined for binary classification only"):
+                            # AUC cannot be computed because all instances
+                            # belong to the same class
+                            score = None
+                            comp_errors[measure] += 1
+                        else:
+                            raise e
+                elif measure == "CA":
+                    score = metrics.accuracy_score(y_test, y_pred)
                 else:
-                    m_score = m_scores[0]
-                scores[user_id][m_name] = m_score
+                    raise ValueError("Unknown scoring measure: {}".\
+                                     format(measure))
+                scores[user_id][measure] = score
         # report the number of errors when computing the scoring measures
         n = len(self._users)
         for m_name, m_errors in comp_errors.iteritems():
             if m_errors > 0:
-                logger.info("Scoring measure {} could not be computed for {}" \
+                logger.info("Scoring measure {} could not be computed for {}"
                     " out of {} users ({:.1f}%)".format(m_name, m_errors, n,
                     100.*m_errors/n))
         return scores
@@ -409,9 +435,8 @@ class UsersPool:
         base learners -- ordered dictionary with items of the form (name,
             learner), where name is a string representing the base learner's
             name and learner is an Orange learner
-        measures -- ordered dictionary with items of the form (name, measure),
-            where name is a string representing the measure's name and measure
-            is an Orange scoring measure (e.g. CA, AUC, ...)
+        measures -- list of strings representing measure's names (currently,
+            only CA and AUC are supported)
         
         """
         # divide users' data into folds
@@ -431,7 +456,7 @@ class UsersPool:
                     fold_scores[i][bl][l] = self._test_users(user_models,
                                                              measures)
                     end = time.clock()
-                    logger.debug("Finished fold: {}, base learner: {}, " \
+                    logger.debug("Finished fold: {}, base learner: {}, "
                         "learner: {} in {:.2f}s".format(i, bl, l, end-start))
         # compute the average measure scores over all folds
         avg_scores = _compute_avg_scores(fold_scores)
@@ -456,8 +481,8 @@ class UsersPool:
         for bl, tr in self._test_res.iteritems():
             pickle_path = pickle_path_fmt.format(bl)
             pickle_obj(tr, pickle_path)
-            logger.debug("Successfully pickled the results of base learner: " \
-                          "{} to file: {}".format(bl, pickle_path))
+            logger.debug("Successfully pickled the results of base learner: {}"
+                         " to file: {}".format(bl, pickle_path))
             
     def find_pickled_test_results(self, pickle_path_fmt):
         """Find previously pickled TestingResults objects in the given location,
@@ -472,24 +497,24 @@ class UsersPool:
         # check if pickle_path_fmt has the right format
         match = re.search(r"^(.*){}(.*)$", file_name)
         if not match:
-            raise ValueError("The given pickle_path_fmt does not have an " \
+            raise ValueError("The given pickle_path_fmt does not have an "
                 "appropriate format.")
         re_template = r"^{}(.+){}$".format(match.group(1), match.group(2)) 
-        for file in sorted(os.listdir(dir_name)):
-            match = re.search(re_template, file)
+        for file_ in sorted(os.listdir(dir_name)):
+            match = re.search(re_template, file_)
             if match:
                 bl = match.group(1)
                 if bl not in self._test_res:
-                    file_path = os.path.join(dir_name, file)
+                    file_path = os.path.join(dir_name, file_)
                     tr = unpickle_obj(file_path)
                     if not isinstance(tr, TestingResults):
-                        raise TypeError("Object loaded from file: {} is not " \
+                        raise TypeError("Object loaded from file: {} is not "
                             "of type TestingResults.".format(file_path))
                     self._test_res[bl] = tr
-                    logger.debug("Successfully unpickled the results of base" \
+                    logger.debug("Successfully unpickled the results of base"
                         " learner: {} from file: {}".format(bl, file_path))
                 else:
-                    logger.info("Results of base learner: {} are already " \
+                    logger.info("Results of base learner: {} are already "
                         "loaded".format(bl))
         
     def check_test_results_compatible(self):
@@ -552,7 +577,7 @@ class UsersPool:
             # get the scores of users in the current bin for the given base
             # learner, learner and scoring measure
             bl_avg_scores = self._test_res[base_learner].avg_scores
-            scores = numpy.array([bl_avg_scores[learner][id][measure] for id
+            scores = np.array([bl_avg_scores[learner][id][measure] for id
                                   in bin])
             avgs.append(stat.mean(scores))
             stds.append(stat.unbiased_std(scores))
@@ -613,11 +638,11 @@ class UsersPool:
                         raise ValueError("Unsupported plot type: '{}'".\
                                          format(plot_type))
             plot_multiple(plot_desc_sd, results_path+"/{}-avg-SD.pdf".\
-                    format(m), title="Avg. results for groups of users (error" \
+                    format(m), title="Avg. results for groups of users (error"
                     " bars show std. dev.)", subplot_title_fmt="Learner: {}",
                     xlabel="Number of ratings", ylabel=m)
             plot_multiple(plot_desc_ci95, results_path+"/{}-avg-CI.pdf".\
-                    format(m), title="Avg. results for groups of users (error" \
+                    format(m), title="Avg. results for groups of users (error"
                     " bars show 95% conf. intervals)", subplot_title_fmt=\
                     "Learner: {}", xlabel="Number of ratings", ylabel=m)
 
@@ -645,12 +670,19 @@ if __name__ == "__main__":
     # create a pool of users
     rnd_seed = 51
     pool = UsersPool(users_data_path, rnd_seed)
-    
+    # select base learners
     base_learners = OrderedDict()
-    from orange_learners import CustomMajorityLearner
-    # a custom Majority learner which circumvents a bug with the  return_type
-    # keyword argument
-    base_learners["majority"] = CustomMajorityLearner()
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.pipeline import Pipeline
+    from sklearn_utils import MeanImputer
+    clf = Pipeline([("imputer", MeanImputer()),
+                    ("log_reg", LogisticRegression())])
+    base_learners["log_reg"] = clf
+    #TODO: Replace or remove these Orange-based base learners
+#    from orange_learners import CustomMajorityLearner
+#    # a custom Majority learner which circumvents a bug with the  return_type
+#    # keyword argument
+#    base_learners["majority"] = CustomMajorityLearner()
 #    base_learners["bayes"] = Orange.classification.bayes.NaiveLearner()
 #    #base_learners["c45"] = Orange.classification.tree.C45Learner()
 #    from orange_learners import CustomC45Learner
@@ -672,21 +704,21 @@ if __name__ == "__main__":
 #    base_learners["svm_RBF"] = svm.SVMLearner(svm_type=svm.SVMLearner.C_SVC,
 #        kernel_type=svm.SVMLearner.RBF, C=100.0, gamma=0.01, cache_size=500)
     
-    measures = OrderedDict()
-    measures["CA"] = Orange.evaluation.scoring.CA
-    measures["AUC"] = Orange.evaluation.scoring.AUC
+    measures = []
+    measures.append("CA")
+    measures.append("AUC")
     
     learners = OrderedDict()
-    learners["NoMerging"] = learning.NoMergingLearner()
+#    learners["NoMerging"] = learning.NoMergingLearner()
     learners["MergeAll"] = learning.MergeAllLearner()
-    no_filter = prefiltering.NoFilter()
-    learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
+#    no_filter = prefiltering.NoFilter()
+#    learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
     
     # test all combinations of learners and base learners (compute the testing
     # results with the defined measures) and save the results
     pool.test_users(learners, base_learners, measures)
 #    pool.pickle_test_results(pickle_path_fmt)
-    
+#    
 #    # find previously computed testing results and check if they were computed
 #    # using the same data tables and cross-validation indices
 #    pool.find_pickled_test_results(pickle_path_fmt)

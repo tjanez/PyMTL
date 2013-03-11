@@ -2,7 +2,7 @@
 # learning.py
 # Contains classes and methods implementing the merging learning methods.
 #
-# Copyright (C) 2012 Tadej Janez
+# Copyright (C) 2012, 2013 Tadej Janez
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,10 +20,12 @@
 
 import logging
 
-import Orange
+import numpy as np
+
+from sklearn.base import clone
 
 # create a child logger of the ERMRec logger
-logger = logging.getLogger("ERMRec.learning")
+logger = logging.getLogger("ERMRec.learning.learning")
 
 class MergeAllLearner:
     
@@ -34,27 +36,29 @@ class MergeAllLearner:
     
     def __call__(self, users, base_learner):
         """Run the merging algorithm for the given users. Learn a single model
-        on the merger of all users' data tables using the given base learner.
+        on the merger of all users' data using the given base learner.
         Return a dictionary mapping from users' ids to the learned models (in
         this case, all users' ids will map to the same model).
         
         Arguments:
-        users -- a dictionary mapping from users' ids to their User objects
-        base_learner -- an Orange learner
+        users -- dictionary mapping from users' ids to their User objects
+        base_learner -- scikit-learn estimator
         
         """
-        merged_data = None
+        # merge learning data of all users
+        Xs_ys = [u.get_learn_data() for u in users.itervalues()]
+        Xs, ys = zip(*Xs_ys)
+        merged_data = np.concatenate(Xs, axis=0), np.concatenate(ys, axis=0)
+        logger.debug("Merged data has {0[1]} attributes and {0[0]} examples.".\
+                     format(merged_data[0].shape))
+        # NOTE: The scikit-learn estimator must be cloned to prevent different
+        # users from having the same classifiers
+        base_learner = clone(base_learner)
+        base_learner.fit(*merged_data)
+        # assign the fitted classifier to all users
         user_models = dict()
-        for user_id, user in users.iteritems():
-            if merged_data == None:
-                merged_data = Orange.data.Table(user.get_learn_data())
-            else:
-                merged_data.extend(user.get_learn_data())
-        logger.debug("Merged data has {} attributes and {} examples.".format(
-            len(merged_data.domain.attributes), len(merged_data)))
-        model = base_learner(merged_data)
-        for user_id in users.iterkeys():
-            user_models[user_id] = model
+        for user_id in users:
+            user_models[user_id] = base_learner
         return user_models
 
 class NoMergingLearner:
@@ -70,13 +74,16 @@ class NoMergingLearner:
         Return a dictionary mapping from users' ids to the learned models.
         
         Arguments:
-        users -- a dictionary mapping from users' ids to their User objects
-        base_learner -- an Orange learner
+        users -- dictionary mapping from users' ids to their User objects
+        base_learner -- scikit-learn estimator
         
         """
         user_models = dict()
         for user_id, user in users.iteritems():
-            user_models[user_id] = base_learner(user.get_learn_data())
+            # NOTE: The scikit-learn estimator must be cloned so that each user
+            # gets its own classifier
+            base_learner = clone(base_learner)
+            user_models[user_id] = base_learner.fit(*user.get_learn_data())
         return user_models
 
 import random
@@ -152,7 +159,7 @@ def flatten(l):
     iterables (e.g. list of lists).
     
     Arguments:
-    l -- an (arbitrarily) nested iterable of iterables
+    l -- (arbitrarily) nested iterable of iterables
     
     """
     flat_l = []
@@ -182,22 +189,19 @@ class MergedUser:
         if len(users) == 1:
             u = users[0]
             self.id = u.id
-            # Note: the created data table only contains references to instances
-            self._learn = Orange.data.Table(u.get_learn_data(), True)
+            # create a copy of both numpy.arrays
+            X, y = u.get_learn_data()
+            self._learn = X.copy(), y.copy()
         else:
             # id is a hierarchically structured tuple of tuples representing the
             # history of the merged user (e.g. id "(5, (38, 40))" represents
             # the merged user that initially contained the merger of users
             # 38 and 40, which was later merged with user 5)
             self.id = tuple([u.id for u in users])
-            # merge the learning sets of all objects
-            # Note: we are not able to create a table with just references to
-            # instances, since calling extend() method returns a TypeError:
-            # "tables containing references to examples can only extend by
-            # examples from the same table"
-            self._learn = Orange.data.Table(users[0].get_learn_data())
-            for u in users[1:]:
-                self._learn.extend(u.get_learn_data())
+            # merge learning data of all users
+            Xs_ys = [u.get_learn_data() for u in users]
+            Xs, ys = zip(*Xs_ys)
+            self._learn = np.concatenate(Xs, axis=0), np.concatenate(ys, axis=0)
     
     def __str__(self):
         """Return a "pretty" representation of the merged user by indicating
@@ -207,8 +211,12 @@ class MergedUser:
         return _convert_id_to_string(self.id)
     
     def get_learn_data(self):
-        """Return the learning data of the user. """
+        """Return the learning data of the user."""
         return self._learn
+    
+    def get_data_size(self):
+        """Return the number of instances in user's learning data."""
+        return len(self._learn[1])
                 
     def get_original_ids(self):
         """Extract original ids of users merged into this user.
@@ -282,9 +290,9 @@ class ERMLearner:
             cross-validation to estimate errors and significances of merging two
             users (in the call of the _estimate_errors_significances() function)
         seed -- integer to be used as a seed for the private Random object
-        prefilter -- a pre-filter object which can be called with a pair of 
-            users and returns a boolean value indicating whether or not the
-            given pair of users passes the filtering criteria
+        prefilter -- pre-filter object which can be called with a pair of users
+            and returns a boolean value indicating whether or not the given pair
+            of users passes the filtering criteria
         
         """
         self._folds = folds
@@ -298,8 +306,8 @@ class ERMLearner:
         user and assign this model to each original user of this (merged) user.
         
         Arguments:
-        users -- a dictionary mapping from users' ids to their User objects
-        base_learner -- an Orange learner
+        users -- dictionary mapping from users' ids to their User objects
+        base_learner -- scikit-learn estimator
         
         """
         self._base_learner = base_learner
@@ -318,8 +326,8 @@ class ERMLearner:
                 er_ij = error_reduction(avg_pred_errs["data1"]["data1"],
                                         avg_pred_errs["data2"]["data2"],
                                         avg_pred_errs["dataM"]["dataM"],
-                                        len(self._users[u_i].get_learn_data()),
-                                        len(self._users[u_j].get_learn_data()))
+                                        self._users[u_i].get_data_size(),
+                                        self._users[u_j].get_data_size())
                 min_ij = min(avg_pred_errs["data1"]["dataM"],
                              avg_pred_errs["data2"]["dataM"])
                 if  er_ij >= 0 and avg_pred_errs["dataM"]["dataM"] <= min_ij:
@@ -340,8 +348,8 @@ class ERMLearner:
             self._users[u_M] = u_M_obj
             # remove object pairs that don't exist anymore from C
             for (u_i, u_j) in C.keys():
-                if (u_i == min_u_i) or (u_i == min_u_j) or \
-                    (u_j == min_u_i) or (u_j == min_u_j):
+                if ((u_i == min_u_i) or (u_i == min_u_j) or
+                    (u_j == min_u_i) or (u_j == min_u_j)):
                     del C[(u_i, u_j)]
             # find new user pairs that are candidates for merging
             for u_i in self._users:
@@ -349,10 +357,10 @@ class ERMLearner:
                     avg_pred_errs, p_values_iM = \
                         self._estimate_errors_significances(u_i, u_M)
                     er_iM = error_reduction(avg_pred_errs["data1"]["data1"],
-                                        avg_pred_errs["data2"]["data2"],
-                                        avg_pred_errs["dataM"]["dataM"],
-                                        len(self._users[u_i].get_learn_data()),
-                                        len(self._users[u_M].get_learn_data()))
+                                            avg_pred_errs["data2"]["data2"],
+                                            avg_pred_errs["dataM"]["dataM"],
+                                            self._users[u_i].get_data_size(),
+                                            self._users[u_M].get_data_size())
                     min_iM = min(avg_pred_errs["data1"]["dataM"],
                                  avg_pred_errs["data2"]["dataM"])
                     if er_iM >= 0 and avg_pred_errs["dataM"]["dataM"] <= min_iM:
@@ -361,10 +369,13 @@ class ERMLearner:
         # build a model for each remaining (merged) user
         user_models = dict()
         for merg_u_obj in self._users.itervalues():
-            model = self._base_learner(merg_u_obj.get_learn_data())
+            # NOTE: The scikit-learn estimator must be cloned so that each
+            # (merged) user gets its own classifier
+            base_learner = clone(self._base_learner)
+            base_learner.fit(*merg_u_obj.get_learn_data())
             # assign this model to each original user of this (merged) user
             for user_id in merg_u_obj.get_original_ids():
-                user_models[user_id] = model
+                user_models[user_id] = base_learner
         return user_models
     
     def _estimate_errors_significances(self, u_1, u_2):
@@ -408,9 +419,8 @@ class ERMLearner:
 
 if __name__ == "__main__":
 #    # TEST compute_significance()
-#    import numpy
-#    errors1 = [numpy.random.normal(0.6, 0.2) for i in range(10)]
-#    errors2 = [numpy.random.normal(0.8, 0.2) for i in range(10)]
+#    errors1 = [np.random.normal(0.6, 0.2) for i in range(10)]
+#    errors2 = [np.random.normal(0.8, 0.2) for i in range(10)]
 #    print "errors1: ", errors1
 #    print "errors2: ", errors2
 #    p_value = compute_significance(errors1, errors2)
