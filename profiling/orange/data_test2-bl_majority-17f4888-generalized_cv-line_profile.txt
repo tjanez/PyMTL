@@ -1,0 +1,91 @@
+[tadej@tlinux64 ERMRec]$ kernprof.py -l -v src/ERMRec/test.py
+[2013-03-12 12:38:49] ERMRec          DEBUG  : Finished fold: 0, base learner: majority, learner: NoMerging in 0.04s
+[2013-03-12 12:38:49] ERMRec.learning DEBUG  : Merged data has 154 attributes and 5291 examples.
+[2013-03-12 12:38:49] ERMRec          DEBUG  : Finished fold: 0, base learner: majority, learner: MergeAll in 0.08s
+[2013-03-12 12:39:06] ERMRec          DEBUG  : Finished fold: 0, base learner: majority, learner: ERM in 16.44s
+[2013-03-12 12:39:06] ERMRec          DEBUG  : Finished fold: 1, base learner: majority, learner: NoMerging in 0.05s
+[2013-03-12 12:39:06] ERMRec.learning DEBUG  : Merged data has 154 attributes and 5294 examples.
+[2013-03-12 12:39:06] ERMRec          DEBUG  : Finished fold: 1, base learner: majority, learner: MergeAll in 0.07s
+[2013-03-12 12:39:23] ERMRec          DEBUG  : Finished fold: 1, base learner: majority, learner: ERM in 16.48s
+[2013-03-12 12:39:23] ERMRec          DEBUG  : Finished fold: 2, base learner: majority, learner: NoMerging in 0.05s
+[2013-03-12 12:39:23] ERMRec.learning DEBUG  : Merged data has 154 attributes and 5298 examples.
+[2013-03-12 12:39:23] ERMRec          DEBUG  : Finished fold: 2, base learner: majority, learner: MergeAll in 0.08s
+[2013-03-12 12:39:39] ERMRec          DEBUG  : Finished fold: 2, base learner: majority, learner: ERM in 16.52s
+[2013-03-12 12:39:39] ERMRec          DEBUG  : Finished fold: 3, base learner: majority, learner: NoMerging in 0.04s
+[2013-03-12 12:39:39] ERMRec.learning DEBUG  : Merged data has 154 attributes and 5308 examples.
+[2013-03-12 12:39:39] ERMRec          DEBUG  : Finished fold: 3, base learner: majority, learner: MergeAll in 0.08s
+[2013-03-12 12:39:55] ERMRec          DEBUG  : Finished fold: 3, base learner: majority, learner: ERM in 15.94s
+[2013-03-12 12:39:56] ERMRec          DEBUG  : Finished fold: 4, base learner: majority, learner: NoMerging in 0.05s
+[2013-03-12 12:39:56] ERMRec.learning DEBUG  : Merged data has 154 attributes and 5313 examples.
+[2013-03-12 12:39:56] ERMRec          DEBUG  : Finished fold: 4, base learner: majority, learner: MergeAll in 0.07s
+[2013-03-12 12:40:13] ERMRec          DEBUG  : Finished fold: 4, base learner: majority, learner: ERM in 16.95s
+Wrote profile results to test.py.lprof
+Timer unit: 1e-06 s
+
+File: /home/tadej/Workspace/ERMRec/src/ERMRec/learning/testing.py
+Function: _generalized_cross_validation at line 144
+Total time: 65.8743 s
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   144                                           @profile
+   145                                           def _generalized_cross_validation(learner, data1, data2, cv_indices1):
+   146                                               """Perform one part of the generalized version of the cross-validation
+   147                                               testing method on the given data sets.
+   148                                               Perform cross-validation over data set data1. For each fold of data1,
+   149                                               build models on the remaining folds of data1, the whole data set data2 and
+   150                                               the merged data set and test them on the selected fold of data1.
+   151                                               Return a tuple (pred_errs1, pred_errs2, pred_errsm), where:
+   152                                                   pred_errs1 -- list of prediction errors of the model built on the
+   153                                                       remaining folds of data1 for instances in data1
+   154                                                   pred_errs2 -- list of prediction errors of the model built on the whole
+   155                                                       data set data2 for instances in data1
+   156                                                   pred_errm -- list of prediction errors of the model built on the merged
+   157                                                       data set for instances in data1
+   158                                               
+   159                                               Arguments:
+   160                                               learner -- Orange learner
+   161                                               data1 -- Orange data table representing the first data set
+   162                                               data2 -- Orange data table representing the second data set
+   163                                               cv_indices1 -- Orange LongList with indices for performing cross-validation
+   164                                                   over data1
+   165                                               
+   166                                               """
+   167      3952        10249      2.6      0.0      n1 = len(data1)
+   168      3952        69321     17.5      0.1      folds = max(cv_indices1) + 1
+   169                                               # prediction errors of models computed as:
+   170                                               # 1 - P_model(predicted_class == true_class)
+   171      3952        39943     10.1      0.1      pred_errs1 = [None]*n1
+   172      3952         8496      2.1      0.0      pred_errs2 = [None]*n1
+   173      3952         6983      1.8      0.0      pred_errsm = [None]*n1
+   174                                               # build a model on data2
+   175                                               # Note: The model does not change throughout cross-validation on data1
+   176      3952       103992     26.3      0.2      model2 = learner(data2)
+   177                                               # perform generalized cross-validation on data1
+   178     23712        31414      1.3      0.0      for fold in range(folds):
+   179                                                   # create testing data table for the current fold
+   180     19760       227835     11.5      0.3          test = data1.select_ref(cv_indices1, fold)
+   181   3749150      5066510      1.4      7.7          test_ids = [i for i, _ in enumerate(data1) if cv_indices1[i] == fold]
+   182                                                   # create learning data tables for the current fold
+   183     19760       234994     11.9      0.4          learn1 = data1.select_ref(cv_indices1, fold, negate=True)
+   184     19760     35367854   1789.9     53.7          learnm = Orange.data.Table(learn1[:] + data2[:])
+   185                                                   # build models
+   186     19760       831603     42.1      1.3          model1 = learner(learn1)
+   187     19760       749652     37.9      1.1          modelm = learner(learnm)
+   188                                                   # test models on examples in the testing data table
+   189    765638      1273478      1.7      1.9          for ex, id in zip(test, test_ids):
+   190                                                       # hide actual class to prevent cheating
+   191    745878      4797090      6.4      7.3              test_ex = Orange.data.Instance(ex)
+   192    745878      1194163      1.6      1.8              test_ex_cls = test_ex.get_class()
+   193    745878      1545973      2.1      2.3              test_ex.set_class('?')
+   194                                                       # predict the class of test_ex and update prediction errors lists
+   195    745878       977937      1.3      1.5              prob = Orange.classification.Classifier.GetProbabilities
+   196    745878      3520569      4.7      5.3              probs = model1(test_ex, result_type=prob)
+   197    745878      1346014      1.8      2.0              pred_errs1[id] = (1 - probs[test_ex_cls])
+   198    745878      3070208      4.1      4.7              probs = model2(test_ex, result_type=prob)
+   199    745878      1192047      1.6      1.8              pred_errs2[id] = (1 - probs[test_ex_cls])
+   200    745878      2999260      4.0      4.6              probs = modelm(test_ex, result_type=prob)
+   201    745878      1204697      1.6      1.8              pred_errsm[id] = (1 - probs[test_ex_cls])
+   202      3952         4000      1.0      0.0      return pred_errs1, pred_errs2, pred_errsm
+
+[tadej@tlinux64 ERMRec]$
