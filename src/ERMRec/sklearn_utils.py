@@ -180,7 +180,7 @@ class MeanImputer(BaseEstimator, TransformerMixin):
                               range(X.shape[1]))
         return self
     
-    def transform(self, X):
+    def transform_new(self, X):
         """Impute the missing values of features with indices in feat_indices_
         with the means in mean_
         
@@ -207,7 +207,7 @@ class MeanImputer(BaseEstimator, TransformerMixin):
         X[imputation_mask] = repeated_means[imputation_mask]
         return X
     
-    def transform_old(self, X):
+    def transform(self, X):
         """OLDER (AND SLOWER) VERSION of the transform() method."""
         X = check_arrays_without_finite_check(X, sparse_format="dense",
                                               copy=self.copy)[0]
