@@ -709,10 +709,10 @@ if __name__ == "__main__":
     measures.append("AUC")
     
     learners = OrderedDict()
-#    learners["NoMerging"] = learning.NoMergingLearner()
+    learners["NoMerging"] = learning.NoMergingLearner()
     learners["MergeAll"] = learning.MergeAllLearner()
-#    no_filter = prefiltering.NoFilter()
-#    learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
+    no_filter = prefiltering.NoFilter()
+    learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
     
     # test all combinations of learners and base learners (compute the testing
     # results with the defined measures) and save the results
