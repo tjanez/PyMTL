@@ -21,7 +21,6 @@
 import logging
 
 import numpy as np
-
 from sklearn.base import clone
 
 # create a child logger of the ERMRec logger
