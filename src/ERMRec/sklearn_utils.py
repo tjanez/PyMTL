@@ -148,6 +148,25 @@ class MeanImputer(BaseEstimator, TransformerMixin):
         """
         X = check_arrays_without_finite_check(X, sparse_format="dense",
                                               copy=self.copy)[0]
+        missing = np.isnan(X)
+        if missing.any():
+            X_m = ma.masked_array(X, mask=missing)
+            self.mean_ = X_m.mean(axis=0)
+            if self.mean_.mask.any():
+                raise ValueError("Means of some columns could not be computed"
+                                 "meaning it will not be possible to impute all"
+                                 "missing values")
+            else:
+                # convert self.mean_ from a MaskedArray to a regular numpy.array
+                self.mean_ = self.mean_.data
+        self.feat_indices_ = (self.feat_indices if self.feat_indices else
+                              range(X.shape[1]))
+        return self
+    
+    def fit_old(self, X, y=None):
+        """OLDER (AND SLOWER) VERSION of the fit() method."""
+        X = check_arrays_without_finite_check(X, sparse_format="dense",
+                                              copy=self.copy)[0]
         self.feat_indices_ = (self.feat_indices if self.feat_indices else
                               range(X.shape[1]))
         if sum([1 for i in self.feat_indices_ if i < 0 or i >= X.shape[1]]) > 0:
@@ -161,26 +180,7 @@ class MeanImputer(BaseEstimator, TransformerMixin):
                 self.mean_[j] = Xj_m.mean()
         return self
     
-    def fit2(self, X, y=None):
-        """FASTER VERSION of the fit() method.
-        
-        DOESN'T WORK AT THE MOMENT DUE to BUG:
-        TypeError: ufunc 'isfinite' not supported for the input types when
-        calling X_m.mean(axis=0).
-        Reported as NumPy Issue #2814.
-        
-        """
-        X = check_arrays_without_finite_check(X, sparse_format="dense",
-                                              copy=self.copy)[0]
-        missing = np.isnan(X)
-        if missing.any():
-            X_m = ma.masked_array(X, mask=missing)
-            self.mean_ = X_m.mean(axis=0)
-        self.feat_indices_ = (self.feat_indices if self.feat_indices else
-                              range(X.shape[1]))
-        return self
-    
-    def transform_new(self, X):
+    def transform(self, X):
         """Impute the missing values of features with indices in feat_indices_
         with the means in mean_
         
@@ -202,12 +202,12 @@ class MeanImputer(BaseEstimator, TransformerMixin):
         # selected for imputation by the feat_indices_mask)
         imputation_mask = np.isnan(X) & feat_indices_mask
         # clone the self.mean_ vector as many times as there are rows in X
-        repeated_means = np.tile(self.mean_, (X.shape[0], 1))
+        repeated_means = np.tile(self.mean_, (len(X), 1))
         # perform the imputation
         X[imputation_mask] = repeated_means[imputation_mask]
         return X
     
-    def transform(self, X):
+    def transform_old(self, X):
         """OLDER (AND SLOWER) VERSION of the transform() method."""
         X = check_arrays_without_finite_check(X, sparse_format="dense",
                                               copy=self.copy)[0]
