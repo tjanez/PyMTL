@@ -136,35 +136,6 @@ class MeanImputer(BaseEstimator, TransformerMixin):
         self.copy = copy
         self.feat_indices = feat_indices
     
-#    def fit(self, X, y=None):
-#        """Compute the means of (chosen) columns (features) that will be used
-#        later for imputation.
-#
-#        Parameters
-#        ----------
-#        X : array-like, shape [n_samples, n_features]
-#            The data used to compute the means of columns (features) that will
-#            be used later for imputation of missing values.
-#        """
-#        X = check_arrays_without_finite_check(X, sparse_format="dense",
-#                                              copy=self.copy)[0]
-#        missing = np.isnan(X)
-#        if missing.any():
-#            X_m = ma.masked_array(X, mask=missing)
-#            self.mean_ = X_m.mean(axis=0)
-#            if self.mean_.mask.any():
-#                raise ValueError("Means of some columns could not be computed"
-#                                 "meaning it will not be possible to impute all"
-#                                 "missing values")
-#            else:
-#                # convert self.mean_ from a MaskedArray to a regular numpy.array
-#                self.mean_ = self.mean_.data
-#        else:
-#            self.mean_ = X.mean(axis=0)
-#        self.feat_indices_ = (self.feat_indices if self.feat_indices else
-#                              range(X.shape[1]))
-#        return self
-    
     def fit(self, X, y=None):
         """Compute the means of (chosen) columns (features) that will be used
         later for imputation.
@@ -178,15 +149,18 @@ class MeanImputer(BaseEstimator, TransformerMixin):
         X = check_arrays_without_finite_check(X, sparse_format="dense",
                                               copy=self.copy)[0]
         missing = np.isnan(X)
-        X_m = ma.masked_array(X, mask=missing)
-        self.mean_ = X_m.mean(axis=0)
-        if self.mean_.mask.any():
-            raise ValueError("Means of some columns could not be computed"
-                             "meaning it will not be possible to impute all"
-                             "missing values")
+        if missing.any():
+            X_m = ma.masked_array(X, mask=missing)
+            self.mean_ = X_m.mean(axis=0)
+            if self.mean_.mask.any():
+                raise ValueError("Means of some columns could not be computed"
+                                 "meaning it will not be possible to impute all"
+                                 "missing values")
+            else:
+                # convert self.mean_ from a MaskedArray to a regular numpy.array
+                self.mean_ = self.mean_.data
         else:
-            # convert self.mean_ from a MaskedArray to a regular numpy.array
-            self.mean_ = self.mean_.data
+            self.mean_ = X.mean(axis=0)
         self.feat_indices_ = (self.feat_indices if self.feat_indices else
                               range(X.shape[1]))
         return self
