@@ -159,6 +159,8 @@ class MeanImputer(BaseEstimator, TransformerMixin):
             else:
                 # convert self.mean_ from a MaskedArray to a regular numpy.array
                 self.mean_ = self.mean_.data
+        else:
+            self.mean_ = X.mean(axis=0)
         self.feat_indices_ = (self.feat_indices if self.feat_indices else
                               range(X.shape[1]))
         return self
@@ -178,6 +180,8 @@ class MeanImputer(BaseEstimator, TransformerMixin):
             if missing.any():
                 Xj_m = ma.masked_array(X[:, j], mask=missing)
                 self.mean_[j] = Xj_m.mean()
+            else:
+                self.mean_[j] = X[:, j].mean()
         return self
     
     def transform(self, X):
