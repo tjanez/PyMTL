@@ -119,13 +119,14 @@ class MeanImputer(BaseEstimator, TransformerMixin):
         Set to False to perform inplace column imputation and avoid a copy (if
         the input is already a numpy array).
     
-    feat_indices : list, optional, default is None
-        A list of column (feature) indices for which the imputation should be
+    feat_indices : {array-like, list, None}, shape (n_features,), optional,
+        default is None
+        Contains column (feature) indices for which the imputation should be
         performed. If None, the imputation is done for all columns (features).
     
     Attributes
     ----------
-    feat_indices_ : list
+    feat_indices_ : ndarray, shape (n_features,)
         Indices of features for which the imputation should be performed.
     mean_ : ndarray, shape (n_features,)
         Means of features (only for features in feat_indices_; otherwise zeros).
@@ -134,7 +135,8 @@ class MeanImputer(BaseEstimator, TransformerMixin):
     
     def __init__(self, copy=True, feat_indices=None):
         self.copy = copy
-        self.feat_indices = feat_indices
+        self.feat_indices = (np.array(feat_indices, copy=True) if feat_indices
+                             else None)
     
     def fit(self, X, y=None):
         """Compute the means of (chosen) columns (features) that will be used
@@ -162,7 +164,7 @@ class MeanImputer(BaseEstimator, TransformerMixin):
         else:
             self.mean_ = X.mean(axis=0)
         self.feat_indices_ = (self.feat_indices if self.feat_indices else
-                              range(X.shape[1]))
+                              np.arange(X.shape[1]))
         return self
     
     def fit_old(self, X, y=None):
@@ -200,8 +202,9 @@ class MeanImputer(BaseEstimator, TransformerMixin):
             X = np.array([X])
         # convert the self.feat_indices_ list to a boolean array with the same
         # shape as X
-        feat_indices_mask = np.zeros(X.shape, dtype="bool")
-        feat_indices_mask[:, self.feat_indices_] = True
+        feat_indices_mask = np.zeros(X.shape[1], dtype="bool")
+        feat_indices_mask[self.feat_indices_] = True
+        feat_indices_mask = np.tile(feat_indices_mask, (len(X), 1))
         # create the imputation mask (a value has to be NaN and it must be
         # selected for imputation by the feat_indices_mask)
         imputation_mask = np.isnan(X) & feat_indices_mask
