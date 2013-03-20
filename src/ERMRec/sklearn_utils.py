@@ -167,25 +167,6 @@ class MeanImputer(BaseEstimator, TransformerMixin):
                               np.arange(X.shape[1]))
         return self
     
-    def fit_old(self, X, y=None):
-        """OLDER (AND SLOWER) VERSION of the fit() method."""
-        X = check_arrays_without_finite_check(X, sparse_format="dense",
-                                              copy=self.copy)[0]
-        self.feat_indices_ = (self.feat_indices if self.feat_indices else
-                              range(X.shape[1]))
-        if sum([1 for i in self.feat_indices_ if i < 0 or i >= X.shape[1]]) > 0:
-            raise ValueError("Feature indices should be in range: [0, "
-                             "# features).")
-        self.mean_ = np.zeros(X.shape[1])
-        for j in self.feat_indices_:
-            missing = np.isnan(X[:, j])
-            if missing.any():
-                Xj_m = ma.masked_array(X[:, j], mask=missing)
-                self.mean_[j] = Xj_m.mean()
-            else:
-                self.mean_[j] = X[:, j].mean()
-        return self
-    
     def transform(self, X):
         """Impute the missing values of features with indices in feat_indices_
         with the means in mean_
@@ -212,21 +193,6 @@ class MeanImputer(BaseEstimator, TransformerMixin):
         repeated_means = np.tile(self.mean_, (len(X), 1))
         # perform the imputation
         X[imputation_mask] = repeated_means[imputation_mask]
-        return X
-    
-    def transform_old(self, X):
-        """OLDER (AND SLOWER) VERSION of the transform() method."""
-        X = check_arrays_without_finite_check(X, sparse_format="dense",
-                                              copy=self.copy)[0]
-        # convert the input array to 2D if it is 1D
-        if len(X.shape) == 1:
-            X = np.array([X])
-        # impute the missing values
-        for j in self.feat_indices_:
-            missing = np.isnan(X[:, j])
-            if missing.any():
-                Xj_m = ma.masked_array(X[:, j], missing)
-                X[:, j] = ma.filled(Xj_m, fill_value=self.mean_[j])
         return X
 
 from sklearn import dummy
