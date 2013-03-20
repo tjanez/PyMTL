@@ -176,11 +176,11 @@ class MeanImputer(BaseEstimator, TransformerMixin):
         X : array-like with shape [n_samples, n_features]
             Input data that will be transformed.
         """
+        if not hasattr(self, "mean_"):
+            raise ValueError("MeanImputer not fitted.")
         X = check_arrays_without_finite_check(X, sparse_format="dense",
                                               copy=self.copy)[0]
-        # convert the input array to 2D if it is 1D
-        if len(X.shape) == 1:
-            X = np.array([X])
+        X = np.atleast_2d(X)
         # convert the self.feat_indices_ list to a boolean array with the same
         # shape as X
         feat_indices_mask = np.zeros(X.shape[1], dtype="bool")
