@@ -672,12 +672,18 @@ if __name__ == "__main__":
     pool = UsersPool(users_data_path, rnd_seed)
     # select base learners
     base_learners = OrderedDict()
-    from sklearn.linear_model import LogisticRegression
+#    from sklearn.linear_model import LogisticRegression
+#    from sklearn.pipeline import Pipeline
+#    from sklearn_utils import MeanImputer
+#    clf = Pipeline([("imputer", MeanImputer()),
+#                    ("log_reg", LogisticRegression())])
+#    base_learners["log_reg"] = clf
+    from sklearn.dummy import DummyClassifier
     from sklearn.pipeline import Pipeline
     from sklearn_utils import MeanImputer
     clf = Pipeline([("imputer", MeanImputer()),
-                    ("log_reg", LogisticRegression())])
-    base_learners["log_reg"] = clf
+                    ("majority", DummyClassifier(strategy="most_frequent"))])
+    base_learners["majority"] = clf
     #TODO: Replace or remove these Orange-based base learners
 #    from orange_learners import CustomMajorityLearner
 #    # a custom Majority learner which circumvents a bug with the  return_type
