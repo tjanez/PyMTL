@@ -1,0 +1,72 @@
+[tadej@tlinux64 ERMRec]$ kernprof.py -l -v src/ERMRec/test.py
+[2013-03-15 13:34:35] ERMRec          INFO   : Scoring measure AUC could not be computed for 2 out of 27 users (7.4%)
+[2013-03-15 13:34:35] ERMRec          DEBUG  : Finished fold: 0, base learner: log_reg, learner: NoMerging in 0.12s
+[2013-03-15 13:34:35] ERMRec.learning.learning DEBUG  : Merged data has 154 attributes and 5291 examples.
+[2013-03-15 13:34:35] ERMRec          INFO   : Scoring measure AUC could not be computed for 2 out of 27 users (7.4%)
+[2013-03-15 13:34:35] ERMRec          DEBUG  : Finished fold: 0, base learner: log_reg, learner: MergeAll in 0.10s
+[2013-03-15 13:35:46] ERMRec          INFO   : Scoring measure AUC could not be computed for 2 out of 27 users (7.4%)
+[2013-03-15 13:35:46] ERMRec          DEBUG  : Finished fold: 0, base learner: log_reg, learner: ERM in 70.44s
+[2013-03-15 13:35:47] ERMRec          INFO   : Scoring measure AUC could not be computed for 4 out of 27 users (14.8%)
+[2013-03-15 13:35:47] ERMRec          DEBUG  : Finished fold: 1, base learner: log_reg, learner: NoMerging in 0.10s
+[2013-03-15 13:35:47] ERMRec.learning.learning DEBUG  : Merged data has 154 attributes and 5294 examples.
+[2013-03-15 13:35:47] ERMRec          INFO   : Scoring measure AUC could not be computed for 4 out of 27 users (14.8%)
+[2013-03-15 13:35:47] ERMRec          DEBUG  : Finished fold: 1, base learner: log_reg, learner: MergeAll in 0.11s
+[2013-03-15 13:36:46] ERMRec          INFO   : Scoring measure AUC could not be computed for 4 out of 27 users (14.8%)
+[2013-03-15 13:36:46] ERMRec          DEBUG  : Finished fold: 1, base learner: log_reg, learner: ERM in 59.24s
+[2013-03-15 13:36:47] ERMRec          DEBUG  : Finished fold: 2, base learner: log_reg, learner: NoMerging in 0.11s
+[2013-03-15 13:36:47] ERMRec.learning.learning DEBUG  : Merged data has 154 attributes and 5298 examples.
+[2013-03-15 13:36:47] ERMRec          DEBUG  : Finished fold: 2, base learner: log_reg, learner: MergeAll in 0.11s
+[2013-03-15 13:37:41] ERMRec          DEBUG  : Finished fold: 2, base learner: log_reg, learner: ERM in 53.87s
+[2013-03-15 13:37:41] ERMRec          INFO   : Scoring measure AUC could not be computed for 1 out of 27 users (3.7%)
+[2013-03-15 13:37:41] ERMRec          DEBUG  : Finished fold: 3, base learner: log_reg, learner: NoMerging in 0.12s
+[2013-03-15 13:37:41] ERMRec.learning.learning DEBUG  : Merged data has 154 attributes and 5308 examples.
+[2013-03-15 13:37:41] ERMRec          INFO   : Scoring measure AUC could not be computed for 1 out of 27 users (3.7%)
+[2013-03-15 13:37:41] ERMRec          DEBUG  : Finished fold: 3, base learner: log_reg, learner: MergeAll in 0.11s
+[2013-03-15 13:38:28] ERMRec.learning.testing DEBUG  : Learning data for data1 has less than 2 class values. Using DummyClassifier.
+[2013-03-15 13:38:45] ERMRec          INFO   : Scoring measure AUC could not be computed for 1 out of 27 users (3.7%)
+[2013-03-15 13:38:45] ERMRec          DEBUG  : Finished fold: 3, base learner: log_reg, learner: ERM in 63.67s
+[2013-03-15 13:38:46] ERMRec          INFO   : Scoring measure AUC could not be computed for 3 out of 27 users (11.1%)
+[2013-03-15 13:38:46] ERMRec          DEBUG  : Finished fold: 4, base learner: log_reg, learner: NoMerging in 0.12s
+[2013-03-15 13:38:46] ERMRec.learning.learning DEBUG  : Merged data has 154 attributes and 5313 examples.
+[2013-03-15 13:38:46] ERMRec          INFO   : Scoring measure AUC could not be computed for 3 out of 27 users (11.1%)
+[2013-03-15 13:38:46] ERMRec          DEBUG  : Finished fold: 4, base learner: log_reg, learner: MergeAll in 0.12s
+[2013-03-15 13:39:57] ERMRec          INFO   : Scoring measure AUC could not be computed for 3 out of 27 users (11.1%)
+[2013-03-15 13:39:57] ERMRec          DEBUG  : Finished fold: 4, base learner: log_reg, learner: ERM in 71.19s
+Wrote profile results to test.py.lprof
+Timer unit: 1e-06 s
+
+File: /home/tadej/Workspace/ERMRec/src/ERMRec/sklearn_utils.py
+Function: transform at line 187
+Total time: 97.3195 s
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   187                                               @profile
+   188                                               def transform(self, X):
+   189                                                   """Impute the missing values of features with indices in feat_indices_
+   190                                                   with the means in mean_
+   191                                                   
+   192                                                   Parameters
+   193                                                   ----------
+   194                                                   X : array-like with shape [n_samples, n_features]
+   195                                                       Input data that will be transformed.
+   196                                                   """
+   197    130865       253738      1.9      0.3          X = check_arrays_without_finite_check(X, sparse_format="dense",
+   198    130865      8159645     62.4      8.4                                                copy=self.copy)[0]
+   199                                                   # convert the input array to 2D if it is 1D
+   200    130865       258883      2.0      0.3          if len(X.shape) == 1:
+   201                                                       X = np.array([X])
+   202                                                   # convert the self.feat_indices_ list to a boolean array with the same
+   203                                                   # shape as X
+   204    130865       770959      5.9      0.8          feat_indices_mask = np.zeros(X.shape, dtype="bool")
+   205    130865     47895495    366.0     49.2          feat_indices_mask[:, self.feat_indices_] = True
+   206                                                   # create the imputation mask (a value has to be NaN and it must be
+   207                                                   # selected for imputation by the feat_indices_mask)
+   208    130865     17540984    134.0     18.0          imputation_mask = np.isnan(X) & feat_indices_mask
+   209                                                   # clone the self.mean_ vector as many times as there are rows in X
+   210    130865      6389546     48.8      6.6          repeated_means = np.tile(self.mean_, (len(X), 1))
+   211                                                   # perform the imputation
+   212    130865     15887976    121.4     16.3          X[imputation_mask] = repeated_means[imputation_mask]
+   213    130865       162321      1.2      0.2          return X
+
+[tadej@tlinux64 ERMRec]$

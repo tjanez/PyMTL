@@ -1,0 +1,43 @@
+In [1]: import numpy as np
+
+In [2]: X = np.ones((500, 150))
+
+In [3]: fi_list = range(150)
+
+In [4]: fi_na = np.arange(150)
+
+In [5]: %timeit fi_mask = np.zeros(X.shape, dtype="bool"); fi_mask[:, fi_list] = True
+1000 loops, best of 3: 758 us per loop
+
+In [6]: %timeit fi_mask = np.zeros(X.shape, dtype="bool"); fi_mask[:, fi_list] = True
+1000 loops, best of 3: 756 us per loop
+
+In [7]: %timeit fi_mask = np.zeros(X.shape, dtype="bool"); fi_mask[:, fi_list] = True
+1000 loops, best of 3: 772 us per loop
+
+In [8]: %timeit fi_mask = np.zeros(X.shape, dtype="bool"); fi_mask[:, fi_na] = True
+1000 loops, best of 3: 767 us per loop
+
+In [9]: %timeit fi_mask = np.zeros(X.shape, dtype="bool"); fi_mask[:, fi_na] = True
+1000 loops, best of 3: 732 us per loop
+
+In [10]: %timeit fi_mask = np.zeros(X.shape, dtype="bool"); fi_mask[:, fi_na] = True
+1000 loops, best of 3: 745 us per loop
+
+In [11]: %timeit fi_mask = np.zeros(X.shape[1], dtype="bool"); fi_mask[fi_na] = True; np.tile(fi_mask, (len(X), 1))
+10000 loops, best of 3: 20.7 us per loop
+
+In [12]: %timeit fi_mask = np.zeros(X.shape[1], dtype="bool"); fi_mask[fi_na] = True; np.tile(fi_mask, (len(X), 1))
+10000 loops, best of 3: 20.5 us per loop
+
+In [13]: %timeit fi_mask = np.zeros(X.shape[1], dtype="bool"); fi_mask[fi_na] = True; np.tile(fi_mask, (len(X), 1))
+10000 loops, best of 3: 20.4 us per loop
+
+In [14]: %timeit fi_mask = np.zeros(X.shape[1], dtype="bool"); fi_mask[fi_list] = True; np.tile(fi_mask, (len(X), 1))
+10000 loops, best of 3: 46.5 us per loop
+
+In [15]: %timeit fi_mask = np.zeros(X.shape[1], dtype="bool"); fi_mask[fi_list] = True; np.tile(fi_mask, (len(X), 1))
+10000 loops, best of 3: 46.2 us per loop
+
+In [16]: %timeit fi_mask = np.zeros(X.shape[1], dtype="bool"); fi_mask[fi_list] = True; np.tile(fi_mask, (len(X), 1))
+10000 loops, best of 3: 46 us per loop
