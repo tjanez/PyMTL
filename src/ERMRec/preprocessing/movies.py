@@ -18,9 +18,9 @@
 # Author(s): Tadej Janez <tadej.janez@fri.uni-lj.si>
 #
 
-import Orange
+import logging
 
-from ERMRec.config import * 
+import Orange
 
 class RawDataPreprocessor:
 
