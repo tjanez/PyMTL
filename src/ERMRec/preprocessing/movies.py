@@ -1,8 +1,9 @@
+# -*- coding: utf-8 -*-
 #
 # movies.py
 # Classes and methods for preprocessing the raw iTivi movie data.
 #
-# Copyright (C) 2012 Tadej Janez
+# Copyright (C) 2012, 2013 Tadej Janez
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,9 +19,75 @@
 # Author(s): Tadej Janez <tadej.janez@fri.uni-lj.si>
 #
 
-import logging
+import logging, re
+from collections import OrderedDict
 
 import Orange
+
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
+
+def is_series(attrs):
+    """Return True if the given movie is a series, False otherwise.
+    
+    Arguments:
+    attrs -- dictionary containing movie's attributes and their values
+    
+    """
+    title = str.lower(attrs["Title"])
+    if re.search(r"disk \d", title) or re.search(r"disc \d", title):
+    	return True
+    elif re.search(r"sezona", title):
+        return True
+    elif re.search(r"epizode", title):
+        return True
+    elif re.search(r"nekoč je bilo\s*\.\.\.\s*življenje", title):
+        return True
+    elif re.search(r"sveto pismo \d+", title):
+        return True
+    else:
+     	return False
+
+def is_porno(attrs):
+    """Return True if the given movie is a porno movie, False otherwise.
+    
+    Arguments:
+    attrs -- dictionary containing movie's attributes and their values
+    
+    """
+    if "adult" in attrs["Genre"]:
+        return True
+    else:
+        return False
+
+def is_book(attrs):
+    """Return True if the given movie is a book, False otherwise.
+    
+    Arguments:
+    attrs -- dictionary containing movie's attributes and their values
+    
+    """
+    title = str.lower(attrs["Title"])
+    if re.search(r"\(knjiga\)", title):
+        return True
+    elif re.search(r"^izvor vrst$", title):
+        return True
+    elif re.search(r"^sašo ožbolt: anti-politična", title):
+        return True
+    else:
+        return False
+
+def is_game(attrs):
+    """Return True if the given movie is a video game, False otherwise.
+    
+    Arguments:
+    attrs -- dictionary containing movie's attributes and their values
+    
+    """
+    title = str.lower(attrs["Title"])
+    if re.search(r"\(wii\)", title):
+        return True
+    else:
+        return False
 
 class RawDataPreprocessor:
 
@@ -31,23 +98,31 @@ class RawDataPreprocessor:
     
     # dictionary mapping from attribute ids (as used in the iTivi database)
     # to their names (as used in the Orange domain)
-    _ATTR_ID_NAME = {"2": "Year",
+    _ATTR_ID_NAME = {"1": "Genre",
+                     "2": "Year",
                      "3": "Length",
+                     "4": "Actor",
                      "5": "Director",
+                     "6": "Voice-actor",
                      "7": "Title"}
+    # list of attributes with one value
+    _ATTR_ONE_VALUE = ["Year", "Length", "Director", "Title"]
     
     def __init__(self, raw_data_file):
         """Read the raw_data_file, parse it and convert each line to a triplet:
         (movie_id, attr_id, attr_value).
-        Store the list of triplets in the self._database variable.
+        Create a dictionary mapping from movies' ids to a dictionary mapping
+        from movies' attributes to their values. Store this dictionary in the
+        self._movie_attrs variable.
         
         Keyword arguments:
         raw_data_file -- string representing the path to the raw iTivi movie
             data
         
         """
+        # read the file and store the triples in a list
         with open(raw_data_file) as raw_data:
-            self._database = []
+            triplets = []
             for i, line in enumerate(raw_data):
                 if i == 0:
                     # skip the first line as it contains attribute descriptions
@@ -56,7 +131,69 @@ class RawDataPreprocessor:
                 # split lines into 3 parts: movie id, attribute id,
                 # attribute value
                 movie_id, attr_id, attr_value = line.split(None, 2)
-                self._database.append((movie_id, attr_id, attr_value))
+                triplets.append((movie_id, attr_id, attr_value))
+        # create a double-layered dictionary with movie attributes
+        self._movie_attrs = OrderedDict()
+        for movie_id, attr_id, attr_value in triplets:
+            if movie_id not in self._movie_attrs:
+                self._movie_attrs[movie_id] = dict()
+            attr_name = self._ATTR_ID_NAME[attr_id]
+            if attr_name in self._ATTR_ONE_VALUE:
+                self._movie_attrs[movie_id][attr_name] = attr_value
+            elif attr_name not in self._movie_attrs[movie_id]:
+                self._movie_attrs[movie_id][attr_name] = [attr_value]
+            else:
+                self._movie_attrs[movie_id][attr_name].append(attr_value)
+    
+    def purge_database(self):
+        """Purge the movie database and remove all entries that are either:
+        - series, or
+        - porno movies, or
+        - books, or
+        - video games.
+        Report on the number of deleted entries.
+        
+        """
+        
+        n = len(self._movie_attrs)
+        # drop all series
+        for movie_id, attrs in list(self._movie_attrs.iteritems()):
+            if is_series(attrs):
+                del self._movie_attrs[movie_id]
+                logging.debug("Deleted movie (cause: series): {} (id: {})".\
+                              format(attrs["Title"], movie_id))
+        logging.info("Dropped {} series.".format(n - len(self._movie_attrs)))
+        n = len(self._movie_attrs)
+        # drop all porno movies
+        for movie_id, attrs in list(self._movie_attrs.iteritems()):
+            if is_porno(attrs):
+                del self._movie_attrs[movie_id]
+                logging.debug("Deleted movie (cause: porno): {} (id: {})".\
+                              format(attrs["Title"], movie_id))
+        logging.info("Dropped {} porno movies.".format(n - 
+                                                       len(self._movie_attrs)))
+        n = len(self._movie_attrs)
+        # drop all books
+        for movie_id, attrs in list(self._movie_attrs.iteritems()):
+            if is_book(attrs):
+                del self._movie_attrs[movie_id]
+                logging.debug("Deleted movie (cause: book): {} (id: {})".\
+                              format(attrs["Title"], movie_id))
+        logging.info("Dropped {} books.".format(n - len(self._movie_attrs)))
+        n = len(self._movie_attrs)
+        # drop video games
+        for movie_id, attrs in list(self._movie_attrs.iteritems()):
+            if is_game(attrs):
+                del self._movie_attrs[movie_id]
+                logging.debug("Deleted movie (cause: game): {} (id: {})".\
+                              format(attrs["Title"], movie_id))
+        logging.info("Dropped {} games.".format(n - len(self._movie_attrs)))
+        n = len(self._movie_attrs)
+#        # DEBUG
+#        # print remaining movies
+#        for movie_id, attrs in self._movie_attrs.iteritems():
+##        	print "{} (id: {})".format(attrs["Title"], movie_id)
+#            print "{}".format(attrs["Title"])
 
     def _find_frequent_actors(self, k):
         """Select k most frequently appearing actors from the database.
@@ -69,19 +206,22 @@ class RawDataPreprocessor:
         """
         if k < 0:
             raise ValueError("Number of actors to select should be > 0.")
+        # count actor appearances
         actors = dict()
-        for _, attr_id, attr_value in self._database:
-            # lines with attr_id = 4 describe actors' names
-            if attr_id == "4":
-                actor = attr_value
-                if actor in actors:
-                    actors[actor] += 1
-                else:
-                    actors[actor] = 1
+        for attrs in self._movie_attrs.itervalues():
+            if "Actor" in attrs:
+                for actor in attrs["Actor"]:
+                    if actor in actors:
+                        actors[actor] += 1
+                    else:
+                        actors[actor] = 1
         sorted_actors = sorted(actors.iteritems(), key=lambda x: x[1],
                                reverse=True)
-        logging.debug("Total number of actors: {}".format(len(sorted_actors)))
+        logging.info("Total number of actors: {}".format(len(sorted_actors)))
         self._frequent_actors = [actor for actor, _ in sorted_actors[:k]]
+#        # DEBUG
+#        for actor in self._frequent_actors:
+#            print actor
 
     def _find_genres(self):
         """Search for all genres appearing in the database.
@@ -90,17 +230,17 @@ class RawDataPreprocessor:
         
         """
         genres = dict()
-        for _, attr_id, attr_value in self._database:
-            # lines with attr_id = 1 describe genres' names
-            if attr_id == "1":
-                genre = attr_value
-                if genre in genres:
-                    genres[genre] += 1
-                else:
-                    genres[genre] = 1
+        # count genre appearances
+        for attrs in self._movie_attrs.itervalues():
+            if "Genre" in attrs:
+                for genre in attrs["Genre"]:
+                    if genre in genres:
+                        genres[genre] += 1
+                    else:
+                        genres[genre] = 1
         sorted_genres = sorted(genres.iteritems(), key=lambda x: x[1],
                                reverse=True)
-        logging.debug("Total number of genres: {}".format(len(sorted_genres)))
+        logging.info("Total number of genres: {}".format(len(sorted_genres)))
         self._genres = [genre for genre, _ in sorted_genres]
 
     def create_domain(self, k):
@@ -129,7 +269,7 @@ class RawDataPreprocessor:
         genres = [Orange.data.variable.Discrete(name=genre,
                     values=["yes", "no"]) for genre in self._genres]
         # meta attributes
-        id = Orange.data.variable.String(name="Id")
+        id_ = Orange.data.variable.String(name="Id")
         title = Orange.data.variable.String(name="Title")
         director = Orange.data.variable.String(name="Director")
         # create a new class-less domain
@@ -137,7 +277,7 @@ class RawDataPreprocessor:
                                     [n_freq_actors] + genres, False)
         # add meta attributes
         meta_attributes = {Orange.data.new_meta_id() : attr for attr in
-                           [id, title, director]}
+                           [id_, title, director]}
         domain.add_metas(meta_attributes)
         self._domain = domain
 
@@ -165,7 +305,7 @@ class RawDataPreprocessor:
         """
         movies = dict()
         # iterate over the whole database
-        for movie_id, attr_id, attr_value in self._database:
+        for movie_id in self._movie_attrs:
             # create (or retrieve) an Orange instance corresponding to the movie
             if movie_id not in movies:
                 ins = self._create_instance()
@@ -173,30 +313,50 @@ class RawDataPreprocessor:
                 movies[movie_id] = ins
             else:
                 ins = movies[movie_id]
-            # store the value if the current attribute is in self._ATTR_ID_NAME
-            if attr_id in self._ATTR_ID_NAME:
-                ins[self._ATTR_ID_NAME[attr_id]] = attr_value
-            # store the genre value
-            elif attr_id == "1":
-                ins[attr_value] = "yes"
-            # store the actor value if the actor is among the most frequently
-            # appearing actors
-            elif attr_id == "4":
-                if attr_value in self._frequent_actors:
-                    ins[attr_value] = "yes"
-            # ignore the "voice-actors" in animated movies
-            elif attr_id == "6":
-                pass
-            else:
-                raise ValueError("Unknown attribute id: {} with value: {}".\
-                                 format(attr_id, attr_value))
+            for attr_name, attr_value in self._movie_attrs[movie_id].iteritems():
+                # store the value if the attribute only has one value
+                if attr_name in self._ATTR_ONE_VALUE:
+                    ins[attr_name] = attr_value
+                # store the genre value
+                elif attr_name == "Genre":
+                    for genre in attr_value:
+                        ins[genre] = "yes"
+                # store the actor value if the actor is among the most
+                # frequently appearing actors
+                elif attr_name == "Actor":
+                    for actor in attr_value:
+                        if actor in self._frequent_actors:
+                            ins[actor] = "yes"
+                # ignore the "voice-actors" in animated movies
+                elif attr_name == "Voice-actor":
+                    pass
+                else:
+                    raise ValueError("Unknown attribute id: {} with value: {}".\
+                                     format(attr_id, attr_value))
         # compute the number of frequent actors appearing in each movie
         for movie_id, ins in movies.iteritems():
-            sum = 0
+            s = 0
             for i in range(2, 2 + len(self._frequent_actors)):
                 if ins[i] == "yes":
-                    sum += 1
-            ins["# Freq Actors"] = sum
+                    s += 1
+            ins["# Freq Actors"] = s
+        # sanity check
+        for movie_id, ins in movies.iteritems():
+            try:
+                length = int(ins["Length"]) 
+                if length < 30:
+                    logging.warning("'{}' has length {} minutes.".\
+                                    format(ins["Title"], length))
+            except TypeError as e:
+                logging.warning("'{}' has unknown length.".format(ins["Title"]))
+            try:
+                year = int(ins["Year"]) 
+                if not 1950 < year < 2012:
+                    logging.warning("'{}' has year {}.".format(ins["Title"],
+                                                               year))
+            except TypeError as e:
+                logging.warning("'{}' has unknown year.".format(ins["Title"]))
+        
         sorted_movies = sorted(movies.iteritems(), key=lambda x: int(x[0]))
         sorted_movies = [movie for _, movie in sorted_movies]
         logging.debug("Total number of movies: {}".format(len(sorted_movies)))
@@ -222,6 +382,7 @@ if __name__ == "__main__":
     
     # process the raw data file
     preprocessor = RawDataPreprocessor(raw_data_file)
+    preprocessor.purge_database()
     preprocessor.create_domain(128)
     preprocessor.create_datatable()
     preprocessor.save_datatable(os.path.join(path_prefix, "data/movies.tab"))
