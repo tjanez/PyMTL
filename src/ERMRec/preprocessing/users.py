@@ -2,7 +2,7 @@
 # users.py
 # Classes and methods for preprocessing the raw iTivi users' ratings.
 #
-# Copyright (C) 2012 Tadej Janez
+# Copyright (C) 2012, 2013 Tadej Janez
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 # Author(s): Tadej Janez <tadej.janez@fri.uni-lj.si>
 #
 
-import math, os, re
+import logging, math, os, re
 import matplotlib.pyplot as plt
 
 import Orange
 
-from ERMRec.config import *
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 
 def _all_ratings_same(table):
     """Check if the ratings in the given Orange data table are all the same.
@@ -96,17 +96,20 @@ class RawDataPreprocessor:
         movies_file -- string representing the path to the movies data table 
         
         """
-        movies = Orange.data.Table(movies_file)
+        movies_table = Orange.data.Table(movies_file)
+        # create a dictionary mapping from movie id to its Orange instance
+        movies = {str(ins["Id"]) : ins for ins in movies_table}
         # create a new domain from the movies domain and add two new attributes:
         # numerical (raw) rating and binarized (like/dislike) rating
         rating = Orange.data.variable.Discrete(name="Rating",
                                                values=["like", "dislike"])
         raw_rating = Orange.data.variable.Continuous(name="Rating (raw)",
                                                      number_of_decimals=1)
-        new_domain = Orange.data.Domain(movies.domain, rating)
-        new_domain.add_metas(movies.domain.get_metas())
+        new_domain = Orange.data.Domain(movies_table.domain, rating)
+        new_domain.add_metas(movies_table.domain.get_metas())
         new_domain.add_meta(Orange.data.new_meta_id(), raw_rating)
         
+        skip = 0
         users = dict()
         # iterate over the whole database
         for movie_id, user_id, rating in self._database:
@@ -117,17 +120,21 @@ class RawDataPreprocessor:
                 users[user_id] = table
             else:
                 table = users[user_id]
-            ins = Orange.data.Instance(new_domain, movies[int(movie_id)-1])
-            if ins["Id"] != movie_id:
-                raise ValueError("Movie at position {} does not have id={}".\
-                                 format(int(movie_id)-1, movie_id))
-            ins["Rating (raw)"] = rating
-            table.append(ins)
-        logging.debug("Total number of users: {}".format(len(users)))
+            # retrieve the Orange instance corresponding to this movie id if it
+            # exits
+            if movie_id in movies:
+                ins = Orange.data.Instance(new_domain, movies[movie_id])
+                ins["Rating (raw)"] = rating
+                table.append(ins)
+            else:
+                skip += 1
+        logging.info("Skipped {} ratings since the corresponding movie was not "
+                     "found in the movies data table.".format(skip))
+        logging.info("Total number of users: {}".format(len(users)))
         # only keep users with at least m ratings
         users = {user_id : table for user_id, table in users.iteritems()
                  if len(table) >= m}
-        logging.debug("Kept {} users who have more than {} ratings".\
+        logging.info("Kept {} users who have more than {} ratings".\
                       format(len(users), m))
         # store m for later use
         self._m = m
@@ -135,7 +142,7 @@ class RawDataPreprocessor:
         len_before = len(users)
         users = {user_id : table for user_id, table in users.iteritems()
                  if not _all_ratings_same(table)}
-        logging.debug("Discared {} users with ratings that are all the same".\
+        logging.info("Discared {} users with ratings that are all the same".\
                       format(len_before - len(users)))
         # compute binarized ratings for users
         for table in users.itervalues():
