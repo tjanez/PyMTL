@@ -2,7 +2,7 @@
 # data.py
 # Contains methods for loading users' data.
 #
-# Copyright (C) 2012 Tadej Janez
+# Copyright (C) 2012, 2013 Tadej Janez
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ def _yes_no_converter(s):
     elif s == "no":
         return 0.
     else:
+        print("Yes/No converter received an unexpected value: {}".format(s))
         raise ValueError("Yes/No converter received an unexpected value: {}".\
                          format(s))
 
@@ -36,6 +37,8 @@ def _like_dislike_converter(s):
     elif s == "dislike":
         return 0.
     else:
+        print("Like/Dislike converter received an unexpected value: {}".\
+              format(s))
         raise ValueError("Like/Dislike converter received an unexpected value: "
                          "{}".format(s))
 
@@ -60,8 +63,8 @@ def load_ratings_dataset(file_name):
         "target_names": symbolic names of classification labels
 
     """
-    # columns 0 - 154 represent features, column 154 represents the class
-    usecols = range(155)
+    # columns 0 - 153 represent features, column 153 represents the class
+    usecols = range(154)
     # specify converters for features and the class
     converters = {}
     # first two columns represent year and length of the movie
@@ -69,11 +72,11 @@ def load_ratings_dataset(file_name):
     for i in range(2, 130):
         converters[i] = _yes_no_converter
     # column 130 represents number of frequent actors
-    # columns 131 - 154 represent genres
-    for i in range(131, 154):
+    # columns 131 - 153 represent genres
+    for i in range(131, 153):
         converters[i] = _yes_no_converter
     # column 154 represents rating (class)
-    converters[154] = _like_dislike_converter
+    converters[153] = _like_dislike_converter
     d = np.genfromtxt(file_name, dtype=float, delimiter='\t', skip_header=3,
                        converters=converters, missing_values='?',
                        usecols=usecols)
@@ -81,7 +84,7 @@ def load_ratings_dataset(file_name):
     y = np.array(d[:, -1], dtype=int)
     
     with open(file_name) as f:
-        feature_names = f.readline().split('\t')[:155]
+        feature_names = f.readline().split('\t')[:154]
     
     return Bunch(data=X,
                  DESCR="Ratings for " + file_name[:-4],
