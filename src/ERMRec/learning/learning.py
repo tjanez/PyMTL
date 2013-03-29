@@ -22,6 +22,9 @@ import logging
 
 import numpy as np
 from sklearn.base import clone
+from sklearn.dummy import DummyClassifier
+
+from ERMRec.sklearn_utils import change_dummy_classes
 
 # create a child logger of the ERMRec logger
 logger = logging.getLogger("ERMRec.learning.learning")
@@ -79,10 +82,23 @@ class NoMergingLearner:
         """
         user_models = dict()
         for user_id, user in users.iteritems():
-            # NOTE: The scikit-learn estimator must be cloned so that each user
-            # gets its own classifier
-            base_learner = clone(base_learner)
-            user_models[user_id] = base_learner.fit(*user.get_learn_data())
+            # NOTE: When the number of unique class values is less than 2, we
+            # cannot fit an ordinary model (e.g. logistic regression). Instead,
+            # we have to use a dummy classifier which is subsequently augmented
+            # to handle all the other class values.
+            # NOTE: The scikit-learn estimator must be cloned so that each data
+            # set gets its own classifier
+            learn = user.get_learn_data()
+            if len(np.unique(learn[1])) < 2:
+                logger.debug("Learning data for user {} has less than 2 class "
+                             "values. Using DummyClassifier.".format(user_id))
+                model = DummyClassifier()
+                model.fit(*learn)
+                change_dummy_classes(model, np.array([0, 1]))
+            else:
+                model = clone(base_learner)
+                model.fit(*learn)
+            user_models[user_id] = model
         return user_models
 
 import random
