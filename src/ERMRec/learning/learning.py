@@ -101,7 +101,7 @@ class NoMergingLearner:
             user_models[user_id] = model
         return user_models
 
-import random
+import random, sys
 from collections import Iterable, OrderedDict
 from itertools import combinations
 
@@ -284,6 +284,23 @@ class CandidatePair():
         return max(self.p_values["dataM vs data1; dataM"],
                    self.p_values["dataM vs data2; dataM"])       
 
+def update_progress(progress, width=20):
+    """Write a textual progress bar to the console along with the progress' 
+    numerical value in percent.
+    
+    Arguments:
+    progress -- float in range [0, 1] indicating the progress
+    
+    Keyword arguments:
+    width -- integer representing the width (in characters) of the textual
+        progress bar
+    
+    """
+    template = "\r[{:<" + str(width) + "}] {:.1f}%"
+    sys.stdout.write(template.format('#' * (int(progress * width)),
+                                     progress * 100))
+    sys.stdout.flush()
+
 class ERMLearner:
     
     """Learning method that intelligently merges data for different users that
@@ -334,7 +351,10 @@ class ERMLearner:
             self._users[merg_u_obj.id] = merg_u_obj
         # populate the dictionary of user pairs that are candidates for merging
         C = dict()
-        for u_i, u_j in combinations(self._users, 2):
+        pairs = list(combinations(self._users, 2))
+        n_pairs = len(pairs)
+        print "Computing candidate pairs for merging ({} pairs)".format(n_pairs)
+        for i, (u_i, u_j) in enumerate(pairs):
             if self._prefilter(u_i, u_j):
                 avg_pred_errs, p_values_ij = \
                     self._estimate_errors_significances(u_i, u_j)
@@ -348,6 +368,7 @@ class ERMLearner:
                 if  er_ij >= 0 and avg_pred_errs["dataM"]["dataM"] <= min_ij:
                     cp = CandidatePair(u_i, u_j, p_values_ij)
                     C[cp.key] = cp
+            update_progress(1.* (i + 1) / n_pairs)
         # iteratively merge the most similar pair of users, until such pairs
         # exist
         while len(C) > 0:
