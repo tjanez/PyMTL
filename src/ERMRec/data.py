@@ -63,8 +63,8 @@ def load_ratings_dataset(file_name):
         "target_names": symbolic names of classification labels
 
     """
-    # columns 0 - 153 represent features, column 153 represents the class
-    usecols = range(154)
+    # columns 0 - 152 represent features, column 152 represents the class
+    usecols = range(153)
     # specify converters for features and the class
     converters = {}
     # first two columns represent year and length of the movie
@@ -72,11 +72,11 @@ def load_ratings_dataset(file_name):
     for i in range(2, 130):
         converters[i] = _yes_no_converter
     # column 130 represents number of frequent actors
-    # columns 131 - 153 represent genres
-    for i in range(131, 153):
+    # columns 131 - 152 represent genres
+    for i in range(131, 152):
         converters[i] = _yes_no_converter
-    # column 154 represents rating (class)
-    converters[153] = _like_dislike_converter
+    # column 152 represents rating (class)
+    converters[152] = _like_dislike_converter
     d = np.genfromtxt(file_name, dtype=float, delimiter='\t', skip_header=3,
                        converters=converters, missing_values='?',
                        usecols=usecols)
@@ -93,6 +93,6 @@ def load_ratings_dataset(file_name):
                  feature_names=feature_names)
 
 if __name__ == "__main__":
-    data = load_ratings_dataset("/home/tadej/Workspace/ERMRec/data/users-test3/"
-                                "user00024.tab")
+    data = load_ratings_dataset("/home/tadej/Workspace/ERMRec/data/users-m10/"
+                                "user00012.tab")
     print data.data[0]
