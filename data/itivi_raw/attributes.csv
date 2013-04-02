@@ -1430,6 +1430,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 100	3	352
 100	1	drama
 100	1	fantasy
+100	1	tv-series
 100	4	Al Pacino
 100	4	Meryl Streep
 100	4	Ben Shenkman
@@ -9515,19 +9516,19 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 640	4	Snezana Lukic
 640	5	Zivojin Pavlovic
 641	2	2003
-641	3	0
+641	3	90
 641	1	comedy
 641	1	drama
 641	4	Tanja Ribič
-641	4	Dragan Bjelogrli&#263;
+641	4	Dragan Bjelogrlic
 641	4	Rene Bitorajac
-641	4	tanja ri
+641	4	Branko Djurič
 641	4	Teja Glazar
 641	4	Roberto Magnifico
 641	4	Vlado Novak
 641	4	Primož Petkovšek
 641	4	Igor Samobor
-641	5	tanja ri
+641	5	Branko Djurič
 642	2	1993
 642	3	117
 642	1	crime
@@ -10268,7 +10269,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 692	2	2003
 692	3	92
 692	1	drama
-692	4	Dragan Bjelogrli&#263;
+692	4	Dragan Bjelogrlic
 692	4	Ksenija Pajic
 692	4	Zijah Sokolović
 692	4	Milena Dravić
@@ -10361,7 +10362,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 698	1	war
 698	1	drama
 698	1	comedy
-698	4	Dragan Bjelogrli&#263;
+698	4	Dragan Bjelogrlic
 698	4	Nikola Kojo
 698	4	Dragan Maksimovic
 698	4	Zoran Cvijanovic
@@ -11450,7 +11451,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 769	4	Caroline O'Connor
 769	5	Baz Luhrmann
 770	2	2005
-770	3	0
+770	3	94
 770	1	comedy
 770	1	drama
 770	1	romance
@@ -11464,7 +11465,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 770	4	Nate Mooney
 770	4	Rusty Schwimmer
 770	4	Robert Wisdom
-770	5	Petter N泳
+770	5	Petter Næss
 771	2	2005
 771	3	120
 771	1	action
@@ -11575,7 +11576,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 777	4	John Vickery
 777	5	Barbet Schroeder
 778	2	1992
-778	3	0
+778	3	120
 778	1	drama
 778	4	Curtis L. McClarin
 778	4	Anna Maria Horsford
@@ -11595,6 +11596,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 779	1	drama
 779	1	fantasy
 779	1	sci-fi
+779	1	tv-series
 779	4	Forbes March
 779	4	Victoria Pratt
 779	4	Lauren Lee Smith
@@ -12564,7 +12566,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 841	4	Robert Vaughn
 841	5	Louis C.K.
 842	2	2000
-842	3	0
+842	3	80
 842	1	comedy
 842	4	Matjaz Latin
 842	4	Primož Petkovšek
@@ -13950,8 +13952,8 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 930	4	Lynne Thigpen
 930	4	Josef Sommer
 930	5	John Singleton
-931	2	1971
-931	3	0
+931	2	1972
+931	3	104
 931	1	adventure
 931	1	action
 931	4	Victor Arnold
@@ -14298,7 +14300,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 953	1	romance
 953	4	Srdjan Todorovic
 953	4	Aleksandra Balmazovic
-953	4	Dragan Bjelogrli&#263;
+953	4	Dragan Bjelogrlic
 953	4	Bogdan Diklic
 953	4	Boris Milivojevic
 953	4	Milutin Karadzic
@@ -15424,9 +15426,10 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1025	4	Paul Soter
 1025	4	Erik Stolhanske
 1025	5	Jay Chandrasekhar
-1026	2	0
+1026	2	1996
 1026	3	396
 1026	1	animation
+1026	1	tv-series
 1026	5	Hiroyuki Aoyama
 1026	5	Curt Geda
 1027	2	1980
@@ -15461,9 +15464,10 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1028	4	Robert Vaughn
 1028	5	Richard Lester
 1029	2	1996
-1029	3	85
+1029	3	30
 1029	1	animation
 1029	1	family
+1029	1	tv-series
 1029	4	Brad Garrett
 1029	4	John Garry
 1029	4	Tress MacNeille
@@ -20337,10 +20341,6 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1345	4	Ryan Hurst
 1345	4	Robert Bagnell
 1345	5	Randall Wallace
-1346	2	2003
-1346	3	40
-1346	1	animation
-1346	4	Weebles
 1347	2	2000
 1347	3	113
 1347	1	thriller
@@ -20838,8 +20838,8 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1378	4	Michael 'Bear' Taliferro
 1378	4	DeMario Thornton
 1378	5	Christopher B. Stokes
-1379	2	1976
-1379	3	180
+1379	2	1973
+1379	3	93
 1379	1	biography
 1379	1	action
 1379	1	documentary
@@ -20975,6 +20975,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1389	3	63
 1389	1	animation
 1390	2	2003
+1390	3	75
 1390	1	animation
 1391	2	2006
 1391	3	95
@@ -20991,6 +20992,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1394	3	47
 1394	1	animation
 1395	2	2005
+1395	3	53
 1395	1	animation
 1396	2	2002
 1396	3	60
@@ -20999,6 +21001,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1397	3	47
 1397	1	animation
 1398	2	2004
+1398	3	68
 1398	1	animation
 1399	2	1988
 1399	3	71
@@ -21081,6 +21084,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1417	3	76
 1417	1	animation
 1418	2	1946
+1418	3	130
 1418	1	drama
 1418	4	James Stewart
 1418	4	Donna Reed
@@ -21089,6 +21093,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1418	4	Henry Travers
 1418	5	Frank Capra
 1419	2	2002
+1419	3	120
 1419	1	action
 1419	5	Mark Malone
 1419	4	Kiefer Sutherland
@@ -21126,7 +21131,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1422	4	Ricky Koole
 1422	5	Jean van de Velde
 1423	2	1998
-1423	3	0
+1423	3	93
 1423	1	drama
 1423	1	thriller
 1423	5	Gaspar Noe
@@ -21193,6 +21198,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1428	5	Jeff Balsmeyer
 1429	2	2004
 1429	1	drama
+1429	3	97
 1429	4	Diane Venora
 1429	4	Carrie Fisher
 1429	4	Joe Mantegna
@@ -21212,6 +21218,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1430	4	Forrest Tucker
 1430	4	Randolph Scott
 1431	2	2003
+1431	3	100
 1431	1	drama
 1431	4	Billy Bob Thornton	
 1431	4	Ed Solomon
@@ -21222,6 +21229,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1431	4	Holly Hunter
 1431	4	Morgan Freeman
 1432	2	2004
+1432	3	101
 1432	1	drama
 1432	4	Virgina Ariza
 1432	4	Catalina Sandino Moreno
@@ -21230,7 +21238,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1432	4	Rodrigo Sánchez Borhorquez	
 1432	4	Yenny Paola Vega
 1433	2	2002
-1433	3	0
+1433	3	103
 1433	1	drama
 1433	1	music
 1433	5	Lisa Cholodenko
@@ -21295,6 +21303,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1438	4	Sean Chapman
 1438	5	Tony Randel
 1439	2	1992
+1439	3	93
 1439	1	horror
 1439	4	Kevin Bernhardt
 1439	4	Lawrence Mortorff
@@ -21349,6 +21358,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1443	4	Jure Sotlar
 1443	4	Dare Valic
 1444	2	2003
+1444	3	106
 1444	1	drama
 1444	4	Sarah Polley
 1444	4	Amanda Plummer
@@ -21367,7 +21377,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1445	4	Matjaz Gruden
 1445	4	Andrej Djordjevic
 1446	2	2002
-1446	3	0
+1446	3	95
 1446	1	action
 1446	1	comedy
 1446	5	Lasse Spang Olsen
@@ -21418,7 +21428,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1450	4	Alberto San Juan
 1450	4	María Esteve
 1451	2	2002
-1451	3	0
+1451	3	99
 1451	1	drama
 1451	1	sport
 1451	5	Mars Callahan
@@ -21468,6 +21478,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1455	4	Sally Forrest
 1455	4	John Ireland
 1456	2	2002
+1456	3	96
 1456	1	crime
 1456	4	Pete Postlethwaite	
 1456	4	Neil Morrissey
@@ -21504,6 +21515,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1459	4	Slobodan Stefanovic
 1459	5	Marko Marinkovic
 1460	2	2000
+1460	3	135
 1460	1	drama
 1460	4	Franka Potente
 1460	4	Benno Fürmann
@@ -23530,7 +23542,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1598	4	Katarina Zutic
 1598	4	Nikola Kojo
 1598	4	Sonja Kolacaric
-1598	4	Dragan Bjelogrli&#263;
+1598	4	Dragan Bjelogrlic
 1598	4	Irfan Mensur
 1598	4	Nikola Djuricko
 1598	4	Nikola Pejakovic
@@ -24775,6 +24787,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1681	4	Alan Cooke
 1681	5	David Mackenzie
 1682	2	2002
+1682	3	104
 1682	1	comedy
 1682	5	Tom Brady
 1682	4	Rob Schneider
@@ -24797,6 +24810,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1683	4	Jet Li
 1683	4	Donnie Yen
 1684	2	1998
+1684	3	73
 1684	1	animation
 1684	6	Steven Weber
 1684	6	Ernest Borgnine
@@ -24818,6 +24832,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1686	4	Sonny Surowiec
 1686	4	John Simon Jones
 1687	2	2002
+1687	3	108
 1687	1	comedy
 1687	5	Louis Saïa
 1687	4	Véronique Cloutier	
@@ -24828,6 +24843,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1688	1	documentary
 1688	5	Tilman Remme
 1689	2	2003
+1689	3	94
 1689	1	horror
 1689	5	Richard Friedman
 1689	4	Samaire Armstrong	
@@ -24937,7 +24953,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1700	4	Jamie Bell
 1700	4	Thomas Kretschmann
 1701	2	2004
-1701	3	0
+1701	3	90
 1701	1	comedy
 1701	4	Marija Karan
 1701	4	Nebojsa Glogovac
@@ -25119,7 +25135,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1721	1	drama
 1721	1	war
 1721	5	Darko Bajic
-1721	4	Dragan Bjelogrli&#263;
+1721	4	Dragan Bjelogrlic
 1721	4	Srdjan Todorovic
 1721	4	Vesna Trivalic
 1721	4	Dubravka Mijatovic
@@ -25251,7 +25267,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1736	1	documentary
 1736	5	Neil Nightingale
 1737	2	2003
-1737	3	0
+1737	3	50
 1737	1	documentary
 1737	4	Sanjeev Bhaskar
 1737	5	Neil Nightingale
@@ -26901,12 +26917,14 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1888	4	Souad Amidou
 1888	5	Claude Lelouch
 1889	2	1988
+1889	3	171
 1889	1	drama
 1889	4	Daniel Day-Lewis
 1889	4	Juliette Binoche
 1889	4	Lena Olin
 1889	5	Philip Kaufman
 1890	2	2002
+1890	3	102
 1890	1	romance
 1890	4	Gwyneth Paltrow
 1890	4	Aaron Eckhart
@@ -26934,7 +26952,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1892	4	Jack Buchanan
 1892	5	Vincente Minnelli
 1893	2	1944
-1893	3	0
+1893	3	114
 1893	1	thriller
 1893	1	drama
 1893	4	Charles Boyer
@@ -26996,6 +27014,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1898	4	Aidan Quinn
 1898	5	Neil Jordan
 1899	2	2003
+1899	3	110
 1899	1	drama
 1899	4	Jessica Lange
 1899	4	Tom Wilkinson
@@ -27016,7 +27035,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1900	4	Linden Ashby
 1900	5	Lawrence Kasdan
 1901	2	1994
-1901	3	0
+1901	3	95
 1901	1	comedy
 1901	1	family
 1901	4	Macaulay Culkin
@@ -29653,7 +29672,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 2152	5	Dario Argento
 2152	4	Claudio Santamaria
 2153	2	1999
-2153	3	1999
+2153	3	112
 2153	1	biography
 2153	1	adventure
 2153	1	drama
@@ -32935,7 +32954,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 2502	3	60
 2502	1	animation
 2503	2	1977
-2503	3	1977
+2503	3	60
 2503	1	animation
 2504	2	2003
 2504	3	50
@@ -34472,7 +34491,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 2714	4	Michael Madsen
 2714	5	Quentin Tarantino
 2715	2	1999
-2715	3	0
+2715	3	99
 2715	1	sci-fi
 2715	1	action
 2715	1	horror
@@ -36220,6 +36239,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 2879	3	608
 2879	1	horror
 2879	1	thriller
+2879	1	tv-series
 2879	4	Andrew McCarthy
 2879	4	Bruce Davison
 2879	4	Diane Ladd
@@ -39532,7 +39552,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 3195	2	2004
 3195	3	45
 3195	1	animation
-3196	2	0
+3196	2	2004
 3196	3	50
 3196	1	animation
 3197	2	2006
@@ -40274,7 +40294,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 3264	4	Joseph Gordon-Levitt
 3264	4	Macy Gray
 3265	2	2005
-3265	3	0
+3265	3	84
 3265	1	action
 3265	1	thriller
 3265	5	Luc Campeau
@@ -41448,12 +41468,12 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 3377	4	Shawn Ashmore
 3377	4	David Gallagher
 3378	2	2002
-3378	3	0
+3378	3	95
 3378	1	crime
 3378	1	action
 3378	5	Cess Silvera
 3378	4	Ky-Mani Marley
-3378	4		Spragga Benz
+3378	4	Spragga Benz
 3378	4	Paul Campbell
 3378	4	Louie Rankin
 3378	4	Wyclef Jean
@@ -42023,7 +42043,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 3437	4	John Cleese
 3437	4	Terry Gilliam
 3438	2	2006
-3438	3	0
+3438	3	90
 3438	1	animation
 3438	1	comedy
 3438	1	family
@@ -45851,7 +45871,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 4071	4	James Karen
 4071	4	Dan Castellaneta
 4072	2	2006
-4072	3	0
+4072	3	94
 4072	1	comedy
 4072	5	Nicholaus Goossen
 4072	4	Linda Cardellini
@@ -50846,7 +50866,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 4529	4	Amira Casar
 4529	4	Philippe Katerine
 4530	2	2006
-4530	3	0
+4530	3	81
 4530	1	action
 4530	1	crime
 4530	1	thriller
@@ -53845,7 +53865,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 4787	4	Dana Delany
 4787	4	Denise Dowse
 4788	2	1993
-4788	3	0
+4788	3	91
 4788	1	sci-fi
 4788	1	action
 4788	1	thriller
@@ -54969,7 +54989,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 4891	3	60
 4891	1	animation
 4892	2	2006
-4892	3	0
+4892	3	76
 4892	1	animation
 4893	2	2007
 4893	3	60
@@ -55610,7 +55630,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 5008	1	war
 5008	1	documentary
 5009	2	2007
-5009	3	2007
+5009	3	70
 5009	1	war
 5009	1	documentary
 5010	2	1978
@@ -56060,7 +56080,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 5071	3	51
 5071	1	documentary
 5072	2	2008
-5072	3	2008
+5072	3	55
 5072	1	documentary
 5073	2	2008
 5073	3	52
@@ -56448,7 +56468,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 5111	4	Tracy Arnold
 5111	4	David Katz
 5112	2	1976
-5112	3	1976
+5112	3	155
 5112	1	biography
 5112	1	drama
 5112	1	history
@@ -60015,14 +60035,14 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 5444	4	Emir Hadžihafizbegović
 5444	4	Jovan Radovanović
 5444	4	Lazar Ristovski
-5444	4	Dragan Bjelogrli&#263;
+5444	4	Dragan Bjelogrlic
 5445	2	1989
 5445	3	92
 5445	1	comedy
 5445	1	family
 5445	5	Mihailo Vukobratovic
 5445	4	Lidija Vukičević
-5445	4	Dragan Bjelogrli&#263;
+5445	4	Dragan Bjelogrlic
 5445	4	Marko Nikolić
 5445	4	Svetlana Bojkovic
 5445	4	Aljoša Vučković
@@ -63644,12 +63664,12 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 5859	4	Ernest Miller
 5859	5	Darren Aronofsky
 5860	2	2009
-5860	3	0
+5860	3	86
 5860	1	comedy
 5860	1	crime
 5860	1	drama
 5860	4	Seth Rogen
-5860	4	 Ray Liotta
+5860	4	Ray Liotta
 5860	4	Michael Pena
 5860	4	Anna Faris
 5860	4	Dan Bakkedahl
@@ -66333,7 +66353,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 6086	4	James Cosmo
 6086	5	Mel Gibson
 6087	2	2009
-6087	3	0
+6087	3	140
 6087	1	biography
 6087	1	crime
 6087	1	drama
@@ -67831,11 +67851,11 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 6198	4	Lindsay Sloane
 6198	5	Jim Field Smith
 6199	2	2010
-6199	3	0
+6199	3	129
 6199	1	drama
 6199	1	romance
 6199	4	Robert Pattinson
-6199	4	 Pierce Brosnan
+6199	4	Pierce Brosnan
 6199	4	Emilie de Ravin
 6199	4	Chris Cooper
 6199	4	Lena Olin
@@ -68634,10 +68654,10 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 233	7	Čudežna mreža
 234	7	Kje je Holden?
 235	7	Količinski popust
-236	7	Goljufi (manjka opis)
+236	7	Goljufi
 237	7	Cherry Falls
 238	7	Chicago
-239	7	manjkaopis in naslov
+239	7	Chicks with Sticks
 240	7	Otroci manjšega boga
 241	7	Chisum
 242	7	Čokolada
@@ -68711,7 +68731,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 310	7	Uničevalec
 311	7	V nevarnosti
 312	7	Vlak smrti
-313	7	Ure obupa (manjka opis)
+313	7	Ure obupa
 314	7	Pripor
 315	7	Deuce bigalow: Moški žigolo
 316	7	Hudičeva hrbtenica
@@ -68756,7 +68776,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 355	7	Drakula II: Vnebohod
 356	7	Kačji pastir
 357	7	Svet zmajev
-358	7	Zmji ognja in ledu (manjka opis)
+358	7	Zmaji ognja in ledu
 359	7	Lovec na sanje
 360	7	Dirka
 361	7	Hitre tarče
@@ -68814,7 +68834,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 413	7	Skozi oko zasledovalca
 414	7	Široko zaprte oči
 415	7	Brez obraza
-416	7	Faerie Tale Theatre - Rapunzel (manjka naslov in opis)
+416	7	Faerie Tale Theatre - Rapunzel
 417	7	Fahrenheit 9/11
 418	7	Prosti pad
 419	7	Zaljubljena Zaljubljenost
@@ -68825,7 +68845,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 424	7	Debeli Albert
 425	7	Usodna privlačnost
 426	7	Usodna ženska
-427	7	FernGully: Zadnji deževni gozd (manjka opis)
+427	7	FernGully: Zadnji deževni gozd
 428	7	Prosti dan Ferrisa Bullerja
 429	7	Popoln ulov
 430	7	Brez povratka
@@ -68861,7 +68881,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 460	7	Petek 13. - 5.del
 461	7	Petek 13. - 6.del
 462	7	Petek 13. - 8.del
-463	7	Trčeni in zabavni (manjka opis)
+463	7	Trčeni in zabavni
 464	7	Zabava v Acapulcu
 465	7	Smešni obraz
 466	7	G.I. Jane
@@ -68873,7 +68893,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 472	7	Garfield (sinhronizirano)
 473	7	Džingis khan
 474	7	George in zmaj
-475	7	Geronimo (manjka naslov in opis)
+475	7	Geronimo
 476	7	Ubijte Carterja
 477	7	Duh
 478	7	Duh psa: Na samurajevi poti
@@ -68902,7 +68922,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 501	7	Gotika
 502	7	Grand hotel
 503	7	Mrtvečeve sanje
-504	7	Garuzone (manjka naslov in opis)
+504	7	Siva cona
 505	7	Briljantina
 506	7	Briljantina 2
 507	7	Cvet vseh zapornikov
@@ -68980,7 +69000,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 579	7	I.Q.
 580	7	Ledena doba
 581	7	Ledena princesa
-582	7	Gremo naprej (manjka opis)
+582	7	Gremo naprej
 583	7	Identiteta
 584	7	Igmanski marš
 585	7	Namišljeni junaki
@@ -69051,7 +69071,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 650	7	Ubila bom Billa 1
 651	7	Ubila bom Billa 2
 652	7	Ubij me pozneje
-653	7	Emmetov boj (manjka opis)
+653	7	Emmetov boj
 654	7	Ubiti Hitlerja
 655	7	Ubij me strastno
 656	7	Kim Possible: Dosje zlikovca
@@ -69067,7 +69087,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 666	7	Grobijani
 667	7	Kdo neki tam poje
 668	7	K-Pax
-669	7	Konec vojne (manjka opis)
+669	7	Konec vojne
 670	7	Kraljevski vlak
 671	7	L.A. zaupno
 672	7	Nikita
@@ -69100,12 +69120,12 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 699	7	Zboristi
 700	7	Mladi, lepi in zadeti
 701	7	Smrtonosno orožje 4
-702	7	Leui ting jin ging - Thunder Cop (manjka opis)
+702	7	Leui ting jin ging - Thunder Cop
 703	7	Ostrostrelec
-704	7	Life (manjka naslov in opis)
+704	7	Life
 705	7	Hiša na pečini
 706	7	Brianovo življenje
-707	7	Life's Decisions (manjka naslov in opis)
+707	7	Life's Decisions
 708	7	Žverčine pustolovščine
 709	7	Lili in Žverca
 710	7	Mali veliki mož
@@ -69154,7 +69174,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 753	7	Cena odrešitve
 754	7	Metallica: Some Kind Of Monster
 755	7	Polnoč v vrtu dobrega in zla
-756	7	Midsomer Murders - Death's Shadow (manjka naslov in opis)
+756	7	Midsomer Murders - Death's Shadow
 757	7	Posebno poročilo
 758	7	Izgubljene misice
 759	7	Lepotica pod krinko
@@ -69177,7 +69197,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 776	7	Umor v vojaški utrdbi
 777	7	Številke za umor
 778	7	Umor brez motiva: Zgodba Edmunda Perryja
-779	7	Mutant X (manjka opis)
+779	7	Mutant X
 780	7	Moja obilna grška poroka
 781	7	Šefova hčerka
 782	7	Moj prvi frajer
@@ -69251,7 +69271,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 850	7	Bližina
 851	7	Šund
 852	7	Pijana ljubezen
-853	7	Purpose (manjka naslov in opis)
+853	7	Purpose
 854	7	Kraljica prekletih
 855	7	Živi pesek
 856	7	Hitra zebra
@@ -69330,7 +69350,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 929	7	Senca strahu
 930	7	Shaft
 931	7	Shaft je uspel
-932	7	Shaft v afriki (manjka opis)
+932	7	Shaft v afriki
 933	7	Shane
 934	7	Polnočni obračun
 935	7	Opoldanski obračun
@@ -69361,8 +69381,8 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 960	7	Podri jo, mrho francosko
 961	7	Slovar v postelji
 962	7	Brezglavi jezdec
-963	7	Helenine ljubezni (manjka opis)
-964	7	Naključna sopotnica (manjka opis)
+963	7	Helenine ljubezni
+964	7	Naključna sopotnica
 965	7	Ostrostrelec 2
 966	7	Sneguljčica in sedem palčkov
 967	7	Koraki v prostost
@@ -69424,10 +69444,10 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1023	7	Super Mario Bros
 1024	7	Super vlečko
 1025	7	Super policaji
-1026	7	Superman (manjka opis)
+1026	7	Superman
 1027	7	Superman 2
 1028	7	Superman 3
-1029	7	Superman: A Little Piece of Home (manjka opis)
+1029	7	Superman: A Little Piece of Home
 1030	7	Superman - Zadnji kriptonov sin
 1031	7	Super zvezda
 1032	7	Brez osumljenca
@@ -69450,7 +69470,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1049	7	Ekipa Amerika: Svetovni policaji
 1050	7	Sončeve solze
 1051	7	Telebajski - Nered in zmešnjava, Najljubše stvari (sinhronizirano)
-1052	7	Jutro obupanih (manjka opis)
+1052	7	Jutro obupanih
 1053	7	Končna hitrost
 1054	7	Terminator 2: Sodni dan
 1055	7	Terminator 3: Vstaja strojev
@@ -69480,7 +69500,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1079	7	Čarovnica iz Blaira
 1080	7	Telesni stražar
 1081	7	Zbiralec kosti
-1082	7	Upor na ladji Bounty (manjka opis)
+1082	7	Upor na ladji Bounty
 1083	7	Kdo je Bourne?
 1084	7	Bournova premoč
 1085	7	Bradyjeva klapa
@@ -69588,7 +69608,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1187	7	Mothmanova prerokba
 1188	7	Ime rože
 1189	7	Nedokončana zgodba 2
-1190	7	Trčeni profesor (manjka opis)
+1190	7	Trčeni profesor
 1191	7	Vsiljivci
 1192	7	Izobčenec Josey Wales
 1193	7	Podeželana
@@ -69725,7 +69745,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1324	7	Veronica Guerin
 1325	7	Vertikala smrti
 1326	7	Totalni pokvarjenci
-1327	7	(manjka naslov in opis)
+1327	7	Veter
 1328	7	Victor/Victoria
 1329	7	Vidocq
 1330	7	Stevardese letijo v nebo
@@ -69744,7 +69764,6 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1343	7	Waynov svet
 1344	7	Waynov svet 2
 1345	7	Bili smo vojaki
-1346	7	(manjka naslov in opis)
 1347	7	Morje smrti
 1348	7	Dobrodošli v Collinwoodu
 1349	7	Legenda o jezdecu kitov
@@ -69759,7 +69778,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1358	7	Beli božič
 1359	7	Beli oleander
 1360	7	Bela mrzlica
-1361	7	Bele pečine (manjka opis)
+1361	7	Bele pečine
 1362	7	Kdo je Cletis Tout?
 1363	7	Kdo to trka na moja vrata?
 1364	7	Divja igra 2
@@ -69777,7 +69796,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1376	7	Jamakasi
 1377	7	Včerajšnji otroci
 1378	7	Ulični ples
-1379	7	(manjka naslov in opis)
+1379	7	The Real Bruce Lee
 1380	7	Čaka te pošta
 1381	7	Zatoiči
 1382	7	Ze film
@@ -70111,7 +70130,7 @@ PRODUCT_ID	ATTRIBUTE_ID	ORIGINAL_VALUE
 1710	7	Sabrina
 1711	7	Dekleta iz visoke družbe
 1712	7	Vrnitev
-1713	7	Srečna družina (manjka opis)
+1713	7	Srečna družina
 1714	7	Božanski Michelangelo
 1715	7	Pobesneli bik
 1716	7	Morske pošasti

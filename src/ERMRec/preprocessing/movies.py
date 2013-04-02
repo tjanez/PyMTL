@@ -44,6 +44,8 @@ def is_series(attrs):
         return True
     elif re.search(r"sveto pismo \d+", title):
         return True
+    elif "tv-series" in attrs["Genre"]:
+        return True
     else:
      	return False
 
@@ -154,7 +156,6 @@ class RawDataPreprocessor:
         Report on the number of deleted entries.
         
         """
-        
         n = len(self._movie_attrs)
         # drop all series
         for movie_id, attrs in list(self._movie_attrs.iteritems()):
@@ -342,20 +343,24 @@ class RawDataPreprocessor:
             ins["# Freq Actors"] = s
         # sanity check
         for movie_id, ins in movies.iteritems():
+            manually_checked_length_exceptions = ["504"]
             try:
-                length = int(ins["Length"]) 
-                if length < 30:
-                    logging.warning("'{}' has length {} minutes.".\
-                                    format(ins["Title"], length))
+                length = int(ins["Length"])
+                if (not 24 < length < 250 and
+                    movie_id not in manually_checked_length_exceptions):
+                    logging.warning("'{}' has length {} minutes (id: {})".\
+                                    format(ins["Title"], length, movie_id))
             except TypeError as e:
-                logging.warning("'{}' has unknown length.".format(ins["Title"]))
+                logging.warning("'{}' has unknown length (id: {})".\
+                                format(ins["Title"], movie_id))
             try:
-                year = int(ins["Year"]) 
-                if not 1950 < year < 2012:
-                    logging.warning("'{}' has year {}.".format(ins["Title"],
-                                                               year))
+                year = int(ins["Year"])
+                if not 1910 < year < 2012:
+                    logging.warning("'{}' has year {} (id: {})".\
+                                    format(ins["Title"], year, movie_id))
             except TypeError as e:
-                logging.warning("'{}' has unknown year.".format(ins["Title"]))
+                logging.warning("'{}' has unknown year (id: {})".\
+                                format(ins["Title"], movie_id))
         
         sorted_movies = sorted(movies.iteritems(), key=lambda x: int(x[0]))
         sorted_movies = [movie for _, movie in sorted_movies]
