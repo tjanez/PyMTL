@@ -284,7 +284,7 @@ class CandidatePair():
         return max(self.p_values["dataM vs data1; dataM"],
                    self.p_values["dataM vs data2; dataM"])       
 
-def update_progress(progress, width=20):
+def update_progress(progress, width=20, invert=False):
     """Write a textual progress bar to the console along with the progress' 
     numerical value in percent.
     
@@ -294,9 +294,12 @@ def update_progress(progress, width=20):
     Keyword arguments:
     width -- integer representing the width (in characters) of the textual
         progress bar
+    invert -- boolean indicating whether the progress' value should be inverted
     
     """
     template = "\r[{:<" + str(width) + "}] {:.1f}%"
+    if invert:
+        progress = 1 - progress
     sys.stdout.write(template.format('#' * (int(progress * width)),
                                      progress * 100))
     sys.stdout.flush()
@@ -372,6 +375,8 @@ class ERMLearner:
         print
         # iteratively merge the most similar pair of users, until such pairs
         # exist
+        n_cand = len(C)
+        print "Processing {} candidate pairs for merging".format(n_cand)
         while len(C) > 0:
             # find the object pair with the minimal maximal p-value
             maxes = [(cp_key, cp.get_max_p_value()) for cp_key, cp in
@@ -403,6 +408,8 @@ class ERMLearner:
                     if er_iM >= 0 and avg_pred_errs["dataM"]["dataM"] <= min_iM:
                         cp = CandidatePair(u_i, u_M, p_values_iM)
                         C[cp.key] = cp
+            update_progress(1.* len(C) / n_cand, invert=True)
+        print
         # build a model for each remaining (merged) user
         user_models = dict()
         for merg_u_obj in self._users.itervalues():
