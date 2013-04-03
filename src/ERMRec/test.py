@@ -691,10 +691,11 @@ if __name__ == "__main__":
     # select base learners
     base_learners = OrderedDict()
     from sklearn.linear_model import LogisticRegression
-    from sklearn.pipeline import Pipeline
-    from sklearn_utils import MeanImputer
-    clf = Pipeline([("imputer", MeanImputer()),
-                    ("log_reg", LogisticRegression())])
+#    from sklearn.pipeline import Pipeline
+#    from sklearn_utils import MeanImputer
+#    clf = Pipeline([("imputer", MeanImputer()),
+#                    ("log_reg", LogisticRegression())])
+    clf = LogisticRegression()
     base_learners["log_reg"] = clf
 #    from sklearn.dummy import DummyClassifier
 #    from sklearn.pipeline import Pipeline
