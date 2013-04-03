@@ -369,6 +369,7 @@ class ERMLearner:
                     cp = CandidatePair(u_i, u_j, p_values_ij)
                     C[cp.key] = cp
             update_progress(1.* (i + 1) / n_pairs)
+        print
         # iteratively merge the most similar pair of users, until such pairs
         # exist
         while len(C) > 0:
