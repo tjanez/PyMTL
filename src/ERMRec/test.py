@@ -687,7 +687,7 @@ if __name__ == "__main__":
     # create a pool of users
     rnd_seed = 51
     pool = UsersPool(users_data_path, rnd_seed)
-    pool.only_keep_k_users(10)
+#    pool.only_keep_k_users(10)
     # select base learners
     base_learners = OrderedDict()
     from sklearn.linear_model import LogisticRegression
