@@ -281,6 +281,23 @@ class UsersPool:
         # tested base learner
         self._test_res = OrderedDict()
     
+    def only_keep_k_users(self, k):
+        """Reduce the size of the pool to k randomly chosen users.
+        If the pool's size is smaller than k, keep all users.
+        
+        Arguments:
+        k -- integer representing the number of users to keep
+        
+        """
+        new_users = dict()
+        for _ in range(min(k, len(self._users))):
+            user_id = self._random.choice(self._users.keys())
+            new_users[user_id] = self._users[user_id]
+            del self._users[user_id]
+        logger.info("Kept {} randomly chosen users, {} users discarded".\
+                     format(len(new_users), len(self._users)))
+        self._users = new_users
+    
     def __str__(self):
         """Return a "pretty" representation of the pool of users by indicating
         their ids.
@@ -656,7 +673,7 @@ if __name__ == "__main__":
     path_prefix = os.path.abspath(os.path.join(cur_dir, "../../"))
     if test:
         users_data_path = os.path.join(path_prefix, "data/users-test2")
-        results_path = os.path.join(path_prefix, "results/users-test2")
+        results_path = os.path.join(path_prefix, "results/users-test2new")
         if not os.path.exists(results_path):
             os.makedirs(results_path)
         pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
@@ -670,20 +687,21 @@ if __name__ == "__main__":
     # create a pool of users
     rnd_seed = 51
     pool = UsersPool(users_data_path, rnd_seed)
+    pool.only_keep_k_users(10)
     # select base learners
     base_learners = OrderedDict()
-#    from sklearn.linear_model import LogisticRegression
-#    from sklearn.pipeline import Pipeline
-#    from sklearn_utils import MeanImputer
-#    clf = Pipeline([("imputer", MeanImputer()),
-#                    ("log_reg", LogisticRegression())])
-#    base_learners["log_reg"] = clf
-    from sklearn.dummy import DummyClassifier
+    from sklearn.linear_model import LogisticRegression
     from sklearn.pipeline import Pipeline
     from sklearn_utils import MeanImputer
     clf = Pipeline([("imputer", MeanImputer()),
-                    ("majority", DummyClassifier(strategy="most_frequent"))])
-    base_learners["majority"] = clf
+                    ("log_reg", LogisticRegression())])
+    base_learners["log_reg"] = clf
+#    from sklearn.dummy import DummyClassifier
+#    from sklearn.pipeline import Pipeline
+#    from sklearn_utils import MeanImputer
+#    clf = Pipeline([("imputer", MeanImputer()),
+#                    ("majority", DummyClassifier(strategy="most_frequent"))])
+#    base_learners["majority"] = clf
     #TODO: Replace or remove these Orange-based base learners
 #    from orange_learners import CustomMajorityLearner
 #    # a custom Majority learner which circumvents a bug with the  return_type
