@@ -413,13 +413,26 @@ class ERMLearner:
         # build a model for each remaining (merged) user
         user_models = dict()
         for merg_u_obj in self._users.itervalues():
+            # NOTE: When the number of unique class values is less than 2, we
+            # cannot fit an ordinary model (e.g. logistic regression). Instead,
+            # we have to use a dummy classifier which is subsequently augmented
+            # to handle all the other class values.
             # NOTE: The scikit-learn estimator must be cloned so that each
             # (merged) user gets its own classifier
-            base_learner = clone(self._base_learner)
-            base_learner.fit(*merg_u_obj.get_learn_data())
+            X, y = merg_u_obj.get_learn_data()
+            if len(np.unique(y)) < 2:
+                logger.info("Learning data for merged user {} has less than 2 "
+                            "class values. Using DummyClassifier.".\
+                            format(merg_u_obj))
+                model = DummyClassifier()
+                model.fit(X, y)
+                change_dummy_classes(model, np.array([0, 1]))
+            else:
+                model = clone(self._base_learner)
+                model.fit(X, y)
             # assign this model to each original user of this (merged) user
             for user_id in merg_u_obj.get_original_ids():
-                user_models[user_id] = base_learner
+                user_models[user_id] = model
         return user_models
     
     def _estimate_errors_significances(self, u_1, u_2):

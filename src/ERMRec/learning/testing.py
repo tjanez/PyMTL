@@ -230,10 +230,21 @@ def _generalized_cross_validation(learner, data1, data2, cv_folds1):
     X2, y2 = data2
     # build a model on data2
     # NOTE: The model does not change throughout cross-validation on data1
+    # NOTE: When the number of unique class values is less than 2, we
+    # cannot fit an ordinary model (e.g. logistic regression). Instead, we
+    # have to use a dummy classifier which is subsequently augmented to
+    # handle all the other class values.
     # NOTE: The scikit-learn estimator must be cloned so that each data set
     # gets its own classifier
-    model2 = clone(learner)
-    model2.fit(X2, y2)
+    if len(np.unique(y2)) < 2:
+        logger.debug("Learning data for data2 has less than 2 class values."
+                     " Using DummyClassifier.")
+        model2 = DummyClassifier()
+        model2.fit(X2, y2)
+        change_dummy_classes(model2, np.array([0, 1]))
+    else:
+        model2 = clone(learner)
+        model2.fit(X2, y2)
     _check_classes(model2)
     # prediction errors of models computed as:
     # 1 - P_model(predicted_class == true_class)
@@ -262,7 +273,7 @@ def _generalized_cross_validation(learner, data1, data2, cv_folds1):
                          " Using DummyClassifier.")
             model1 = DummyClassifier()
             model1.fit(*learn1)
-            change_dummy_classes(model1, np.unique(y1))
+            change_dummy_classes(model1, np.array([0, 1]))
         else:
             model1 = clone(learner)
             model1.fit(*learn1)
@@ -272,7 +283,7 @@ def _generalized_cross_validation(learner, data1, data2, cv_folds1):
                          " less than 2 class values. Using DummyClassifier.")
             modelm = DummyClassifier()
             modelm.fit(*learn1)
-            change_dummy_classes(modelm, np.unique(y1))
+            change_dummy_classes(modelm, np.array([0, 1]))
         else:
             modelm = clone(learner)
             modelm.fit(*learnm)
@@ -326,9 +337,6 @@ def generalized_cross_validation(learner, data1, data2, folds, rand_seed1,
     # unpack the data1 and data2 tuples
     _, y1 = data1
     _, y2 = data2
-    # check if both data sets have the same class values
-    np.testing.assert_array_equal(np.unique(y1), np.unique(y2),
-                err_msg="Both data sets should have the same class values.")
     # create a two-dimensional dictionary storing prediction error lists of
     # models build on all combinations of the learning data sets and
     # tested on all combinations of the testing data sets
