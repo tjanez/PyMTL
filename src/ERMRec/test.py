@@ -27,37 +27,45 @@ import numpy as np
 from sklearn import metrics
 from sklearn import cross_validation
 
-from data import load_ratings_dataset
+from ERMRec import stat
+from ERMRec.data import load_ratings_dataset
+from ERMRec.learning import prefiltering, learning
+from ERMRec.plotting import BarPlotDesc, LinePlotDesc, plot_multiple
 
-def configure_logging(level=logging.DEBUG, console_level=logging.DEBUG):
+def configure_logging(name=None, level=logging.DEBUG,
+                      console_level=logging.DEBUG,
+                      file_name=None, file_level=logging.DEBUG):
     """Configure logging for the test module of ERMRec.
     Return the created Logger instance.
     
     Keyword arguments:
+    name -- string representing the logger's name;
+        if None, logging module will default to root logger
     level -- level of the created logger
-    console_level -- level of the console handler attached to the created logger 
+    console_level -- level of the console handler attached to the created logger
+    file_name -- file name of the file handler attached to the created logger;
+        if None, no file handler is created 
+    file_level -- level of the file handler attached to the created logger
     
     """
     # set up logging
-    logger = logging.getLogger("ERMRec")
+    logger = logging.getLogger(name)
     logger.setLevel(level)
-    # create console handler and set level to debug
-    ch = logging.StreamHandler()
-    ch.setLevel(console_level)
     # create formatter
     formatter = logging.Formatter(fmt="[%(asctime)s] %(name)-15s "
                     "%(levelname)-7s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-    # add formatter to ch
+    # create console handler and configure it
+    ch = logging.StreamHandler()
+    ch.setLevel(console_level)
     ch.setFormatter(formatter)
-    # add ch to logger
     logger.addHandler(ch)
+    # create a file handler and set its level
+    if file_name:
+        fh = logging.FileHandler(file_name)
+        fh.setLevel(file_level)
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
     return logger
-
-logger = configure_logging(level=logging.DEBUG)
-
-from ERMRec import stat
-from ERMRec.learning import prefiltering, learning
-from ERMRec.plotting import BarPlotDesc, LinePlotDesc, plot_multiple
 
 def pickle_obj(obj, file_path):
     """Pickle the given object to the given file_path.
@@ -667,27 +675,40 @@ if __name__ == "__main__":
     # a boolean indicating which pool of users to use
     test = True
     
+    rnd_seed = 51
+    # the number of users to keep in the users pool
+    if test:
+        keep = 10
+    else:
+        keep = 50
+    
     # compute the location of other files/directories from the current file's
     # location
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     path_prefix = os.path.abspath(os.path.join(cur_dir, "../../"))
     if test:
         users_data_path = os.path.join(path_prefix, "data/users-test2")
-        results_path = os.path.join(path_prefix, "results/users-test2new")
+        results_path = os.path.join(path_prefix, "results/users-test2-seed{}-"
+                                    "keep{}".format(rnd_seed, keep))
         if not os.path.exists(results_path):
             os.makedirs(results_path)
-        pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
     else:
         users_data_path = os.path.join(path_prefix, "data/users-m10")
-        results_path = os.path.join(path_prefix, "results/users-m10new")
+        results_path = os.path.join(path_prefix, "results/users-m10-seed{}-"
+                                    "keep{}".format(rnd_seed, keep))
         if not os.path.exists(results_path):
             os.makedirs(results_path)
-        pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
-        
+    pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
+    log_file = os.path.join(results_path, "run-{}.log".format(
+                            time.strftime("%Y%m%d_%H%M%S")))
+    
+    # configure logging
+    logger = configure_logging(name="ERMRec", console_level=logging.INFO,
+                               file_name=log_file)
+    
     # create a pool of users
-    rnd_seed = 51
     pool = UsersPool(users_data_path, rnd_seed)
-#    pool.only_keep_k_users(10)
+    pool.only_keep_k_users(keep)
     # select base learners
     base_learners = OrderedDict()
     from sklearn.linear_model import LogisticRegression
@@ -742,26 +763,26 @@ if __name__ == "__main__":
     # test all combinations of learners and base learners (compute the testing
     # results with the defined measures) and save the results
     pool.test_users(learners, base_learners, measures)
-#    pool.pickle_test_results(pickle_path_fmt)
-#    
-#    # find previously computed testing results and check if they were computed
-#    # using the same data tables and cross-validation indices
-#    pool.find_pickled_test_results(pickle_path_fmt)
-#    if not pool.check_test_results_compatible():
-#        raise ValueError("Test results for different base learners are not " \
-#                         "compatible.")
-#    # divide users into bins according to the number of ratings they have
-#    if test:
-#        bin_edges = [10, 15, 20]
-#    else:
-#        bin_edges = range(10, 251, 10)
-#    pool.divide_users_to_bins(bin_edges)
-#    
-#    # select the base learners, learners and scoring measures for which to 
-#    # visualize the testing results
-#    bls = pool.get_base_learners()
-#    ls = pool.get_learners()
-#    ms = pool.get_measures()
-#    pool.visualize_results(bls, ls, ms, results_path,
-#        colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
-#        plot_type="line")
+    pool.pickle_test_results(pickle_path_fmt)
+    
+    # find previously computed testing results and check if they were computed
+    # using the same data tables and cross-validation indices
+    pool.find_pickled_test_results(pickle_path_fmt)
+    if not pool.check_test_results_compatible():
+        raise ValueError("Test results for different base learners are not " \
+                         "compatible.")
+    # divide users into bins according to the number of ratings they have
+    if test:
+        bin_edges = [10, 15, 20]
+    else:
+        bin_edges = range(10, 251, 10)
+    pool.divide_users_to_bins(bin_edges)
+    
+    # select the base learners, learners and scoring measures for which to 
+    # visualize the testing results
+    bls = pool.get_base_learners()
+    ls = pool.get_learners()
+    ms = pool.get_measures()
+    pool.visualize_results(bls, ls, ms, results_path,
+        colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
+        plot_type="line")
