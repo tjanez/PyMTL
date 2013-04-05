@@ -237,8 +237,6 @@ def _generalized_cross_validation(learner, data1, data2, cv_folds1):
     # NOTE: The scikit-learn estimator must be cloned so that each data set
     # gets its own classifier
     if len(np.unique(y2)) < 2:
-        logger.debug("Learning data for data2 has less than 2 class values."
-                     " Using DummyClassifier.")
         model2 = DummyClassifier()
         model2.fit(X2, y2)
         change_dummy_classes(model2, np.array([0, 1]))
@@ -269,8 +267,6 @@ def _generalized_cross_validation(learner, data1, data2, cv_folds1):
         # NOTE: The scikit-learn estimator must be cloned so that each data
         # set gets its own classifier 
         if len(np.unique(learn1[1])) < 2:
-            logger.debug("Learning data for data1 has less than 2 class values."
-                         " Using DummyClassifier.")
             model1 = DummyClassifier()
             model1.fit(*learn1)
             change_dummy_classes(model1, np.array([0, 1]))
@@ -279,8 +275,6 @@ def _generalized_cross_validation(learner, data1, data2, cv_folds1):
             model1.fit(*learn1)
         _check_classes(model1)
         if len(np.unique(learnm[1])) < 2:
-            logger.debug("Learning data for the merger of data1 and data2 has"
-                         " less than 2 class values. Using DummyClassifier.")
             modelm = DummyClassifier()
             modelm.fit(*learn1)
             change_dummy_classes(modelm, np.array([0, 1]))
