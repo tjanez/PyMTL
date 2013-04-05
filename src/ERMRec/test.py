@@ -274,8 +274,8 @@ class UsersPool:
         seed -- integer to be used as a seed for the private Random object
         
         """
-        self._users = dict()
-        for file_ in os.listdir(users_data_path):
+        self._users = OrderedDict()
+        for file_ in sorted(os.listdir(users_data_path)):
             match = re.search(r"^user(\d+)\.tab$", file_)
             if match:
                 # get the first parenthesized subgroup of the match
@@ -297,7 +297,7 @@ class UsersPool:
         k -- integer representing the number of users to keep
         
         """
-        new_users = dict()
+        new_users = OrderedDict()
         for _ in range(min(k, len(self._users))):
             user_id = self._random.choice(self._users.keys())
             new_users[user_id] = self._users[user_id]
@@ -680,7 +680,7 @@ if __name__ == "__main__":
     if test:
         keep = 10
     else:
-        keep = 50
+        keep = 100
     
     # compute the location of other files/directories from the current file's
     # location
