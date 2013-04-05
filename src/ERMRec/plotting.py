@@ -22,6 +22,10 @@
 from math import ceil
 
 import numpy as np
+# select a non-interactive backend for matplotlib to enable this script to be
+# run without an open display
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 

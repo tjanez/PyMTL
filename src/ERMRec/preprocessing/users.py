@@ -19,6 +19,11 @@
 #
 
 import logging, math, os, re
+
+# select a non-interactive backend for matplotlib to enable this script to be
+# run without an open display
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import Orange
