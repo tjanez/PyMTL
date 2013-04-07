@@ -370,13 +370,14 @@ class UsersPool:
          
         """
         self._bin_edges = bin_edges
-        self._bins = {edge : [] for edge in self._bin_edges}
+        self._bins = OrderedDict()
+        for edge in bin_edges:
+            self._bins[edge] = []
         for user_id, user in self._users.iteritems():
             # find the appropriate bin for the user
             bin_edge = self._find_bin_edge(user.get_data_size())
             self._bins[bin_edge].append(user_id)
-        logger.debug("Divided the users into {} bins".format(len(
-                                                            self._bin_edges)))
+        logger.debug("Divided the users into {} bins".format(len(self._bins)))
         logger.debug("Percent of users in each bin:")
         n_users = len(self._users)
         for i, bin_edge in enumerate(self._bin_edges[:-1]):
@@ -387,6 +388,42 @@ class UsersPool:
                     format(bin_edge, self._bin_edges[i+1]))
         logger.debug("{: >3}  --  {: >3}: {:.1f}%".format(self._bin_edges[-1],
                 "inf", 100.*len(self._bins[self._bin_edges[-1]])/n_users))
+
+    def divide_users_to_equally_sized_bins(self, n_bins=5):
+        """Divide the users pool into the given number of equally sized bins.
+        Store the user ids corresponding to each bin in the self._bins ordered
+        dictionary.
+        Store the bins' x-coordinates in the self._bin_xs list.
+        
+        Note: The first n % n_bins bins have size n // n_bins + 1, other bins
+        have size n // n_bins.
+        
+        Keyword arguments:
+        n_bins -- integer representing the number of bins
+        
+        """
+        n = len(self._users)
+        bin_sizes = (n // n_bins) * np.ones(n_bins, dtype=np.int)
+        bin_sizes[:n % n_bins] += 1
+        sorted_users = sorted(self._users.iteritems(),
+                              key=lambda (_, user): user.get_data_size())
+        self._bins = OrderedDict()
+        self._bin_xs = []
+        current = 0
+        for i, bin_size in enumerate(bin_sizes):
+            start, stop = current, current + bin_size
+            data_sizes = [sorted_users[i][1].get_data_size() for i in
+                          range(start, stop)]
+            # compute the average data size of all users in the bin
+            self._bin_xs.append(sum(data_sizes) / len(data_sizes))
+            bin_name = "{} - {}".format(data_sizes[0], data_sizes[-1])
+            self._bins[bin_name] = [uid for uid, _ in sorted_users[start:stop]]
+            current = stop
+#        # DEBUG
+#        for bin_x, (bin_name, bin) in zip(self._bin_xs, self._bins.iteritems()):
+#            print "Users from bin {} (x-coor: {})".format(bin_name, bin_x)
+#            for uid in bin:
+#                print self._users[uid].get_data_size()
     
     def _test_users(self, models, measures):
         """Test the given users' models on their testing data sets. Compute
@@ -596,9 +633,7 @@ class UsersPool:
         avgs = []
         stds = []
         ci95s = []
-        for bin_edge in self._bin_edges:
-            # get the ids of users from the current bin
-            bin = self._bins[bin_edge]
+        for bin in self._bins.itervalues():
             # get the scores of users in the current bin for the given base
             # learner, learner and scoring measure
             bl_avg_scores = self._test_res[base_learner].avg_scores
@@ -648,10 +683,23 @@ class UsersPool:
                 for l in learners:
                     avgs, stds, ci95s = self._compute_bin_stats(bl, l, m)
                     if plot_type == "line":
-                        plot_desc_sd[bl].append(LinePlotDesc(self._bin_edges,
-                            avgs, stds, l, color=colors[l], ecolor=colors[l]))
-                        plot_desc_ci95[bl].append(LinePlotDesc(self._bin_edges,
-                            avgs, ci95s, l, color=colors[l], ecolor=colors[l]))
+                        if hasattr(self, "_bin_xs"):
+                            plot_desc_sd[bl].append(LinePlotDesc(self._bin_xs,
+                                avgs, stds, l, color=colors[l],
+                                ecolor=colors[l]))
+                            plot_desc_ci95[bl].append(LinePlotDesc(self._bin_xs,
+                                avgs, ci95s, l, color=colors[l],
+                                ecolor=colors[l]))
+                        elif hasattr(self, "_bin_edges"):
+                            plot_desc_sd[bl].append(LinePlotDesc(
+                                self._bin_edges, avgs, stds, l, color=colors[l],
+                                ecolor=colors[l]))
+                            plot_desc_ci95[bl].append(LinePlotDesc(
+                                self._bin_edges, avgs, ci95s, l,
+                                color=colors[l], ecolor=colors[l]))
+                        else:
+                            raise ValueError("Missing information for bins' x-"
+                                             "coordinates")
                     elif plot_type == "bar":
                         plot_desc_sd[bl].append(BarPlotDesc(self._bin_edges,
                             avgs, self._bin_edges[1] - self._bin_edges[0], stds,
@@ -678,7 +726,7 @@ if __name__ == "__main__":
     rnd_seed = 51
     # the number of users to keep in the users pool
     if test:
-        keep = 10
+        keep = 30
     else:
         keep = 100
     
@@ -769,15 +817,15 @@ if __name__ == "__main__":
     # using the same data tables and cross-validation indices
     pool.find_pickled_test_results(pickle_path_fmt)
     if not pool.check_test_results_compatible():
-        raise ValueError("Test results for different base learners are not " \
+        raise ValueError("Test results for different base learners are not "
                          "compatible.")
     # divide users into bins according to the number of ratings they have
     if test:
         bin_edges = [10, 15, 20]
     else:
         bin_edges = range(10, 251, 10)
-    pool.divide_users_to_bins(bin_edges)
-    
+#    pool.divide_users_to_bins(bin_edges)
+    pool.divide_users_to_equally_sized_bins(n_bins=5)
     # select the base learners, learners and scoring measures for which to 
     # visualize the testing results
     bls = pool.get_base_learners()
