@@ -39,8 +39,10 @@ class MergeAllLearner:
     def __call__(self, users, base_learner):
         """Run the merging algorithm for the given users. Learn a single model
         on the merger of all users' data using the given base learner.
-        Return a dictionary mapping from users' ids to the learned models (in
-        this case, all users' ids will map to the same model).
+        Return a dictionary of data structures computed within this learner.
+        It has the following keys:
+            user_models -- dictionary mapping from users' ids to the learned
+                models (in this case, all users' ids will map to the same model)
         
         Arguments:
         users -- dictionary mapping from users' ids to their User objects
@@ -61,7 +63,10 @@ class MergeAllLearner:
         user_models = dict()
         for user_id in users:
             user_models[user_id] = base_learner
-        return user_models
+        # create and fill the return dictionary
+        R = dict()
+        R["user_models"] = user_models
+        return R
 
 class NoMergingLearner:
     
@@ -73,7 +78,10 @@ class NoMergingLearner:
     def __call__(self, users, base_learner):
         """Run the merging algorithm for the given users. Learn a model using
         the given base learner for each user on its own data (no merging).
-        Return a dictionary mapping from users' ids to the learned models.
+        Return a dictionary of data structures computed within this learner.
+        It has the following keys:
+            user_models -- dictionary mapping from users' ids to the learned
+                models
         
         Arguments:
         users -- dictionary mapping from users' ids to their User objects
@@ -99,7 +107,10 @@ class NoMergingLearner:
                 model = clone(base_learner)
                 model.fit(*learn)
             user_models[user_id] = model
-        return user_models
+        # create and fill the return dictionary
+        R = dict()
+        R["user_models"] = user_models
+        return R
 
 import random, sys
 from collections import Iterable, OrderedDict
@@ -185,6 +196,59 @@ def flatten(l):
             flat_l.append(el)
     return flat_l
 
+def convert_merg_history_to_scipy_linkage(merg_history):
+        """Convert the given merging history to same format as returned by
+        the SciPy's scipy.cluster.hierarchy.linkage function.
+        Return a tuple (Z, labels), where:
+            Z -- numpy.ndarray of size (len(merg_history), 4) in the format
+                as specified in the scipy.cluster.hierarchy.linkage's docstring
+            labels -- list of labels representing ids corresponding to each
+                consecutive integer
+        
+        Arguments:
+        merg_history -- a list of lists, where each inner list contains ids of
+            single and merged users (the first in the form of strings and the
+            second in the form of tuples) 
+        
+        """
+        # dictionary mapping from user ids to consecutive integers
+        id_to_int = OrderedDict()
+        # current consecutive integer
+        cur_int = 0
+        # convert ids of single users to consecutive integers
+        for merg in merg_history:
+            for id in merg:
+                if not isinstance(id, tuple):
+                    id_to_int[id] = cur_int
+                    cur_int += 1
+        # total number of single users
+        n = len(id_to_int)
+        # create a list of labels (i.e. an implicit reverse mapping from
+        # consecutive integers to ids)
+        labels = [t[0] for t in sorted(id_to_int.iteritems(),
+                                       key=lambda t: t[1])]
+        # current 'height' and its increment value
+        inc = 1
+        cur_h = inc
+        # convert the merging history to scipy linkage format
+        Z = np.zeros((n - 1, 4))
+        for i, merg in enumerate(merg_history):
+            # number of users in the current merger
+            cur_n = 0
+            for j, id in enumerate(merg):
+                if id not in id_to_int:
+                    id_to_int[id] = cur_int
+                    cur_int += 1
+                    cur_n += Z[id_to_int[id] - n, 3]
+                else:
+                    cur_n += 1
+                Z[i, j] = id_to_int[id]
+            Z[i, 3] = cur_n
+            # store the current 'height' and increment its value
+            Z[i, 2] = cur_h
+            cur_h += inc
+        return Z, labels
+
 class MergedUser:
     
     """Contains data pertaining to a particular (merged) user and methods for
@@ -207,16 +271,25 @@ class MergedUser:
             # create a copy of both numpy.arrays
             X, y = u.get_learn_data()
             self._learn = X.copy(), y.copy()
-        else:
+        elif len(users) == 2:
             # id is a hierarchically structured tuple of tuples representing the
             # history of the merged user (e.g. id "(5, (38, 40))" represents
             # the merged user that initially contained the merger of users
             # 38 and 40, which was later merged with user 5)
-            self.id = tuple([u.id for u in users])
+            self.id = (users[0].id, users[1].id)
+            # combine merging history for users that have it already
+            self.merg_history = []
+            for u in users:
+                if hasattr(u, "merg_history"):
+                    self.merg_history.extend(u.merg_history)
+            self.merg_history.append([users[0].id, users[1].id])
             # merge learning data of all users
             Xs_ys = [u.get_learn_data() for u in users]
             Xs, ys = zip(*Xs_ys)
             self._learn = np.concatenate(Xs, axis=0), np.concatenate(ys, axis=0)
+        else:
+            raise ValueError("Trying to merge more than 2 users is not "
+                             "possible!")
     
     def __str__(self):
         """Return a "pretty" representation of the merged user by indicating
@@ -339,6 +412,12 @@ class ERMLearner:
         intelligent merging of users' data according to the ERM learning method.
         After the merging is complete, build a model for each remaining (merged)
         user and assign this model to each original user of this (merged) user.
+        Return a dictionary of data structures computed within this call to ERM.
+        It has the following keys:
+            user_models -- dictionary mapping from each original user id to its
+                model
+            dend_info -- list of tuples (one for each merged user) as returned
+                by the convert_merg_history_to_scipy_linkage function
         
         Arguments:
         users -- dictionary mapping from users' ids to their User objects
@@ -410,8 +489,10 @@ class ERMLearner:
                         C[cp.key] = cp
             update_progress(1.* len(C) / n_cand, invert=True)
         print
-        # build a model for each remaining (merged) user
+        # build a model for each remaining (merged) user and store the info
+        # for drawing a dendrogram showing the merging history
         user_models = dict()
+        dend_info = []
         for merg_u_obj in self._users.itervalues():
             # NOTE: When the number of unique class values is less than 2, we
             # cannot fit an ordinary model (e.g. logistic regression). Instead,
@@ -431,9 +512,18 @@ class ERMLearner:
                 model = clone(self._base_learner)
                 model.fit(X, y)
             # assign this model to each original user of this (merged) user
-            for user_id in merg_u_obj.get_original_ids():
+            original_ids = merg_u_obj.get_original_ids()
+            for user_id in original_ids:
                 user_models[user_id] = model
-        return user_models
+            # store the dendrogram info (if the user is truly a merged user)
+            if len(original_ids) > 1:
+                dend_info.append(convert_merg_history_to_scipy_linkage(
+                                    merg_u_obj.merg_history))
+        # create and fill the return dictionary
+        R = dict()
+        R["user_models"] = user_models
+        R["dend_info"] = dend_info
+        return R
     
     def _estimate_errors_significances(self, u_1, u_2):
         """Estimate the average prediction errors of different models on

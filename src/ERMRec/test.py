@@ -30,7 +30,8 @@ from sklearn import cross_validation
 from ERMRec import stat
 from ERMRec.data import load_ratings_dataset
 from ERMRec.learning import prefiltering, learning
-from ERMRec.plotting import BarPlotDesc, LinePlotDesc, plot_multiple
+from ERMRec.plotting import BarPlotDesc, LinePlotDesc, plot_multiple, \
+    plot_dendrograms
 
 def configure_logging(name=None, level=logging.DEBUG,
                       console_level=logging.DEBUG,
@@ -478,7 +479,7 @@ class UsersPool:
                     100.*m_errors/n))
         return scores
     
-    def test_users(self, learners, base_learners, measures):
+    def test_users(self, learners, base_learners, measures, results_path):
         """Divide all users' data into folds and perform the tests on each fold.
         Test the performance of the given learning algorithms with the given
         base learning algorithms and compute the testing results using the
@@ -499,6 +500,9 @@ class UsersPool:
             name and learner is an Orange learner
         measures -- list of strings representing measure's names (currently,
             only CA and AUC are supported)
+        results_path -- string representing the path where to save any extra
+            information about the running of this test (currently, just ERM's
+            dendrograms)
         
         """
         # divide users' data into folds
@@ -514,12 +518,19 @@ class UsersPool:
             for bl in base_learners:
                 for l in learners:
                     start = time.clock()
-                    user_models = learners[l](self._users, base_learners[bl])
-                    fold_scores[i][bl][l] = self._test_users(user_models,
+                    R = learners[l](self._users, base_learners[bl])
+                    fold_scores[i][bl][l] = self._test_users(R["user_models"],
                                                              measures)
                     end = time.clock()
                     logger.debug("Finished fold: {}, base learner: {}, "
                         "learner: {} in {:.2f}s".format(i, bl, l, end-start))
+                    # plot a dendrogram showing merging history if the results
+                    # contain dendrogram info 
+                    if "dend_info" in R:
+                        plot_dendrograms(R["dend_info"], os.path.join(
+                            results_path, "dend-{}-fold{}.png".format(bl, i)),
+                            title="Merging history of ERM with base learner {}"
+                            " (fold {})".format(bl, i))
         # compute the average measure scores over all folds
         avg_scores = _compute_avg_scores(fold_scores)
         # get users' hashes
@@ -644,7 +655,7 @@ class UsersPool:
             ci95s.append(stat.ci95(scores))
         return avgs, stds, ci95s
         
-    def visualize_results(self, base_learners, learners, measures, path_prefix,
+    def visualize_results(self, base_learners, learners, measures, results_path,
                           colors, plot_type="line"):
         """Visualize the results of the given learning algorithms with the given
         base learning algorithms and the given scoring measures on the pool of
@@ -662,8 +673,8 @@ class UsersPool:
         base_learners -- list of strings representing the names of base learners
         learners -- list of strings representing the names of learners
         measures -- list of strings representing names of the scoring measures
-        path_prefix -- string representing the prefix of the path where to save
-            the generated plots
+        results_path -- string representing the path where to save the generated
+            plots
         colors -- dictionary mapping from learners' names to the colors that
             should represent them in the plots
             
@@ -710,14 +721,20 @@ class UsersPool:
                     else:
                         raise ValueError("Unsupported plot type: '{}'".\
                                          format(plot_type))
-            plot_multiple(plot_desc_sd, results_path+"/{}-avg-SD.pdf".\
-                    format(m), title="Avg. results for groups of users (error"
-                    " bars show std. dev.)", subplot_title_fmt="Learner: {}",
-                    xlabel="Number of ratings", ylabel=m)
-            plot_multiple(plot_desc_ci95, results_path+"/{}-avg-CI.pdf".\
-                    format(m), title="Avg. results for groups of users (error"
-                    " bars show 95% conf. intervals)", subplot_title_fmt=\
-                    "Learner: {}", xlabel="Number of ratings", ylabel=m)
+            plot_multiple(plot_desc_sd,
+                os.path.join(results_path, "/{}-avg-SD.pdf".format(m)),
+                title="Avg. results for groups of users (error bars show std. "
+                    "dev.)",
+                subplot_title_fmt="Learner: {}",
+                xlabel="Number of ratings",
+                ylabel=m)
+            plot_multiple(plot_desc_ci95,
+                os.path.join(results_path, "/{}-avg-CI.pdf".format(m)),
+                title="Avg. results for groups of users (error bars show 95% "
+                    "conf. intervals)",
+                subplot_title_fmt="Learner: {}",
+                xlabel="Number of ratings",
+                ylabel=m)
 
 if __name__ == "__main__":
     # a boolean indicating which pool of users to use
@@ -810,7 +827,7 @@ if __name__ == "__main__":
     
     # test all combinations of learners and base learners (compute the testing
     # results with the defined measures) and save the results
-    pool.test_users(learners, base_learners, measures)
+    pool.test_users(learners, base_learners, measures, results_path)
     pool.pickle_test_results(pickle_path_fmt)
     
     # find previously computed testing results and check if they were computed

@@ -3,7 +3,7 @@
 # Contains classes and methods for storing plot descriptions and drawing
 # different plots showing the results of the learning algorithms.
 #
-# Copyright (C) 2012 Tadej Janez
+# Copyright (C) 2012, 2013 Tadej Janez
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -173,8 +173,101 @@ def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
     for i, (bl, plot_descs) in enumerate(plot_descs_mult.iteritems()):
         _draw_subplot(axarr[i], plot_descs, title=subplot_title_fmt.format(bl),
                   xlabel=xlabel, ylabel=ylabel)
-    # adjust figure parameters to make it look nicer
     fig.suptitle(title)
+    # adjust figure parameters to make it look nicer
     fig.subplots_adjust(top=0.93, bottom=0.05, left=0.10, right=0.95,
                         wspace=0.2, hspace=0.25)
     fig.savefig(file_name)
+
+from scipy.cluster.hierarchy import dendrogram
+
+def _draw_dendrogram(axes, Z, labels=None):
+    """Draw the given linkage information as a dendrogram on the given Axes
+    object. Change the drawing parameters so that the dendrogram will blend
+    nicely into the figure showing multiple dendrograms.
+    
+    Arguments:
+    axes -- matplotlib.axes.Axes object where to draw the plot
+    Z -- numpy.ndarray in the format as specified in the
+        scipy.cluster.hierarchy.linkage's docstring
+    
+    Keyword arguments:
+    labels --  list or tuple (optional) where i-th value is the text to put
+        under the i-th leaf node
+    
+    """
+    # set current axes instance
+    plt.sca(axes)
+    # draw the dendrogram
+    dendrogram(Z, labels=labels, orientation="left")
+    # remove x-axis labels
+    axes.set_xticks(())
+    # remove the black border around axes
+    for spine in axes.spines.itervalues():
+        spine.set_visible(False)
+    # decrease the font size of y tick labels
+    for ytl in axes.get_yticklabels():
+        ytl.set_fontsize("small")
+
+def plot_dendrograms(dend_info, file_name, title="", ylabel=""):
+    """Plot multiple dendrograms on one figure.
+    The method stacks multiple dendrograms vertically and by removing subplots'
+    x-axis labels and black borders around axes creates an impression that the
+    whole figure is one big dendrogram.
+    
+    Arguments:
+    dend_info -- list of tuples (Z, labels), where:
+        Z -- numpy.ndarray in the format as specified in the
+            scipy.cluster.hierarchy.linkage's docstring
+        labels -- list of labels representing ids corresponding to each
+            consecutive integer
+    file_name -- string representing the path where to save the drawn figure
+    
+    Keyword arguments:
+    title -- string representing the title of the whole plot
+    ylabel -- string representing the figure's y axis label
+    
+    """
+    nplots = len(dend_info)
+    nrows = nplots
+    ncols = 1
+    fig = plt.figure()
+    # create an empty object array to hold all axes; it's easiest to make it 1-d
+    # so we can just append subplots upon creation
+    axarr = np.empty(nplots, dtype=object)
+    # Note: off-by-one counting because add_subplot uses the MATLAB 1-based
+    # convention.
+    for i in range(1, nplots+1):
+        axarr[i-1] = fig.add_subplot(nrows, ncols, i)
+    # draw dendrograms to the subplots
+    for i, (Z, labels) in enumerate(dend_info):
+        _draw_dendrogram(axarr[i], Z, labels)
+    fig.suptitle(title)
+    # draw a common y-axis label
+    ax = fig.add_axes([0., 0., 1., 1.])
+    ax.set_axis_off()
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.text(.05, 0.5, ylabel, rotation="vertical",
+            horizontalalignment="center", verticalalignment="center")
+    # adjust figure parameters to make it look nicer
+    fig.subplots_adjust(top=0.90, bottom=0.03, left=0.15, right=0.97,
+                        wspace=0.1, hspace=0.05)
+    fig.savefig(file_name)
+
+if __name__ == "__main__":
+    # A simple example with two linkages transformed in a figure with two
+    # dendrograms
+    Z = np.array([[0., 1., 1., 2.],
+                  [2., 3., 2., 2.],
+                  [4., 5., 3., 4.]])
+    labels = ['00009', '00038', '00016', '00033']
+    Z1 = np.array([[0., 1., 1., 2.],
+                   [2., 4., 2., 3.],
+                   [3., 5., 3., 4.]])
+    labels1 = ['00009', '00038', '00016', '00033']
+    dend_info = [(Z, labels), (Z1, labels1)]
+    file_name = "/home/tadej/Workspace/ERMRec/results/temp/dend.png"
+    plot_dendrograms(dend_info, file_name, title="Here comes the title",
+                     ylabel="y-label")
+    
