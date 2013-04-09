@@ -829,9 +829,9 @@ if __name__ == "__main__":
             if not os.path.exists(results_path):
                 os.makedirs(results_path)
         else:
-            users_data_path = os.path.join(path_prefix, "data/users-m10")
-            results_path = os.path.join(path_prefix, "results/users-m10-seed{}-"
-                                        "keep{}".format(rnd_seed, keep))
+            users_data_path = os.path.join(path_prefix, "data/users-min10")
+            results_path = os.path.join(path_prefix, "results/users-min10-"
+                                        "seed{}-keep{}".format(rnd_seed, keep))
             if not os.path.exists(results_path):
                 os.makedirs(results_path)
         pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
