@@ -90,7 +90,7 @@ def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel=""):
     
     Arguments:
     axes -- matplotlib.axes.Axes object where to draw the plot
-    plot_descs -- list of BarPlotDesc or LinePlotDescobjects, one for each
+    plot_descs -- list of BarPlotDesc or LinePlotDesc objects, one for each
         learner
     
     Keyword arguments:
@@ -112,7 +112,15 @@ def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel=""):
     axes.set_title(title, size="small")
     axes.set_xlabel(xlabel, size="small")
     axes.set_ylabel(ylabel, size="small")
-    axes.set_xlim(left=0.0)
+    # find the left-most point of all lines and set the x-axis left limit to
+    # 0.9-times this number
+    x_min = min(pd.x[0] for pd in plot_descs)
+    axes.set_xlim(left=int(0.9 * x_min))
+    # set x-axis scale to logarithmic and also display labels of minor ticks
+    axes.set_xscale("log")
+    axes.xaxis.set_minor_formatter(plt.FormatStrFormatter("%d"))
+    for tick in axes.xaxis.get_minor_ticks():
+        tick.label.set_fontsize("x-small") 
     axes.set_ylim(0.0, 1.0)
     axes.grid(b=True)
     axes.legend(loc="upper right", fancybox=True,
@@ -175,7 +183,7 @@ def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
                   xlabel=xlabel, ylabel=ylabel)
     fig.suptitle(title)
     # adjust figure parameters to make it look nicer
-    fig.subplots_adjust(top=0.93, bottom=0.05, left=0.10, right=0.95,
+    fig.subplots_adjust(top=0.93, bottom=0.08, left=0.10, right=0.95,
                         wspace=0.2, hspace=0.25)
     fig.savefig(file_name)
 
