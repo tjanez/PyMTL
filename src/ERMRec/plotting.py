@@ -119,8 +119,7 @@ def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel=""):
     # set x-axis scale to logarithmic and also display labels of minor ticks
     axes.set_xscale("log")
     axes.xaxis.set_minor_formatter(plt.FormatStrFormatter("%d"))
-    for tick in axes.xaxis.get_minor_ticks():
-        tick.label.set_fontsize("x-small") 
+    axes.tick_params(axis='x', which="minor", labelsize="x-small")
     axes.set_ylim(0.0, 1.0)
     axes.grid(b=True)
     axes.legend(loc="upper right", fancybox=True,
