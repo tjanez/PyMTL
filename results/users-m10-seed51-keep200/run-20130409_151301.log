@@ -1,0 +1,2 @@
+[2013-04-09 15:13:21] ERMRec          INFO   : Kept 200 randomly chosen users, 1419 users discarded
+[2013-04-09 15:13:21] ERMRec          DEBUG  : Successfully unpickled the results of base learner: log_reg from file: /home/tadej/Workspace/ERMRec/results/users-m10-seed51-keep200/bl-log_reg.pkl
