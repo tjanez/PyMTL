@@ -88,19 +88,36 @@ class RawDataPreprocessor:
                 movie_id, user_id, _, rating = line.split('\t', 3)
                 self._database.append((movie_id, user_id, rating))
     
-    def create_datatables(self, m, movies_file):
-        """Create Orange data tables for all users who have at least m ratings.
+    def create_datatables(self, movies_file, selection_type="min_ratings",
+                          p=10):
+        """Create Orange data tables for according to the specified
+        selection_type and the corresponding value of parameter p.
         Each data table will contain all the movies the user rated along with
         their binarized ratings (like/dislike).
         Store the created Orange.data.Table objects in the self._datatables
         dictionary with keys corresponding to users' ids.
         
+        Arguments:
+        movies_file -- string representing the path to the movies data table
+         
         Keyword arguments:
-        m -- integer representing the minimal value of ratings the user has to
-            have in order to create a data table for him
-        movies_file -- string representing the path to the movies data table 
+        selection_type -- string (optional) which indicates which criterion to
+            use when selecting users:
+            - "min_ratings" (default) -- users who have at least p ratings will
+                be kept
+            - "largest_users" -- p users with the maximal number of ratings will
+                be kept
+        p -- integer (optional) representing the p parameter for the
+            selection_type
         
         """
+        if selection_type not in ["min_ratings", "largest_users"]:
+            raise ValueError("Unsupported selection_type: {}".\
+                             format(selection_type))
+        # store selection_type and p for later
+        self._selection_type = selection_type
+        self._p = p
+        
         movies_table = Orange.data.Table(movies_file)
         # create a dictionary mapping from movie id to its Orange instance
         movies = {str(ins["Id"]) : ins for ins in movies_table}
@@ -136,19 +153,25 @@ class RawDataPreprocessor:
         logging.info("Skipped {} ratings since the corresponding movie was not "
                      "found in the movies data table.".format(skip))
         logging.info("Total number of users: {}".format(len(users)))
-        # only keep users with at least m ratings
-        users = {user_id : table for user_id, table in users.iteritems()
-                 if len(table) >= m}
-        logging.info("Kept {} users who have more than {} ratings".\
-                      format(len(users), m))
-        # store m for later use
-        self._m = m
-        # discard users with ratings that are all the same
+        # discard users with all the same ratings
         len_before = len(users)
         users = {user_id : table for user_id, table in users.iteritems()
                  if not _all_ratings_same(table)}
         logging.info("Discared {} users with ratings that are all the same".\
                       format(len_before - len(users)))
+        # select users according to selection_type
+        if selection_type == "min_ratings":
+            # only keep users with at least p ratings
+            users = {user_id : table for user_id, table in users.iteritems()
+                     if len(table) >= p}
+            logging.info("Kept {} users who have more than {} ratings".\
+                         format(len(users), p))
+        elif selection_type == "largest_users":
+            # keep p users with the most number of ratings
+            users = dict(sorted(users.iteritems(), key=lambda u: len(u[1]),
+                                reverse=True)[:p])
+            logging.info("Kept {} users with the most number of ratings.".\
+                         format(len(users)))
         # compute binarized ratings for users
         for table in users.itervalues():
             _compute_binarized_ratings(table)
@@ -194,8 +217,15 @@ class RawDataPreprocessor:
         y_max = math.ceil(1.2*max(n))
         plt.xlabel("Number of ratings")
         plt.ylabel("Number of users")
-        plt.title("Histogram for users with at least {} ratings".\
-                  format(self._m))
+        if self._selection_type == "min_ratings":
+            plt.title("Histogram for users with at least {} ratings".\
+                      format(self._p))
+        elif self._selection_type == "largest_users":
+            plt.title("Histogram for {} users with the most number of ratings".\
+                      format(self._p))
+        else:
+            raise ValueError("Unsupported selection_type: {}".\
+                             format(self._selection_type))
         plt.ylim(0, y_max)
         plt.grid(True)
         plt.savefig(save_path)
@@ -207,10 +237,14 @@ if __name__ == "__main__":
     raw_data_file = os.path.join(path_prefix, "data/itivi_raw/ratings.csv")
     movies_file = os.path.join(path_prefix, "data/movies.tab")
     
-    min_ins = 10
-    save_dir = os.path.join(path_prefix, "data/users-m{}".format(min_ins))
     preprocessor = RawDataPreprocessor(raw_data_file)
-    preprocessor.create_datatables(min_ins, movies_file)
+#    min_ins = 10
+#    save_dir = os.path.join(path_prefix, "data/users-min{}".format(min_ins))
+#    preprocessor.create_datatables(movies_file, selection_type="min_ratings",
+#                                   p = min_ins)
+    larg_users = 100
+    save_dir = os.path.join(path_prefix, "data/users-larg{}".format(larg_users))
+    preprocessor.create_datatables(movies_file, selection_type="largest_users",
+                                   p = larg_users)
     preprocessor.save_datatables(save_dir)
     preprocessor.plot_histogram(os.path.join(save_dir, "histogram.png"))
-    
