@@ -403,7 +403,7 @@ class UsersPool:
         logger.debug("{: >3}  --  {: >3}: {:.1f}%".format(self._bin_edges[-1],
                 "inf", 100.*len(self._bins[self._bin_edges[-1]])/n_users))
 
-    def divide_users_to_equally_sized_bins(self, n_bins=5):
+    def divide_users_to_equally_sized_bins(self, n_bins=0):
         """Divide the users pool into the given number of equally sized bins.
         Store the user ids corresponding to each bin in the self._bins ordered
         dictionary.
@@ -413,10 +413,13 @@ class UsersPool:
         have size n // n_bins.
         
         Keyword arguments:
-        n_bins -- integer representing the number of bins
+        n_bins -- integer representing the number of bins;
+            if n_bins == 0 (Default), then n_bins = int(sqrt(n))
         
         """
         n = len(self._users)
+        if n_bins == 0:
+            n_bins = int(np.sqrt(n))
         bin_sizes = (n // n_bins) * np.ones(n_bins, dtype=np.int)
         bin_sizes[:n % n_bins] += 1
         sorted_users = sorted(self._users.iteritems(),
@@ -860,7 +863,10 @@ if __name__ == "__main__":
 #        else:
 #            bin_edges = range(10, 251, 10)
 #        pool.divide_users_to_bins(bin_edges)
-        pool.divide_users_to_equally_sized_bins(n_bins=5)
+        if test:
+            pool.divide_users_to_equally_sized_bins(n_bins=5)
+        else:
+            pool.divide_users_to_equally_sized_bins()
         # select the base learners, learners and scoring measures for which to 
         # visualize the testing results
         bls = pool.get_base_learners()
