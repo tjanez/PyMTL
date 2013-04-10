@@ -513,7 +513,7 @@ class UsersPool:
             learner is a merging learning algorithm (e.g. ERM, NoMerging, ...) 
         base learners -- ordered dictionary with items of the form (name,
             learner), where name is a string representing the base learner's
-            name and learner is an Orange learner
+            name and learner is a scikit-learn estimator object
         measures -- list of strings representing measure's names (currently,
             only CA and AUC are supported)
         results_path -- string representing the path where to save any extra
@@ -752,21 +752,106 @@ class UsersPool:
                 xlabel="Number of ratings",
                 ylabel=m)
 
-if __name__ == "__main__":
-    # a boolean indicating which pool of users to use
-    test = True
+def test_users_pool(users_data_path, results_path_fmt, base_learners,
+                    measures, learners, rnd_seed=50, keep=0, test=True,
+                    unpickle=False, visualize=True, n_bins=None):
+    """Test the given users pool according to the given parameters and save the
+    results where indicated.
     
-    # random seeds for which to repeat the experiment
+    Arguments:
+    users_data_path -- string representing the path where to find the data files
+        of the users pool
+    results_path_fmt -- string representing a template for the results path;
+        it must contain exactly two pairs of braces ({}), where the rnd_seed and
+        keep parameters will be put
+    base_learners -- ordered dictionary with items of the form (name, learner),
+        where name is a string representing the base learner's name and learner
+        is a scikit-learn estimator object
+    measures -- list of strings representing measure's names
+    learners -- ordered dictionary with items of the form (name, learner),
+        where name is a string representing the learner's name and
+        learner is a merging learning algorithm (e.g. ERM, NoMerging, ...)
+    
+    Keyword arguments:
+    rnd_seed -- integer indicating the random seed to be used for the UsersPool
+        object
+    keep -- integer indicating the number of random users to keep in the users
+        pool; if 0 (Default), then all users are kept
+    test -- boolean indicating whether to perform tests on the users pool (with
+        the given base_learners, measures and learners)
+    unpickle -- boolean indicating whether to search for previously computed
+        testing results and including them in the users pool
+    visualize -- boolean indicating whether to visualize the results of the
+        current users (for each combination of base learners, measures and
+        learners in the users pool)
+    n_bins -- integer representing the number of bins;
+        if None (Default), then divide_users_to_equally_sized_bins()'s default
+        will be used
+    
+    """
+    results_path = results_path_fmt.format(rnd_seed, keep)
+    if not os.path.exists(results_path):
+        os.makedirs(results_path)
+    pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
+    log_file = os.path.join(results_path, "run-{}.log".format(time.strftime(
+                                                            "%Y%m%d_%H%M%S")))
+    # NOTE: This is not very nice, but we have to declare that logger is a
+    # global variable so it can be used in other functions of this module
+    global logger
+    logger = create_logger(name="ERMRec", console_level=logging.INFO,
+                           file_name=log_file)
+    # create a pool of users (and select a random subset if keep > 0)
+    pool = UsersPool(users_data_path, rnd_seed)
+    if keep > 0:
+        pool.only_keep_k_users(keep)
+    # test all combinations of learners and base learners (compute the testing
+    # results with the defined measures) and save the results if test == True
     if test:
-        rnd_seeds = range(51, 54)
-    else:
-        rnd_seeds = range(51, 61)
-    # the number of users to keep in the users pool
-    if test:
-        keep = 10
-    else:
-        keep = 100
+        pool.test_users(learners, base_learners, measures, results_path)
+        pool.pickle_test_results(pickle_path_fmt)
+    # find previously computed testing results and check if they were computed
+    # using the same data tables and cross-validation indices if
+    # unpickle == True
+    if unpickle:
+        pool.find_pickled_test_results(pickle_path_fmt)
+        if not pool.check_test_results_compatible():
+            raise ValueError("Test results for different base learners are not "
+                             "compatible.")
+    # visualize the results of the current users for each combination of base
+    # learners, learners and measures that are in the users pool
+    if visualize:
+        if n_bins:
+            pool.divide_users_to_equally_sized_bins(n_bins=n_bins)
+        else:
+            pool.divide_users_to_equally_sized_bins()
+        bls = pool.get_base_learners()
+        ls = pool.get_learners()
+        ms = pool.get_measures()
+        pool.visualize_results(bls, ls, ms, results_path,
+            colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
+            plot_type="line")
+    remove_logger(logger)
 
+if __name__ == "__main__":
+    # boolean indicating which testing configuration to use:
+    # 1 -- test
+    # 2 -- users-min10
+    # 3 -- users-larg100
+    test_config = 1
+    
+    # boolean indicating whether to perform the tests on users pool
+    test = True
+    # boolean indicating whether to find previously computed testing results
+    # and unpickling them
+    unpickle = False
+    # boolean indicating whether to visualize the results of current users
+    visualize = True
+    
+    # find out the current file's location so it can be used to compute the
+    # location of other files/directories
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    path_prefix = os.path.abspath(os.path.join(cur_dir, "../../"))
+    
     base_learners = OrderedDict()
     from sklearn.linear_model import LogisticRegression
 #    from sklearn.pipeline import Pipeline
@@ -806,7 +891,7 @@ if __name__ == "__main__":
 #    # Canvas using data in user02984.tab
 #    base_learners["svm_RBF"] = svm.SVMLearner(svm_type=svm.SVMLearner.C_SVC,
 #        kernel_type=svm.SVMLearner.RBF, C=100.0, gamma=0.01, cache_size=500)
-
+    
     measures = []
     measures.append("CA")
     measures.append("AUC")
@@ -816,65 +901,33 @@ if __name__ == "__main__":
     learners["MergeAll"] = learning.MergeAllLearner()
     no_filter = prefiltering.NoFilter()
     learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
-
-    for rnd_seed in rnd_seeds:    
-        # compute the location of other files/directories from the current
-        # file's location
-        cur_dir = os.path.dirname(os.path.abspath(__file__))
-        path_prefix = os.path.abspath(os.path.join(cur_dir, "../../"))
-        if test:
-            users_data_path = os.path.join(path_prefix, "data/users-test2")
-            results_path = os.path.join(path_prefix, "results/users-test2-"
-                                        "seed{}-keep{}".format(rnd_seed, keep))
-            if not os.path.exists(results_path):
-                os.makedirs(results_path)
-        else:
-            users_data_path = os.path.join(path_prefix, "data/users-min10")
-            results_path = os.path.join(path_prefix, "results/users-min10-"
-                                        "seed{}-keep{}".format(rnd_seed, keep))
-            if not os.path.exists(results_path):
-                os.makedirs(results_path)
-        pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
-        log_file = os.path.join(results_path, "run-{}.log".format(
-                                time.strftime("%Y%m%d_%H%M%S")))
     
-        # create a logger
-        logger = create_logger(name="ERMRec", console_level=logging.INFO,
-                               file_name=log_file)
-    
-        # create a pool of users
-        pool = UsersPool(users_data_path, rnd_seed)
-        pool.only_keep_k_users(keep)
-        
-        # test all combinations of learners and base learners (compute the
-        # testing results with the defined measures) and save the results
-        pool.test_users(learners, base_learners, measures, results_path)
-        pool.pickle_test_results(pickle_path_fmt)
-    
-        # find previously computed testing results and check if they were
-        # computed using the same data tables and cross-validation indices
-        pool.find_pickled_test_results(pickle_path_fmt)
-        if not pool.check_test_results_compatible():
-            raise ValueError("Test results for different base learners are not "
-                             "compatible.")
-#        # divide users into bins according to the number of ratings they have
-#        if test:
-#            bin_edges = [10, 15, 20]
-#        else:
-#            bin_edges = range(10, 251, 10)
-#        pool.divide_users_to_bins(bin_edges)
-        if test:
-            pool.divide_users_to_equally_sized_bins(n_bins=5)
-        else:
-            pool.divide_users_to_equally_sized_bins()
-        # select the base learners, learners and scoring measures for which to 
-        # visualize the testing results
-        bls = pool.get_base_learners()
-        ls = pool.get_learners()
-        ms = pool.get_measures()
-        pool.visualize_results(bls, ls, ms, results_path,
-            colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
-            plot_type="line")
-        
-        # remove logger
-        remove_logger(logger)
+    if test_config == 1:
+        users_data_path = os.path.join(path_prefix, "data/users-test2")
+        results_path_fmt = os.path.join(path_prefix, "results/users-test2-"
+                                        "seed{}-keep{}")
+        rnd_seeds = range(51, 54)
+        keep = 10
+        for rnd_seed in rnd_seeds:
+            test_users_pool(users_data_path, results_path_fmt, base_learners,
+                            measures, learners, rnd_seed=rnd_seed, keep=keep,
+                            test=test, unpickle=unpickle, visualize=visualize,
+                            n_bins=5)
+    elif test_config == 2:
+        users_data_path = os.path.join(path_prefix, "data/users-min10")
+        results_path_fmt = os.path.join(path_prefix, "results/users-min10-"
+                                        "seed{}-keep{}")
+        rnd_seeds = range(51, 61)
+        keep = 100
+        for rnd_seed in rnd_seeds:
+            test_users_pool(users_data_path, results_path_fmt, base_learners,
+                            measures, learners, rnd_seed=rnd_seed, keep=keep,
+                            test=test, unpickle=unpickle, visualize=visualize)
+    elif test_config == 3:
+        users_data_path = os.path.join(path_prefix, "data/users-larg100")
+        results_path_fmt = os.path.join(path_prefix, "results/users-larg100-"
+                                        "seed{}")
+        rnd_seed = 51
+        test_users_pool(users_data_path, results_path_fmt, base_learners,
+                        measures, learners, rnd_seed=rnd_seed, test=test,
+                        unpickle=unpickle, visualize=visualize)
