@@ -1,0 +1,43 @@
+[2013-04-09 13:36:25] ERMRec          INFO   : Kept 100 randomly chosen users, 1519 users discarded
+[2013-04-09 13:36:25] ERMRec.learning.learning DEBUG  : Learning data for user 06408 has less than 2 class values. Using DummyClassifier.
+[2013-04-09 13:36:25] ERMRec          INFO   : Scoring measure AUC could not be computed for 14 out of 100 users (14.0%)
+[2013-04-09 13:36:25] ERMRec          DEBUG  : Finished fold: 0, base learner: log_reg, learner: NoMerging in 0.21s
+[2013-04-09 13:36:25] ERMRec.learning.learning DEBUG  : Merged data has 152 attributes and 5653 examples.
+[2013-04-09 13:36:25] ERMRec          INFO   : Scoring measure AUC could not be computed for 14 out of 100 users (14.0%)
+[2013-04-09 13:36:25] ERMRec          DEBUG  : Finished fold: 0, base learner: log_reg, learner: MergeAll in 0.16s
+[2013-04-09 13:43:54] ERMRec.learning.learning INFO   : Learning data for merged user 06408 has less than 2 class values. Using DummyClassifier.
+[2013-04-09 13:43:54] ERMRec          INFO   : Scoring measure AUC could not be computed for 14 out of 100 users (14.0%)
+[2013-04-09 13:43:54] ERMRec          DEBUG  : Finished fold: 0, base learner: log_reg, learner: ERM in 445.09s
+[2013-04-09 13:43:55] ERMRec          INFO   : Scoring measure AUC could not be computed for 10 out of 100 users (10.0%)
+[2013-04-09 13:43:55] ERMRec          DEBUG  : Finished fold: 1, base learner: log_reg, learner: NoMerging in 0.20s
+[2013-04-09 13:43:55] ERMRec.learning.learning DEBUG  : Merged data has 152 attributes and 5669 examples.
+[2013-04-09 13:43:55] ERMRec          INFO   : Scoring measure AUC could not be computed for 10 out of 100 users (10.0%)
+[2013-04-09 13:43:55] ERMRec          DEBUG  : Finished fold: 1, base learner: log_reg, learner: MergeAll in 0.15s
+[2013-04-09 13:51:28] ERMRec          INFO   : Scoring measure AUC could not be computed for 10 out of 100 users (10.0%)
+[2013-04-09 13:51:28] ERMRec          DEBUG  : Finished fold: 1, base learner: log_reg, learner: ERM in 449.35s
+[2013-04-09 13:51:30] ERMRec.learning.learning DEBUG  : Learning data for user 01560 has less than 2 class values. Using DummyClassifier.
+[2013-04-09 13:51:30] ERMRec.learning.learning DEBUG  : Learning data for user 03238 has less than 2 class values. Using DummyClassifier.
+[2013-04-09 13:51:30] ERMRec          INFO   : Scoring measure AUC could not be computed for 11 out of 100 users (11.0%)
+[2013-04-09 13:51:30] ERMRec          DEBUG  : Finished fold: 2, base learner: log_reg, learner: NoMerging in 0.21s
+[2013-04-09 13:51:30] ERMRec.learning.learning DEBUG  : Merged data has 152 attributes and 5685 examples.
+[2013-04-09 13:51:30] ERMRec          INFO   : Scoring measure AUC could not be computed for 11 out of 100 users (11.0%)
+[2013-04-09 13:51:30] ERMRec          DEBUG  : Finished fold: 2, base learner: log_reg, learner: MergeAll in 0.16s
+[2013-04-09 13:58:47] ERMRec.learning.learning INFO   : Learning data for merged user M(01560,03238) has less than 2 class values. Using DummyClassifier.
+[2013-04-09 13:58:48] ERMRec          INFO   : Scoring measure AUC could not be computed for 11 out of 100 users (11.0%)
+[2013-04-09 13:58:48] ERMRec          DEBUG  : Finished fold: 2, base learner: log_reg, learner: ERM in 433.14s
+[2013-04-09 13:58:49] ERMRec          INFO   : Scoring measure AUC could not be computed for 21 out of 100 users (21.0%)
+[2013-04-09 13:58:49] ERMRec          DEBUG  : Finished fold: 3, base learner: log_reg, learner: NoMerging in 0.20s
+[2013-04-09 13:58:49] ERMRec.learning.learning DEBUG  : Merged data has 152 attributes and 5703 examples.
+[2013-04-09 13:58:49] ERMRec          INFO   : Scoring measure AUC could not be computed for 21 out of 100 users (21.0%)
+[2013-04-09 13:58:49] ERMRec          DEBUG  : Finished fold: 3, base learner: log_reg, learner: MergeAll in 0.14s
+[2013-04-09 14:06:18] ERMRec          INFO   : Scoring measure AUC could not be computed for 21 out of 100 users (21.0%)
+[2013-04-09 14:06:18] ERMRec          DEBUG  : Finished fold: 3, base learner: log_reg, learner: ERM in 445.25s
+[2013-04-09 14:06:19] ERMRec          INFO   : Scoring measure AUC could not be computed for 20 out of 100 users (20.0%)
+[2013-04-09 14:06:19] ERMRec          DEBUG  : Finished fold: 4, base learner: log_reg, learner: NoMerging in 0.20s
+[2013-04-09 14:06:19] ERMRec.learning.learning DEBUG  : Merged data has 152 attributes and 5726 examples.
+[2013-04-09 14:06:19] ERMRec          INFO   : Scoring measure AUC could not be computed for 20 out of 100 users (20.0%)
+[2013-04-09 14:06:19] ERMRec          DEBUG  : Finished fold: 4, base learner: log_reg, learner: MergeAll in 0.14s
+[2013-04-09 14:14:09] ERMRec          INFO   : Scoring measure AUC could not be computed for 20 out of 100 users (20.0%)
+[2013-04-09 14:14:09] ERMRec          DEBUG  : Finished fold: 4, base learner: log_reg, learner: ERM in 466.35s
+[2013-04-09 14:14:11] ERMRec          DEBUG  : Successfully pickled the results of base learner: log_reg to file: /home/tadej/ERMRec/results/users-m10-seed53-keep100/bl-log_reg.pkl
+[2013-04-09 14:14:11] ERMRec          INFO   : Results of base learner: log_reg are already loaded
