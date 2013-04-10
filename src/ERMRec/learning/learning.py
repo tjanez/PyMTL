@@ -435,7 +435,9 @@ class ERMLearner:
         C = dict()
         pairs = list(combinations(self._users, 2))
         n_pairs = len(pairs)
-        print "Computing candidate pairs for merging ({} pairs)".format(n_pairs)
+        msg = "Computing candidate pairs for merging ({} pairs)".format(n_pairs)
+        logger.debug(msg)
+        print msg
         for i, (u_i, u_j) in enumerate(pairs):
             if self._prefilter(u_i, u_j):
                 avg_pred_errs, p_values_ij = \
@@ -455,7 +457,9 @@ class ERMLearner:
         # iteratively merge the most similar pair of users, until such pairs
         # exist
         n_cand = len(C)
-        print "Processing {} candidate pairs for merging".format(n_cand)
+        msg = "Processing {} candidate pairs for merging".format(n_cand)
+        logger.debug(msg)
+        print msg
         while len(C) > 0:
             # find the object pair with the minimal maximal p-value
             maxes = [(cp_key, cp.get_max_p_value()) for cp_key, cp in
