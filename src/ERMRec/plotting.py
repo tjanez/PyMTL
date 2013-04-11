@@ -274,7 +274,12 @@ if __name__ == "__main__":
                    [3., 5., 3., 4.]])
     labels1 = ['00009', '00038', '00016', '00033']
     dend_info = [(Z, labels), (Z1, labels1)]
-    file_name = "/home/tadej/Workspace/ERMRec/results/temp/dend.png"
+    # find out the current file's location so it can be used to compute the
+    # location of other files/directories
+    import os.path
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    path_prefix = os.path.abspath(os.path.join(cur_dir, "../../"))
+    file_name = os.path.join(path_prefix, "results/temp-dend.png")
     plot_dendrograms(dend_info, file_name, title="Here comes the title",
                      ylabel="y-label")
     
