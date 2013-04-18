@@ -1,7 +1,7 @@
 #
 # test.py
-# Contains classes and methods for testing and comparing various machine
-# learning algorithms on different sets of users and their ratings.
+# Contains classes and methods for testing and comparing various multi-task
+# learning (MTL) algorithms.
 #
 # Copyright (C) 2012, 2013 Tadej Janez
 #
@@ -27,16 +27,15 @@ import numpy as np
 from sklearn import metrics
 from sklearn import cross_validation
 
-from ERMRec import stat
-from ERMRec.data import load_ratings_dataset
-from ERMRec.learning import prefiltering, learning
-from ERMRec.plotting import BarPlotDesc, LinePlotDesc, plot_multiple, \
+from PyMTL import data, stat
+from PyMTL.learning import prefiltering, learning
+from PyMTL.plotting import BarPlotDesc, LinePlotDesc, plot_multiple, \
     plot_dendrograms
 
 def create_logger(name=None, level=logging.DEBUG,
                   console_level=logging.DEBUG,
                   file_name=None, file_level=logging.DEBUG):
-    """Create and configure a logger for the test module of ERMRec.
+    """Create and configure a logger for the test module of PyMTL.
     Return the created Logger instance.
     
     Keyword arguments:
@@ -68,6 +67,7 @@ def create_logger(name=None, level=logging.DEBUG,
         logger.addHandler(fh)
     return logger
 
+
 def remove_logger(logger):
     """Remove all handlers of the given Logger object.
     
@@ -81,6 +81,7 @@ def remove_logger(logger):
     for handler in list(logger.handlers):
         logger.removeHandler(handler)
 
+
 def pickle_obj(obj, file_path):
     """Pickle the given object to the given file_path.
     
@@ -91,6 +92,7 @@ def pickle_obj(obj, file_path):
     """
     with open(file_path, "wb") as pkl_file:
         pickle.dump(obj, pkl_file, pickle.HIGHEST_PROTOCOL)
+
 
 def unpickle_obj(file_path):
     """Unpickle an object from the given file_path.
@@ -104,35 +106,41 @@ def unpickle_obj(file_path):
     with open(file_path, "rb") as pkl_file:
         return pickle.load(pkl_file)
 
-class User:
+
+class Task:
     
-    """Contains data pertaining to a particular user and methods for extracting
-    and manipulating this data.
+    """Contains data pertaining to a particular MTL task and methods for
+    extracting and manipulating this data.
     
     """
+    
     def __init__(self, id, data):
-        """Initialize a User object. Store the user's id and its data to private
+        """Initialize a Task object. Store the task's id and its data to private
         attributes.
         
         Arguments:
-        id -- string representing user's id
-        data -- sklearn.datasets.Bunch object holding user's data
+        id -- string representing task's id
+        data -- sklearn.datasets.Bunch object holding task's data
         
         """
         self.id = id
         self._data = data
+        # flatten the target array if needed
+        # NOTE: This is necessary for some MTL methods.
+        if len(self._data.target.shape) == 2:
+            self._data.target = np.ravel(self._data.target)
         self._active_fold = None
     
     def __str__(self):
-        """Return a "pretty" representation of the user by indicating its id."""
+        """Return a "pretty" representation of the task by indicating its id."""
         return self.id
     
     def get_data_size(self):
-        """Return the number of examples in the user's data object"""
+        """Return the number of examples of the task."""
         return self._data.data.shape[0]
     
     def divide_data_into_folds(self, k, rand_seed):
-        """Divide the user's data into the given number of folds.
+        """Divide the task's data into the given number of folds.
         Store the random indices in the self._cv_folds variable.
         
         Keyword arguments:
@@ -181,7 +189,7 @@ class User:
         return self._test
     
     def get_hash(self):
-        """Return a SHA1 hex digest based on user's id, data and
+        """Return a SHA1 hex digest based on task's id, data and
         cross-validation random indices. 
         
         NOTE: The hash built-in is not used since it doesn't work on mutable
@@ -200,12 +208,13 @@ class User:
             h.update(fold_test)
         return h.hexdigest()
 
+
 def _compute_avg_scores(fold_scores):
     """Compute the average scores of the given fold scores.
     Return a four-dimensional dictionary with:
         first key corresponding to the base learner's name,
         second key corresponding to the learner's name,
-        third key corresponding to the user's id,
+        third key corresponding to the task's id,
         fourth key corresponding to the scoring measure's name,
         value corresponding to the average value of the scoring measure.
     
@@ -214,7 +223,7 @@ def _compute_avg_scores(fold_scores):
         first key corresponding to the fold number,
         second key corresponding to the base learner's name,
         third key corresponding to the learner's name,
-        fourth key corresponding to the user's id,
+        fourth key corresponding to the task's id,
         fifth key corresponding to the scoring measure's name,
         value corresponding to the scoring measure's value.
     
@@ -224,110 +233,105 @@ def _compute_avg_scores(fold_scores):
         avg_scores[bl] = dict()
         for l in fold_scores[0][bl]:
             avg_scores[bl][l] = dict()
-            for user_id in fold_scores[0][bl][l]:
-                avg_scores[bl][l][user_id] = dict()
-                for m_name in fold_scores[0][bl][l][user_id]:
-                    u_scores = []
+            for task_id in fold_scores[0][bl][l]:
+                avg_scores[bl][l][task_id] = dict()
+                for m_name in fold_scores[0][bl][l][task_id]:
+                    t_scores = []
                     for i in fold_scores:
-                        u_score = fold_scores[i][bl][l][user_id][m_name]
+                        u_score = fold_scores[i][bl][l][task_id][m_name]
                         if u_score != None:
-                            u_scores.append(u_score)
-                    # the number of scores for each user is not always the
+                            t_scores.append(u_score)
+                    # the number of scores for each task is not always the
                     # same since it could happen that in some folds a
                     # scoring measures could not be computed
-                    avg_scores[bl][l][user_id][m_name] = (sum(u_scores) /
-                                                            len(u_scores))
+                    avg_scores[bl][l][task_id][m_name] = (sum(t_scores) /
+                                                            len(t_scores))
     return avg_scores
+
 
 class TestingResults:
 
-    """Contains data of testing a particular base learning method on the pool
-    of users.
+    """Contains data of testing a particular base learning method on a
+    multi-task learning (MTL) problem.
     
     """
     
-    def __init__(self, name, user_hashes, avg_scores):
+    def __init__(self, name, task_hashes, avg_scores):
         """Initialize a TestingResults object. Store the given arguments as
         attributes.
         
         Arguments:
         name -- string representing the base learner's name
-        user_hashes -- OrderedDictionary with keys corresponding to users' ids
-            and values to users' hashes
+        task_hashes -- OrderedDictionary with keys corresponding to tasks' ids
+            and values to tasks' hashes
         avg_scores -- three-dimensional dictionary with:
             first key corresponding to the learner's name,
-            second key corresponding to the user's id,
+            second key corresponding to the task's id,
             third key corresponding to the scoring measure's name,
             value corresponding to the average value of the scoring measure
         
         """
         self.name = name
-        self.user_hashes = user_hashes
+        self.task_hashes = task_hashes
         self.avg_scores = avg_scores
-        
 
-class UsersPool:
+
+class MTLProblem:
     
     """Contains methods for testing various learning algorithms on the given
-    pool of users.
+    multi-task learning (MTL) problem.
     
     """
     
-    def __init__(self, users_data_path, seed):
-        """Find all users who have data files in the given directory.
-        Load data tables from these data files and create a new User object for
-        each user.
-        Create a dictionary mapping from users' ids to their User objects and
-        store it in the self._users variable.
+    def __init__(self, tasks_data, seed):
+        """Iterate through the given tasks data and create a new Task object for
+        each task.
+        Create a dictionary mapping from tasks' ids to their Task objects and
+        store it in the self._tasks variable.
         Create a private Random object with the given seed and store it in the
         self._random variable.
         
-        Keyword arguments:
-        users_data_path -- string representing the path to the directory where
-            users' ids and .tab files are stored
+        Arguments:
+        tasks_data -- list of Bunch objects, where each Bunch object holds data
+            corresponding to a task of the MTL problem 
         seed -- integer to be used as a seed for the private Random object
         
         """
-        self._users = OrderedDict()
-        for file_ in sorted(os.listdir(users_data_path)):
-            match = re.search(r"^user(\d+)\.tab$", file_)
-            if match:
-                # get the first parenthesized subgroup of the match
-                user_id = match.group(1)
-                data = load_ratings_dataset(os.path.join(users_data_path,
-                                                         file_))
-                user = User(user_id, data)
-                self._users[user_id] = user
+        self._tasks = OrderedDict()
+        for td in tasks_data:
+            self._tasks[td.ID] = Task(td.ID, td)
         self._random = random.Random(seed)
         # dictionary that will hold the TestingResults objects, one for each
         # tested base learner
         self._test_res = OrderedDict()
     
-    def only_keep_k_users(self, k):
-        """Reduce the size of the pool to k randomly chosen users.
-        If the pool's size is smaller than k, keep all users.
+    def only_keep_k_tasks(self, k):
+        """Reduce the size of the MTL problem to k randomly chosen tasks.
+        If the MTL problem's size is smaller than k, keep all tasks.
+        
+        Note: This is useful when the number of tasks is large (> 100), since
+        it makes some MTL methods (e.g. ERM) computationally tractable.
         
         Arguments:
-        k -- integer representing the number of users to keep
+        k -- integer representing the number of tasks to keep
         
         """
-        new_users = OrderedDict()
-        for _ in range(min(k, len(self._users))):
-            user_id = self._random.choice(self._users.keys())
-            new_users[user_id] = self._users[user_id]
-            del self._users[user_id]
-        logger.info("Kept {} randomly chosen users, {} users discarded".\
-                     format(len(new_users), len(self._users)))
-        self._users = new_users
+        new_tasks = OrderedDict()
+        for _ in range(min(k, len(self._tasks))):
+            tid = self._random.choice(self._tasks.keys())
+            new_tasks[tid] = self._tasks[tid]
+            del self._tasks[tid]
+        logger.info("Kept {} randomly chosen tasks, {} tasks discarded".\
+                     format(len(new_tasks), len(self._tasks)))
+        self._tasks = new_tasks
     
     def __str__(self):
-        """Return a "pretty" representation of the pool of users by indicating
-        their ids.
+        """Return a "pretty" representation of the MTL problem by indicating
+        tasks' ids.
         
         """
-        
-        return "{} users: ".format(len(self._users)) + \
-            ",".join(sorted(self._users.iterkeys()))
+        return "{} tasks: ".format(len(self._tasks)) + \
+            ",".join(sorted(self._tasks.iterkeys()))
     
     def get_base_learners(self):
         """Return a tuple with the names of the base learning algorithms that
@@ -354,117 +358,29 @@ class UsersPool:
         rnd_u = tuple(self._test_res[rnd_bl].avg_scores[rnd_l].iterkeys())[0]
         return tuple(self._test_res[rnd_bl].avg_scores[rnd_l][rnd_u].iterkeys())
     
-    def _find_bin_edge(self, n):
-        """Find the appropriate bin edge for the given number of ratings.
-        If the given value is smaller than the leftmost bin edge, an error is
-        returned.
-        If the given value is larger or equal to the rightmost bin edge, the
-        rightmost bin edge is returned.
-        
-        Keyword arguments:
-        n -- integer representing the number of ratings
-        
-        """
-        i = bisect.bisect_right(self._bin_edges, n)
-        if i <= 0:
-            raise ValueError("The given number of ratings: '{}' is too small".\
-                             format(n))
-        return self._bin_edges[i-1]
-    
-    def divide_users_to_bins(self, bin_edges):
-        """Look at the number of users' ratings and divide them into bins
-        according to the given bin edges. No user should have less ratings than
-        the leftmost bin edge.
-        Store the given bin_edges to the self._bin_edges variable.
-        Store the bins in a dictionary mapping from left bin edge to a list of
-        users belonging to the corresponding bin (variable self._bins).
-        
-        Keyword arguments:
-        bin_edges -- list of bin edges (should be sorted in ascending order)
-         
-        """
-        self._bin_edges = bin_edges
-        self._bins = OrderedDict()
-        for edge in bin_edges:
-            self._bins[edge] = []
-        for user_id, user in self._users.iteritems():
-            # find the appropriate bin for the user
-            bin_edge = self._find_bin_edge(user.get_data_size())
-            self._bins[bin_edge].append(user_id)
-        logger.debug("Divided the users into {} bins".format(len(self._bins)))
-        logger.debug("Percent of users in each bin:")
-        n_users = len(self._users)
-        for i, bin_edge in enumerate(self._bin_edges[:-1]):
-            logger.debug("{: >3}  --  {: >3}: {:.1f}%".format(bin_edge,
-                self._bin_edges[i+1], 100.*len(self._bins[bin_edge])/n_users))
-            if len(self._bins[bin_edge]) < 2:
-                logger.warning("Bin '{: >3}--{: >3}' has less than 2 users".\
-                    format(bin_edge, self._bin_edges[i+1]))
-        logger.debug("{: >3}  --  {: >3}: {:.1f}%".format(self._bin_edges[-1],
-                "inf", 100.*len(self._bins[self._bin_edges[-1]])/n_users))
-
-    def divide_users_to_equally_sized_bins(self, n_bins=0):
-        """Divide the users pool into the given number of equally sized bins.
-        Store the user ids corresponding to each bin in the self._bins ordered
-        dictionary.
-        Store the bins' x-coordinates in the self._bin_xs list.
-        
-        Note: The first n % n_bins bins have size n // n_bins + 1, other bins
-        have size n // n_bins.
-        
-        Keyword arguments:
-        n_bins -- integer representing the number of bins;
-            if n_bins == 0 (Default), then n_bins = int(sqrt(n))
-        
-        """
-        n = len(self._users)
-        if n_bins == 0:
-            n_bins = int(np.sqrt(n))
-        bin_sizes = (n // n_bins) * np.ones(n_bins, dtype=np.int)
-        bin_sizes[:n % n_bins] += 1
-        sorted_users = sorted(self._users.iteritems(),
-                              key=lambda (_, user): user.get_data_size())
-        self._bins = OrderedDict()
-        self._bin_xs = []
-        current = 0
-        for i, bin_size in enumerate(bin_sizes):
-            start, stop = current, current + bin_size
-            data_sizes = [sorted_users[i][1].get_data_size() for i in
-                          range(start, stop)]
-            # compute the average data size of all users in the bin
-            self._bin_xs.append(sum(data_sizes) / len(data_sizes))
-            bin_name = "{} - {}".format(data_sizes[0], data_sizes[-1])
-            self._bins[bin_name] = [uid for uid, _ in sorted_users[start:stop]]
-            current = stop
-#        # DEBUG
-#        for bin_x, (bin_name, bin) in zip(self._bin_xs, self._bins.iteritems()):
-#            print "Users from bin {} (x-coor: {})".format(bin_name, bin_x)
-#            for uid in bin:
-#                print self._users[uid].get_data_size()
-    
-    def _test_users(self, models, measures):
-        """Test the given users' models on their testing data sets. Compute
+    def _test_tasks(self, models, measures):
+        """Test the given tasks' models on their testing data sets. Compute
         the given scoring measures of the testing results.
         Return a two-dimensional dictionary with the first key corresponding to
-        the user's id and the second key corresponding to the measure's name.
-        The value corresponds to the score for the given user and scoring
+        the task's id and the second key corresponding to the measure's name.
+        The value corresponds to the score for the given task and scoring
         measure.
-        Note: If a particular scoring measure couldn't be computed for a user,
+        Note: If a particular scoring measure couldn't be computed for a task,
         its value is set to None.
         
-        Keyword arguments:
-        models -- dictionary mapping from users' ids to their models
+        Arguments:
+        models -- dictionary mapping from tasks' ids to their models
         measures -- list of strings representing measure's names (currently,
             only CA and AUC are supported)
         
         """
         scores = dict()
         comp_errors = {measure : 0 for measure in measures}
-        for user_id, user in self._users.iteritems():
-            X_test, y_test = user.get_test_data()
-            y_pred = models[user_id].predict(X_test)
-            y_pred_proba = models[user_id].predict_proba(X_test)
-            scores[user_id] = dict()
+        for tid, task in self._tasks.iteritems():
+            X_test, y_test = task.get_test_data()
+            y_pred = models[tid].predict(X_test)
+            y_pred_proba = models[tid].predict_proba(X_test)
+            scores[tid] = dict()
             for measure in measures:
                 if measure == "AUC":
                     try:
@@ -485,29 +401,29 @@ class UsersPool:
                 else:
                     raise ValueError("Unknown scoring measure: {}".\
                                      format(measure))
-                scores[user_id][measure] = score
+                scores[tid][measure] = score
         # report the number of errors when computing the scoring measures
-        n = len(self._users)
+        n = len(self._tasks)
         for m_name, m_errors in comp_errors.iteritems():
             if m_errors > 0:
                 logger.info("Scoring measure {} could not be computed for {}"
-                    " out of {} users ({:.1f}%)".format(m_name, m_errors, n,
+                    " out of {} tasks ({:.1f}%)".format(m_name, m_errors, n,
                     100.*m_errors/n))
         return scores
     
-    def test_users(self, learners, base_learners, measures, results_path):
-        """Divide all users' data into folds and perform the tests on each fold.
+    def test_tasks(self, learners, base_learners, measures, results_path):
+        """Divide all tasks' data into folds and perform the tests on each fold.
         Test the performance of the given learning algorithms with the given
         base learning algorithms and compute the testing results using the
         given scoring measures.
         Compute the average scores over all folds and store them in
-        TestingResults objects, one for each base learner, along with users'
+        TestingResults objects, one for each base learner, along with tasks'
         hashes (used for comparing the results of multiple experiments).
         Store the created TestingResults objects in self._test_res, which is
         a dictionary with keys corresponding to base learner's names and values
         corresponding to their TestingResults objects. 
         
-        Keyword arguments:
+        Arguments:
         learners -- ordered dictionary with items of the form (name, learner),
             where name is a string representing the learner's name and
             learner is a merging learning algorithm (e.g. ERM, NoMerging, ...) 
@@ -521,21 +437,21 @@ class UsersPool:
             dendrograms)
         
         """
-        # divide users' data into folds
+        # divide tasks' data into folds
         folds = 5
-        for user in self._users.itervalues():
-            user.divide_data_into_folds(folds, self._random.randint(0, 100))
+        for task in self._tasks.itervalues():
+            task.divide_data_into_folds(folds, self._random.randint(0, 100))
         # perform learning and testing for each fold
         fold_scores = OrderedDict()
         for i in range(folds):
-            for user in self._users.itervalues():
-                user.set_active_fold(i)
+            for task in self._tasks.itervalues():
+                task.set_active_fold(i)
             fold_scores[i] = {bl : dict() for bl in base_learners.iterkeys()}
             for bl in base_learners:
                 for l in learners:
                     start = time.clock()
-                    R = learners[l](self._users, base_learners[bl])
-                    fold_scores[i][bl][l] = self._test_users(R["user_models"],
+                    R = learners[l](self._tasks, base_learners[bl])
+                    fold_scores[i][bl][l] = self._test_tasks(R["user_models"],
                                                              measures)
                     end = time.clock()
                     logger.debug("Finished fold: {}, base learner: {}, "
@@ -549,14 +465,14 @@ class UsersPool:
                             " (fold {})".format(bl, i))
         # compute the average measure scores over all folds
         avg_scores = _compute_avg_scores(fold_scores)
-        # get users' hashes
-        user_hashes = OrderedDict()
-        for user_id, user in self._users.iteritems():
-            user_hashes[user_id] = user.get_hash()
+        # get tasks' hashes
+        task_hashes = OrderedDict()
+        for tid, task in self._tasks.iteritems():
+            task_hashes[tid] = task.get_hash()
         # store the average scores of each base learner in a separate
         # TestingResults object
         for bl in avg_scores:
-            self._test_res[bl] = TestingResults(bl, user_hashes, avg_scores[bl])
+            self._test_res[bl] = TestingResults(bl, task_hashes, avg_scores[bl])
     
     def pickle_test_results(self, pickle_path_fmt):
         """Pickle the TestingResults objects in self._test_res to the given
@@ -608,8 +524,8 @@ class UsersPool:
         
     def check_test_results_compatible(self):
         """Check if all TestingResults objects in the self._test_res dictionary
-        had the same users, users' data tables and cross-validation indices.
-        In addition check if all TestingResults objects had the same learning
+        had the same tasks, tasks' data tables and cross-validation indices.
+        In addition, check if all TestingResults objects had the same learning
         algorithms and scoring measures.
         
         """
@@ -621,12 +537,12 @@ class UsersPool:
         test_res_ref = self._test_res[ref]
         for bl in bls[1:]:
             test_res_bl = self._test_res[bl]
-            # check if users' ids and hashes match for all base learning
+            # check if tasks' ids and hashes match for all base learning
             # algorithms
-            if len(test_res_bl.user_hashes) != len(test_res_ref.user_hashes):
+            if len(test_res_bl.task_hashes) != len(test_res_ref.task_hashes):
                 return False
-            for id, h in test_res_ref.user_hashes.iteritems():
-                if test_res_bl.user_hashes[id] != h:
+            for id, h in test_res_ref.task_hashes.iteritems():
+                if test_res_bl.task_hashes[id] != h:
                     return False
             # check if learning algorithms match for all base learning
             # algorithms
@@ -645,39 +561,38 @@ class UsersPool:
                     return False
         return True
     
-    def _compute_bin_stats(self, base_learner, learner, measure):
+    def _compute_task_stats(self, base_learner, learner, measure):
         """Compute the statistics (average, std. deviation and 95% confidence
         interval) of the performance of the given base learner and learner with
-        the given measure for each bin of users in self._bins.
+        the given measure for each task in self._tasks.
         Return a triple (avgs, stds, ci95s), where:
-            avgs -- list of averages, one for each bin
-            stds -- list of standard deviations, one for each bin
+            avgs -- list of averages, one for each task
+            stds -- list of standard deviations, one for each task
             ci95s -- list of 95% confidence intervals for the means, one for
-                each bin
+                each task
         
         """
         # prepare lists that will store the results
         avgs = []
         stds = []
         ci95s = []
-        for bin in self._bins.itervalues():
-            # get the scores of users in the current bin for the given base
-            # learner, learner and scoring measure
+        for tid, t in self._tasks.iteritems():
+            # get the scores of the current task for the given base learner,
+            # learner and scoring measure
             bl_avg_scores = self._test_res[base_learner].avg_scores
-            scores = np.array([bl_avg_scores[learner][id][measure] for id
-                                  in bin])
+            scores = [bl_avg_scores[learner][tid][measure]]
             avgs.append(stat.mean(scores))
             stds.append(stat.unbiased_std(scores))
             ci95s.append(stat.ci95(scores))
         return avgs, stds, ci95s
-        
-    def visualize_results(self, base_learners, learners, measures, results_path,
-                          colors, plot_type="line"):
+    
+    def visualize_results(self, base_learners, learners, measures,
+                              results_path, colors):
         """Visualize the results of the given learning algorithms with the given
-        base learning algorithms and the given scoring measures on the pool of
-        users.
+        base learning algorithms and the given scoring measures on the MTL
+        problem.
         Compute the averages, std. deviations and 95% conf. intervals on bins
-        of users for all combinations of learners, base learners and scoring
+        of tasks for all combinations of learners, base learners and scoring
         measures.
         Draw a big plot displaying the averages and std. deviations for each
         scoring measure. Each big plot has one subplot for each base learner.
@@ -693,10 +608,6 @@ class UsersPool:
             plots
         colors -- dictionary mapping from learners' names to the colors that
             should represent them in the plots
-            
-        Keyword arguments:
-        plot_type -- string indicating the type of the plot to draw (currently,
-            only types "bar" and "line" are supported)
         
         """
         for m in measures:
@@ -708,59 +619,33 @@ class UsersPool:
                 plot_desc_sd[bl] = []
                 plot_desc_ci95[bl] = []
                 for l in learners:
-                    avgs, stds, ci95s = self._compute_bin_stats(bl, l, m)
-                    if plot_type == "line":
-                        if hasattr(self, "_bin_xs"):
-                            plot_desc_sd[bl].append(LinePlotDesc(self._bin_xs,
-                                avgs, stds, l, color=colors[l],
-                                ecolor=colors[l]))
-                            plot_desc_ci95[bl].append(LinePlotDesc(self._bin_xs,
-                                avgs, ci95s, l, color=colors[l],
-                                ecolor=colors[l]))
-                        elif hasattr(self, "_bin_edges"):
-                            plot_desc_sd[bl].append(LinePlotDesc(
-                                self._bin_edges, avgs, stds, l, color=colors[l],
-                                ecolor=colors[l]))
-                            plot_desc_ci95[bl].append(LinePlotDesc(
-                                self._bin_edges, avgs, ci95s, l,
-                                color=colors[l], ecolor=colors[l]))
-                        else:
-                            raise ValueError("Missing information for bins' x-"
-                                             "coordinates")
-                    elif plot_type == "bar":
-                        plot_desc_sd[bl].append(BarPlotDesc(self._bin_edges,
-                            avgs, self._bin_edges[1] - self._bin_edges[0], stds,
-                            l, color=colors[l], ecolor=colors[l]))
-                        plot_desc_ci95[bl].append(BarPlotDesc(self._bin_edges,
-                            avgs, self._bin_edges[1] - self._bin_edges[0],
-                            ci95s, l, color=colors[l], ecolor=colors[l]))
-                    else:
-                        raise ValueError("Unsupported plot type: '{}'".\
-                                         format(plot_type))
+                    avgs, stds, ci95s = self._compute_task_stats(bl, l, m)
+                    plot_desc_sd[bl].append(LinePlotDesc(np.arange(len(avgs)),
+                        avgs, stds, l, color=colors[l], ecolor=colors[l]))
+                    plot_desc_ci95[bl].append(LinePlotDesc(np.arange(len(avgs)),
+                        avgs, ci95s, l, color=colors[l], ecolor=colors[l]))
             plot_multiple(plot_desc_sd,
                 os.path.join(results_path, "{}-avg-SD.pdf".format(m)),
-                title="Avg. results for groups of users (error bars show std. "
-                    "dev.)",
+                title="Avg. results for tasks (error bars show std. dev.)",
                 subplot_title_fmt="Learner: {}",
-                xlabel="Number of ratings",
+                xlabel="Number of instances",
                 ylabel=m)
             plot_multiple(plot_desc_ci95,
                 os.path.join(results_path, "{}-avg-CI.pdf".format(m)),
-                title="Avg. results for groups of users (error bars show 95% "
-                    "conf. intervals)",
+                title="Avg. results for tasks (error bars show 95% conf. "
+                    "intervals)",
                 subplot_title_fmt="Learner: {}",
-                xlabel="Number of ratings",
+                xlabel="Number of instances",
                 ylabel=m)
 
-def test_users_pool(users_data_path, results_path_fmt, base_learners,
-                    measures, learners, rnd_seed=50, keep=0, test=True,
-                    unpickle=False, visualize=True, n_bins=None):
-    """Test the given users pool according to the given parameters and save the
-    results where indicated.
+def test_tasks(tasks_data, results_path_fmt, base_learners,
+               measures, learners, rnd_seed=50, keep=0, test=True,
+               unpickle=False, visualize=True):
+    """Test the given tasks data corresponding to a MTL problem according to the
+    given parameters and save the results where indicated.
     
     Arguments:
-    users_data_path -- string representing the path where to find the data files
-        of the users pool
+    tasks_data -- list of Bunch objects that hold tasks' data
     results_path_fmt -- string representing a template for the results path;
         it must contain exactly two pairs of braces ({}), where the rnd_seed and
         keep parameters will be put
@@ -773,20 +658,17 @@ def test_users_pool(users_data_path, results_path_fmt, base_learners,
         learner is a merging learning algorithm (e.g. ERM, NoMerging, ...)
     
     Keyword arguments:
-    rnd_seed -- integer indicating the random seed to be used for the UsersPool
+    rnd_seed -- integer indicating the random seed to be used for the MTLProblem
         object
-    keep -- integer indicating the number of random users to keep in the users
-        pool; if 0 (Default), then all users are kept
-    test -- boolean indicating whether to perform tests on the users pool (with
+    keep -- integer indicating the number of random tasks to keep in the MTL
+        problem; if 0 (Default), then all tasks are kept
+    test -- boolean indicating whether to perform tests on the MTL problem (with
         the given base_learners, measures and learners)
     unpickle -- boolean indicating whether to search for previously computed
-        testing results and including them in the users pool
+        testing results and including them in the MTL problem
     visualize -- boolean indicating whether to visualize the results of the
-        current users (for each combination of base learners, measures and
-        learners in the users pool)
-    n_bins -- integer representing the number of bins;
-        if None (Default), then divide_users_to_equally_sized_bins()'s default
-        will be used
+        current tasks (for each combination of base learners, measures and
+        learners in the MTL problem)
     
     """
     results_path = results_path_fmt.format(rnd_seed, keep)
@@ -798,53 +680,48 @@ def test_users_pool(users_data_path, results_path_fmt, base_learners,
     # NOTE: This is not very nice, but we have to declare that logger is a
     # global variable so it can be used in other functions of this module
     global logger
-    logger = create_logger(name="ERMRec", console_level=logging.INFO,
+    logger = create_logger(name="PyMTL", console_level=logging.INFO,
                            file_name=log_file)
-    # create a pool of users (and select a random subset if keep > 0)
-    pool = UsersPool(users_data_path, rnd_seed)
+    # create a MTL problem with tasks' data (and select a random subset of tasks
+    # if keep > 0)
+    mtlp = MTLProblem(tasks_data, rnd_seed)
     if keep > 0:
-        pool.only_keep_k_users(keep)
+        mtlp.only_keep_k_tasks(keep)
     # test all combinations of learners and base learners (compute the testing
     # results with the defined measures) and save the results if test == True
     if test:
-        pool.test_users(learners, base_learners, measures, results_path)
-        pool.pickle_test_results(pickle_path_fmt)
+        mtlp.test_tasks(learners, base_learners, measures, results_path)
+        mtlp.pickle_test_results(pickle_path_fmt)
     # find previously computed testing results and check if they were computed
     # using the same data tables and cross-validation indices if
     # unpickle == True
     if unpickle:
-        pool.find_pickled_test_results(pickle_path_fmt)
-        if not pool.check_test_results_compatible():
+        mtlp.find_pickled_test_results(pickle_path_fmt)
+        if not mtlp.check_test_results_compatible():
             raise ValueError("Test results for different base learners are not "
                              "compatible.")
-    # visualize the results of the current users for each combination of base
-    # learners, learners and measures that are in the users pool
+    # visualize the results of the current tasks for each combination of base
+    # learners, learners and measures that are in the MTL problem
     if visualize:
-        if n_bins:
-            pool.divide_users_to_equally_sized_bins(n_bins=n_bins)
-        else:
-            pool.divide_users_to_equally_sized_bins()
-        bls = pool.get_base_learners()
-        ls = pool.get_learners()
-        ms = pool.get_measures()
-        pool.visualize_results(bls, ls, ms, results_path,
+        bls = mtlp.get_base_learners()
+        ls = mtlp.get_learners()
+        ms = mtlp.get_measures()
+        mtlp.visualize_results(bls, ls, ms, results_path,
             colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
             plot_type="line")
     remove_logger(logger)
 
 if __name__ == "__main__":
     # boolean indicating which testing configuration to use:
-    # 1 -- test
-    # 2 -- users-min10
-    # 3 -- users-larg100
+    # 1 -- USPS digits data
     test_config = 1
     
-    # boolean indicating whether to perform the tests on users pool
+    # boolean indicating whether to perform the tests on the MTL problem
     test = True
     # boolean indicating whether to find previously computed testing results
     # and unpickling them
     unpickle = False
-    # boolean indicating whether to visualize the results of current users
+    # boolean indicating whether to visualize the results of the MTL problem
     visualize = True
     
     # find out the current file's location so it can be used to compute the
@@ -865,32 +742,9 @@ if __name__ == "__main__":
 #    from sklearn_utils import MeanImputer
 #    clf = Pipeline([("imputer", MeanImputer()),
 #                    ("majority", DummyClassifier(strategy="most_frequent"))])
+#    from sklearn.dummy import DummyClassifier
+#    clf = DummyClassifier(strategy="most_frequent")
 #    base_learners["majority"] = clf
-    #TODO: Replace or remove these Orange-based base learners
-#    from orange_learners import CustomMajorityLearner
-#    # a custom Majority learner which circumvents a bug with the  return_type
-#    # keyword argument
-#    base_learners["majority"] = CustomMajorityLearner()
-#    base_learners["bayes"] = Orange.classification.bayes.NaiveLearner()
-#    #base_learners["c45"] = Orange.classification.tree.C45Learner()
-#    from orange_learners import CustomC45Learner
-#    # custom C4.5 learner which allows us to specify the minimal number of
-#    # examples in leaves as a proportion of the size of the data set
-#    base_learners["c45_custom"] = CustomC45Learner(min_objs_prop=0.01)
-#    # by default, Random Forest uses 100 trees in the forest and
-#    # the square root of the number of features as the number of randomly drawn
-#    # features among which it selects the best one to split the data sets in
-#    # tree nodes
-#    base_learners["rnd_forest"] = Orange.ensemble.forest.RandomForestLearner()
-#    # by default, kNN sets parameter k to the square root of the numbers of
-#    # instances
-#    base_learners["knn"] = Orange.classification.knn.kNNLearner()
-#    base_learners["knn5"] = Orange.classification.knn.kNNLearner(k=5)
-#    from Orange.classification import svm
-#    # these SVM parameters were manually obtained by experimenting in Orange
-#    # Canvas using data in user02984.tab
-#    base_learners["svm_RBF"] = svm.SVMLearner(svm_type=svm.SVMLearner.C_SVC,
-#        kernel_type=svm.SVMLearner.RBF, C=100.0, gamma=0.01, cache_size=500)
     
     measures = []
     measures.append("CA")
@@ -903,31 +757,12 @@ if __name__ == "__main__":
     learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
     
     if test_config == 1:
-        users_data_path = os.path.join(path_prefix, "data/users-test2")
-        results_path_fmt = os.path.join(path_prefix, "results/users-test2-"
+        tasks_data = data.load_usps_digits_data()
+        results_path_fmt = os.path.join(path_prefix, "results/usps_digits-"
                                         "seed{}-keep{}")
-        rnd_seeds = range(51, 54)
-        keep = 10
+        rnd_seeds = [51]#range(51, 54)
         for rnd_seed in rnd_seeds:
-            test_users_pool(users_data_path, results_path_fmt, base_learners,
-                            measures, learners, rnd_seed=rnd_seed, keep=keep,
-                            test=test, unpickle=unpickle, visualize=visualize,
-                            n_bins=5)
-    elif test_config == 2:
-        users_data_path = os.path.join(path_prefix, "data/users-min10")
-        results_path_fmt = os.path.join(path_prefix, "results/users-min10-"
-                                        "seed{}-keep{}")
-        rnd_seeds = range(51, 61)
-        keep = 100
-        for rnd_seed in rnd_seeds:
-            test_users_pool(users_data_path, results_path_fmt, base_learners,
-                            measures, learners, rnd_seed=rnd_seed, keep=keep,
-                            test=test, unpickle=unpickle, visualize=visualize)
-    elif test_config == 3:
-        users_data_path = os.path.join(path_prefix, "data/users-larg100")
-        results_path_fmt = os.path.join(path_prefix, "results/users-larg100-"
-                                        "seed{}")
-        rnd_seed = 51
-        test_users_pool(users_data_path, results_path_fmt, base_learners,
-                        measures, learners, rnd_seed=rnd_seed, test=test,
-                        unpickle=unpickle, visualize=visualize)
+            test_tasks(tasks_data, results_path_fmt, base_learners,
+                       measures, learners, rnd_seed=rnd_seed, test=test,
+                       unpickle=unpickle, visualize=visualize)
+    
