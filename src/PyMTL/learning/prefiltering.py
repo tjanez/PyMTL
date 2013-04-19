@@ -1,9 +1,9 @@
 #
 # prefiltering.py
-# Contains classes and methods for pre-filtering pairs of users in the ERM
-# merging learning method.
+# Contains classes and methods for pre-filtering pairs of tasks in the ERM
+# MTL method.
 #
-# Copyright (C) 2012 Tadej Janez
+# Copyright (C) 2012, 2013 Tadej Janez
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,18 +21,17 @@
 
 class NoFilter:
     
-    """Pre-filtering method that doesn't filter out any pair of users. """
+    """Pre-filtering method that doesn't filter out any pair of tasks. """
     
     def __call__(self, *args):
-        """Return True for any pair of users. """
+        """Return True for any pair of tasks. """
         return True
 
 class MinCommonFilter:
     
-    """Pre-filtering method that filters out pairs of users that have less
+    """Pre-filtering method that filters out pairs of tasks that have less
     than a predefined value of common examples.
      
     """
     #NOTE: Not yet implemented.
     pass
-
