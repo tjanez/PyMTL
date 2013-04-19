@@ -1,7 +1,6 @@
 #
 # testing.py
-# Contains classes and methods for internal testing used by merging learning
-# methods.
+# Contains classes and methods for internal testing used by ERM MTL method.
 #
 # Copyright (C) 2011, 2012, 2013 Tadej Janez
 #
@@ -26,10 +25,10 @@ from sklearn.base import clone
 from sklearn import cross_validation, pipeline
 from sklearn.dummy import DummyClassifier
 
-from ERMRec.sklearn_utils import change_dummy_classes
+from PyMTL.sklearn_utils import change_dummy_classes
 
-# create a child logger of the ERMRec logger
-logger = logging.getLogger("ERMRec.learning.testing")
+# create a child logger of the PyMTL logger
+logger = logging.getLogger("PyMTL.learning.testing")
 
 def _compute_average_prediction_errors(pred_errs):
     """Compute average prediction errors from the given prediction error lists
@@ -362,65 +361,61 @@ if __name__ == "__main__":
     import random
     random.seed(17)
     
-    # CHOOSE LEARNER
+    # CHOOSE LEARNING ALGORITHM
     from sklearn.linear_model import LogisticRegression
-    from sklearn.pipeline import Pipeline
-    from ERMRec.sklearn_utils import MeanImputer
-    learner = Pipeline([("imputer", MeanImputer()),
-                    ("log_reg", LogisticRegression())])
+    clf = LogisticRegression()
     
     # LOAD DATA
-#     # users with ~1100 ratings
-#    data1_file = "/home/tadej/Workspace/ERMRec/data/users-m100/user00689.tab"
-#    data2_file = "/home/tadej/Workspace/ERMRec/data/users-m100/user00559.tab"
-    # users with ~50 ratings
-    data1_file = "/home/tadej/Workspace/ERMRec/data/users-m50/user04752.tab"
-    data2_file = "/home/tadej/Workspace/ERMRec/data/users-m50/user00663.tab"
-#    # users with 10-20 ratings
-#    data1_file = "/home/tadej/Workspace/ERMRec/data/users-test/user00009.tab"
-#    data2_file = "/home/tadej/Workspace/ERMRec/data/users-test/user00017.tab"
-    from ERMRec.data import load_ratings_dataset
-    data1 = load_ratings_dataset(data1_file)
-    data1 = data1.data, data1.target
-    data2 = load_ratings_dataset(data2_file)
-    data2 = data2.data, data2.target
+    from PyMTL import data
+    tasks = data.load_usps_digits_data()
+    data1 = tasks[0].data, tasks[0].target
+    data2 = tasks[1].data, tasks[1].target
     print "data1 has {} examples, data2 has {} examples".format(len(data1[0]),
                                                                 len(data2[0]))
     # SET PARAMETERS
     folds = 5
     rand_seed1 = random.randint(0, 100)
     rand_seed2 = random.randint(0, 100)
-    
-    # COMPARE PERFORMANCE
-    # GENERALIZED LEAVE-ONE-OUT
-    from timeit import Timer
-    t = Timer("generalized_leave_one_out(learner, data1, data2)", "gc.enable();"
-              " from __main__ import generalized_leave_one_out, learner, data1,"
-              " data2")
-    repeats = 10
-    elapsed = t.timeit(repeats)
-    print "Average time it took to complete one call to the generalized " \
-        "leave-one-out() method: {:.3f}s ({} repetitions)".format(
-        elapsed/repeats, repeats)
-    # GENERALIZED CROSS-VALIDATION
-    from timeit import Timer
-    t = Timer("generalized_cross_validation(learner, data1, data2, folds, "
-              "rand_seed1, rand_seed2)", "gc.enable(); from __main__ import "
-              "generalized_cross_validation, learner, data1, data2, folds, "
-              "rand_seed1, rand_seed2")
-    repeats = 10
-    elapsed = t.timeit(repeats)
-    print "Average time it took to complete one call to the generalized " \
-        "cross-validation() method: {:.3f}s ({} repetitions)".format(
-        elapsed/repeats, repeats)
 
-    # COMPARE RESULTS
-    _, avg_errs_loo = generalized_leave_one_out(learner, data1, data2)
-    _, avg_errs_cv = generalized_cross_validation(learner, data1, data2, folds,
+    # VIEW RESULTS
+    _, avg_errs_cv = generalized_cross_validation(clf, data1, data2, folds,
                                                   rand_seed1, rand_seed2)
+
     for learn_data in ("data1", "data2", "dataM"):
         for test_data in ("data1", "data2", "dataM"):
-            print "Learn: {}, Test: {}, Difference (LOO - CV): {}".format(
-                learn_data, test_data, avg_errs_loo[learn_data][test_data] - \
-                avg_errs_cv[learn_data][test_data])
+            print "Learn: {}, Test: {}, Avg. pred. err.: {}".format(
+                learn_data, test_data, avg_errs_cv[learn_data][test_data])
+
     
+#    # COMPARE PERFORMANCE
+#    # GENERALIZED LEAVE-ONE-OUT
+#    from timeit import Timer
+#    t = Timer("generalized_leave_one_out(learner, data1, data2)", "gc.enable();"
+#              " from __main__ import generalized_leave_one_out, learner, data1,"
+#              " data2")
+#    repeats = 10
+#    elapsed = t.timeit(repeats)
+#    print "Average time it took to complete one call to the generalized " \
+#        "leave-one-out() method: {:.3f}s ({} repetitions)".format(
+#        elapsed/repeats, repeats)
+#    # GENERALIZED CROSS-VALIDATION
+#    from timeit import Timer
+#    t = Timer("generalized_cross_validation(learner, data1, data2, folds, "
+#              "rand_seed1, rand_seed2)", "gc.enable(); from __main__ import "
+#              "generalized_cross_validation, learner, data1, data2, folds, "
+#              "rand_seed1, rand_seed2")
+#    repeats = 10
+#    elapsed = t.timeit(repeats)
+#    print "Average time it took to complete one call to the generalized " \
+#        "cross-validation() method: {:.3f}s ({} repetitions)".format(
+#        elapsed/repeats, repeats)
+
+#    # COMPARE RESULTS
+#    _, avg_errs_loo = generalized_leave_one_out(clf, data1, data2)
+#    _, avg_errs_cv = generalized_cross_validation(clf, data1, data2, folds,
+#                                                  rand_seed1, rand_seed2)
+#    for learn_data in ("data1", "data2", "dataM"):
+#        for test_data in ("data1", "data2", "dataM"):
+#            print "Learn: {}, Test: {}, Difference (LOO - CV): {}".format(
+#                learn_data, test_data, avg_errs_loo[learn_data][test_data] - \
+#                avg_errs_cv[learn_data][test_data])
