@@ -62,7 +62,7 @@ class MergeAllLearner:
         # assign the fitted model to all tasks
         task_models = dict()
         for tid in tasks:
-            task_models[tid] = base_learner
+            task_models[tid] = model
         # create and fill the return dictionary
         R = dict()
         R["task_models"] = task_models
