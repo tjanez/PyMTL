@@ -106,7 +106,6 @@ def unpickle_obj(file_path):
     with open(file_path, "rb") as pkl_file:
         return pickle.load(pkl_file)
 
-
 class Task:
     
     """Contains data pertaining to a particular MTL task and methods for
@@ -114,8 +113,75 @@ class Task:
     
     """
     
+    def __init__(self, id, learn, test):
+        """Initialize a Task object. Store the task's id and its learning and
+        testing data to private attributes.
+        
+        Arguments:
+        id -- string representing task's id
+        learn -- tuple (X, y), where:
+            X -- numpy.array representing learning examples
+            y -- numpy.array representing learning examples' class values
+        test -- a tuple (X, y), where:
+            X -- numpy.array representing testing examples
+            y -- numpy.array representing testing examples' class values
+        
+        """
+        self.id = id
+        self._learn = learn
+        self._test = test
+        # flatten the target arrays if needed
+        # NOTE: This is necessary for some MTL methods.
+        if len(self._learn[1].shape) == 2:
+            self._learn = self._learn[0], np.ravel(self._learn[1])
+        if len(self._test[1].shape) == 2:
+            self._test = self._test[0], np.ravel(self._test[1])
+    
+    def __str__(self):
+        """Return a "pretty" representation of the task by indicating its id."""
+        return self.id
+
+    def get_learn_data(self):
+        """Return the learning data as a tuple of instances and their class
+        values.
+        
+        """
+        return self._learn
+    
+    def get_test_data(self):
+        """Return the testing data as a tuple of instances and their class
+        values.
+        
+        """
+        return self._test
+    
+    def get_hash(self):
+        """Return a SHA1 hex digest based on task's id and its learning and
+        testing data. 
+        
+        NOTE: The hash built-in is not used since it doesn't work on mutable
+        object types such as NumPy arrays.
+        
+        """
+        h = hashlib.sha1()
+        h.update(self.id)
+        # self._learn and self._test are tuples and can't be put into h.update()
+        for l in self._learn:
+            h.update(l)
+        for t in self._test:
+            h.update(t)
+        return h.hexdigest()
+
+
+class CVTask(Task):
+    
+    """Sub-class of the Task class.
+    Contains support for dividing data into folds to perform cross-validation.
+    
+    """
+    
     def __init__(self, id, data):
-        """Initialize a Task object. Store the task's id and its data to private
+        """Initialize a CVTask object. Store the task's id and its data to private
         attributes.
         
         Arguments:
@@ -130,10 +196,6 @@ class Task:
         if len(self._data.target.shape) == 2:
             self._data.target = np.ravel(self._data.target)
         self._active_fold = None
-    
-    def __str__(self):
-        """Return a "pretty" representation of the task by indicating its id."""
-        return self.id
     
     def get_data_size(self):
         """Return the number of examples of the task."""
@@ -249,6 +311,42 @@ def _compute_avg_scores(fold_scores):
     return avg_scores
 
 
+def _merge_repetition_scores(rpt_scores):
+    """Compute the average scores of the given fold scores.
+    Return a four-dimensional dictionary with:
+        first key corresponding to the base learner's name,
+        second key corresponding to the learner's name,
+        third key corresponding to the task's id,
+        fourth key corresponding to the scoring measure's name,
+        value corresponding to the average value of the scoring measure.
+    
+    Keyword arguments:
+    rpt_scores -- five-dimensional dictionary with:
+        first key corresponding to the fold number,
+        second key corresponding to the base learner's name,
+        third key corresponding to the learner's name,
+        fourth key corresponding to the task's id,
+        fifth key corresponding to the scoring measure's name,
+        value corresponding to the scoring measure's value.
+    
+    """
+    mrg_scores = dict()
+    for bl in rpt_scores[0]:
+        mrg_scores[bl] = dict()
+        for l in rpt_scores[0][bl]:
+            mrg_scores[bl][l] = dict()
+            for task_id in rpt_scores[0][bl][l]:
+                mrg_scores[bl][l][task_id] = dict()
+                for m_name in rpt_scores[0][bl][l][task_id]:
+                    t_scores = []
+                    for i in rpt_scores:
+                        t_score = rpt_scores[i][bl][l][task_id][m_name]
+                        if t_score != None:
+                            t_scores.append(t_score)
+                    mrg_scores[bl][l][task_id][m_name] = t_scores
+    return mrg_scores
+
+
 class TestingResults:
 
     """Contains data of testing a particular base learning method on a
@@ -276,7 +374,411 @@ class TestingResults:
         self.avg_scores = avg_scores
 
 
-class MTLProblem:
+class MTLTester:
+    
+    """Contains methods for testing various learning algorithms on the given
+    multi-task learning (MTL) problem.
+    
+    """
+    
+    def __init__(self, tasks_data, seed, repeats, **kwargs):
+        """Copy the given tasks' data and number of repetitions as private
+        attributes.
+        Create a private Random object with the given seed and store it in the
+        self._random variable.
+        Store the given keyword arguments as a private attribute. The keyword
+        arguments are later passed to the _prepare_tasks_data() function.
+        
+        Arguments:
+        tasks_data -- list of Bunch objects, where each Bunch object holds data
+            corresponding to a task of the MTL problem 
+        seed -- integer to be used as a seed for the private Random object
+        repeats -- integer representing how many times the testing experiment
+            should be repeated
+        
+        """
+        self._random = random.Random(seed)
+        self._repeats = repeats
+        self._tasks_data = tasks_data
+        self._tasks_data_params = kwargs
+        # dictionary that will hold the TestingResults objects, one for each
+        # tested base learner
+        self._test_res = OrderedDict()
+    
+    def __str__(self):
+        """Return a "pretty" representation of the MTL problem by indicating
+        tasks' ids.
+        
+        """
+        return "{} tasks: ".format(len(self._tasks)) + \
+            ",".join(sorted(self._tasks.iterkeys()))
+    
+    def get_base_learners(self):
+        """Return a tuple with the names of the base learning algorithms that
+        have their results stored in the self._test_res TestingResults object.
+        
+        """
+        return tuple(self._test_res.iterkeys())
+    
+    def get_learners(self):
+        """Return a tuple with the names of the learning algorithms that have
+        have their results stored in the self._test_res TestingResults object.
+        
+        """
+        rnd_bl = self.get_base_learners()[0]
+        return tuple(self._test_res[rnd_bl].avg_scores.iterkeys())
+    
+    def get_measures(self):
+        """Return a tuple with the names of the scoring measures that have
+        their results stored in the self._test_res TestingResults object.
+        
+        """
+        rnd_bl = self.get_base_learners()[0]
+        rnd_l = self.get_learners()[0]
+        rnd_u = tuple(self._test_res[rnd_bl].avg_scores[rnd_l].iterkeys())[0]
+        return tuple(self._test_res[rnd_bl].avg_scores[rnd_l][rnd_u].iterkeys())
+    
+    def _prepare_tasks_data(self, test_prop=0.3):
+        """Iterate through the tasks' data stored in self._tasks_data and create
+        a new Task object for each task.
+        Create a dictionary mapping from tasks' ids to their Task objects and
+        store it in the self._tasks variable.
+        
+        Keyword arguments:
+        test_prop -- float (in range 0.0 - 1.0) indicating the proportion of
+            data that should be used for testing
+        
+        """
+        self._tasks = OrderedDict()
+        for td in self._tasks_data:
+            # divide task's data to learn and test sets
+            X, y = td.data, td.target
+            X_train, X_test, y_train, y_test = cross_validation.\
+                train_test_split(X, y, test_size=test_prop,
+                                 random_state=self._random.randint(0, 100))
+            self._tasks[td.ID] = Task(td.ID, (X_train, y_train),
+                                      (X_test, y_test))
+    
+    def _test_tasks(self, models, measures):
+        """Test the given tasks' models on their testing data sets. Compute
+        the given scoring measures of the testing results.
+        Return a two-dimensional dictionary with the first key corresponding to
+        the task's id and the second key corresponding to the measure's name.
+        The value corresponds to the score for the given task and scoring
+        measure.
+        Note: If a particular scoring measure couldn't be computed for a task,
+        its value is set to None.
+        
+        Arguments:
+        models -- dictionary mapping from tasks' ids to their models
+        measures -- list of strings representing measure's names (currently,
+            only CA and AUC are supported)
+        
+        """
+        scores = dict()
+        comp_errors = {measure : 0 for measure in measures}
+        for tid, task in self._tasks.iteritems():
+            X_test, y_test = task.get_test_data()
+            y_pred = models[tid].predict(X_test)
+            y_pred_proba = models[tid].predict_proba(X_test)
+            scores[tid] = dict()
+            for measure in measures:
+                if measure == "AUC":
+                    try:
+                        # the auc_score function only needs probability
+                        # estimates of the positive class
+                        score = metrics.auc_score(y_test, y_pred_proba[:, 1])
+                    except ValueError as e:
+                        if (e.args[0] == 
+                            "AUC is defined for binary classification only"):
+                            # AUC cannot be computed because all instances
+                            # belong to the same class
+                            score = None
+                            comp_errors[measure] += 1
+                        else:
+                            raise e
+                elif measure == "CA":
+                    score = metrics.accuracy_score(y_test, y_pred)
+                else:
+                    raise ValueError("Unknown scoring measure: {}".\
+                                     format(measure))
+                scores[tid][measure] = score
+        # report the number of errors when computing the scoring measures
+        n = len(self._tasks)
+        for m_name, m_errors in comp_errors.iteritems():
+            if m_errors > 0:
+                logger.info("Scoring measure {} could not be computed for {}"
+                    " out of {} tasks ({:.1f}%)".format(m_name, m_errors, n,
+                    100.*m_errors/n))
+        return scores
+    
+    def test_tasks(self, learners, base_learners, measures, results_path):
+        """Repeat the following experiment self._repeats times:
+        Prepare tasks' data with the _prepare_tasks_data() function.
+        Test the performance of the given learning algorithms with the given
+        base learning algorithms and compute the testing results using the
+        given scoring measures.
+        Combine the scores of all repetitions and store them in TestingResults
+        objects, one for each base learner, along with tasks' hashes (used for
+        comparing the results of multiple experiments).
+        Store the created TestingResults objects in self._test_res, which is
+        a dictionary with keys corresponding to base learner's names and values
+        corresponding to their TestingResults objects. 
+        
+        Arguments:
+        learners -- ordered dictionary with items of the form (name, learner),
+            where name is a string representing the learner's name and
+            learner is a MTL method (e.g. ERM, NoMerging, ...) 
+        base learners -- ordered dictionary with items of the form (name,
+            learner), where name is a string representing the base learner's
+            name and learner is a scikit-learn estimator object
+        measures -- list of strings representing measure's names (currently,
+            only CA and AUC are supported)
+        results_path -- string representing the path where to save any extra
+            information about the running of this test (currently, just ERM's
+            dendrograms)
+        
+        """
+        rpt_scores = OrderedDict()
+        for i in range(self._repeats):
+            self._prepare_tasks_data(**self._tasks_data_params)
+            rpt_scores[i] = {bl : dict() for bl in base_learners.iterkeys()}
+            for bl in base_learners:
+                for l in learners:
+                    start = time.clock()
+                    R = learners[l](self._tasks, base_learners[bl])
+                    rpt_scores[i][bl][l] = self._test_tasks(R["task_models"],
+                                                            measures)
+                    end = time.clock()
+                    logger.debug("Finished repetition: {}, base learner: {}, "
+                        "learner: {} in {:.2f}s".format(i, bl, l, end-start))
+                    # plot a dendrogram showing merging history if the results
+                    # contain dendrogram info 
+                    if "dend_info" in R:
+                        plot_dendrograms(R["dend_info"], os.path.join(
+                            results_path, "dend-{}-fold{}.png".format(bl, i)),
+                            title="Merging history of ERM with base learner {}"
+                            " (repeat {})".format(bl, i))
+        # merge results of all repetitions
+        scores = _merge_repetition_scores(rpt_scores)
+        # get tasks' hashes
+        task_hashes = OrderedDict()
+        for tid, task in self._tasks.iteritems():
+            task_hashes[tid] = task.get_hash()
+        # store the average scores of each base learner in a separate
+        # TestingResults object
+        for bl in scores:
+            self._test_res[bl] = TestingResults(bl, task_hashes, scores[bl])
+    
+    def pickle_test_results(self, pickle_path_fmt):
+        """Pickle the TestingResults objects in self._test_res to the given
+        location.
+        
+        pickle_path_fmt -- string representing a template for the pickle paths;
+            it must contain exactly one pair of braces ({}), where the base
+            learner's name will be put
+        
+        """
+        for bl, tr in self._test_res.iteritems():
+            pickle_path = pickle_path_fmt.format(bl)
+            pickle_obj(tr, pickle_path)
+            logger.debug("Successfully pickled the results of base learner: {}"
+                         " to file: {}".format(bl, pickle_path))
+            
+    def find_pickled_test_results(self, pickle_path_fmt):
+        """Find previously pickled TestingResults objects in the given location,
+        unpickle them and store them in the self._test_res dictionary.
+        
+        pickle_path_fmt -- string representing a template that was used for
+            for the pickle paths; it must contain exactly one pair of braces
+            ({}), which were replaced with the base learner's name
+        
+        """
+        dir_name, file_name = os.path.split(pickle_path_fmt)
+        # check if pickle_path_fmt has the right format
+        match = re.search(r"^(.*){}(.*)$", file_name)
+        if not match:
+            raise ValueError("The given pickle_path_fmt does not have an "
+                "appropriate format.")
+        re_template = r"^{}(.+){}$".format(match.group(1), match.group(2)) 
+        for file_ in sorted(os.listdir(dir_name)):
+            match = re.search(re_template, file_)
+            if match:
+                bl = match.group(1)
+                if bl not in self._test_res:
+                    file_path = os.path.join(dir_name, file_)
+                    tr = unpickle_obj(file_path)
+                    if not isinstance(tr, TestingResults):
+                        raise TypeError("Object loaded from file: {} is not "
+                            "of type TestingResults.".format(file_path))
+                    self._test_res[bl] = tr
+                    logger.debug("Successfully unpickled the results of base"
+                        " learner: {} from file: {}".format(bl, file_path))
+                else:
+                    logger.info("Results of base learner: {} are already "
+                        "loaded".format(bl))
+        
+    def check_test_results_compatible(self):
+        """Check if all TestingResults objects in the self._test_res dictionary
+        had the same tasks, tasks' data tables and cross-validation indices.
+        In addition, check if all TestingResults objects had the same learning
+        algorithms and scoring measures.
+        
+        """
+        bls = self.get_base_learners()
+        if len(bls) <= 1:
+            return True
+        # select the first base learner as the reference base learner
+        ref = bls[0]
+        test_res_ref = self._test_res[ref]
+        for bl in bls[1:]:
+            test_res_bl = self._test_res[bl]
+            # check if tasks' ids and hashes match for all base learning
+            # algorithms
+            if len(test_res_bl.task_hashes) != len(test_res_ref.task_hashes):
+                return False
+            for id, h in test_res_ref.task_hashes.iteritems():
+                if test_res_bl.task_hashes[id] != h:
+                    return False
+            # check if learning algorithms match for all base learning
+            # algorithms
+            if len(test_res_bl.avg_scores) != len(test_res_ref.avg_scores):
+                return False
+            for l in test_res_ref.avg_scores:
+                if l not in test_res_bl.avg_scores:
+                    return False
+            # check if scoring measures match for all combinations of base
+            # learning algorithms and learning algorithms
+            for l in test_res_ref.avg_scores:
+                rnd_id = tuple(test_res_ref.avg_scores[l].iterkeys())[0]
+                set_ref = set(test_res_ref.avg_scores[l][rnd_id].iterkeys())
+                set_bl = set(test_res_bl.avg_scores[l][rnd_id].iterkeys())
+                if set_ref != set_bl:
+                    return False
+        return True
+    
+    def _compute_task_stats(self, base_learner, learner, measure):
+        """Compute the statistics (average, std. deviation and 95% confidence
+        interval) of the performance of the given base learner and learner with
+        the given measure for each task in self._tasks.
+        Return a triple (avgs, stds, ci95s), where:
+            avgs -- list of averages, one for each task
+            stds -- list of standard deviations, one for each task
+            ci95s -- list of 95% confidence intervals for the means, one for
+                each task
+        
+        """
+        # prepare lists that will store the results
+        avgs = []
+        stds = []
+        ci95s = []
+        # get the scores for the given base learner
+        bl_avg_scores = self._test_res[base_learner].avg_scores
+        for tid, t in self._tasks.iteritems():
+            # get the scores of the current task for the given learner and
+            # scoring measure
+            scores = bl_avg_scores[learner][tid][measure]
+            avgs.append(stat.mean(scores))
+            stds.append(stat.unbiased_std(scores))
+            ci95s.append(stat.ci95(scores))
+        return avgs, stds, ci95s
+    
+    def visualize_results(self, base_learners, learners, measures,
+                              results_path, colors):
+        """Visualize the results of the given learning algorithms with the given
+        base learning algorithms and the given scoring measures on the MTL
+        problem.
+        Compute the averages, std. deviations and 95% conf. intervals on bins
+        of tasks for all combinations of learners, base learners and scoring
+        measures.
+        Draw a big plot displaying the averages and std. deviations for each
+        scoring measure. Each big plot has one subplot for each base learner.
+        Each subplot shows the comparison between different learning algorithms.
+        The same big plots are drawn for averages and 95% conf. intervals.
+        Save the drawn plots to the files with the given path prefix.
+        
+        Arguments:
+        base_learners -- list of strings representing the names of base learners
+        learners -- list of strings representing the names of learners
+        measures -- list of strings representing names of the scoring measures
+        results_path -- string representing the path where to save the generated
+            plots
+        colors -- dictionary mapping from learners' names to the colors that
+            should represent them in the plots
+        
+        """
+        for m in measures:
+            # plot descriptions for averages and std. deviations
+            plot_desc_sd = OrderedDict()
+            # plot descriptions for averages and 95% conf. intervals
+            plot_desc_ci95 = OrderedDict()
+            for bl in base_learners:
+                plot_desc_sd[bl] = []
+                plot_desc_ci95[bl] = []
+                for l in learners:
+                    avgs, stds, ci95s = self._compute_task_stats(bl, l, m)
+                    plot_desc_sd[bl].append(LinePlotDesc(np.arange(len(avgs)),
+                        avgs, stds, l, color=colors[l], ecolor=colors[l]))
+                    plot_desc_ci95[bl].append(LinePlotDesc(np.arange(len(avgs)),
+                        avgs, ci95s, l, color=colors[l], ecolor=colors[l]))
+            plot_multiple(plot_desc_sd,
+                os.path.join(results_path, "{}-avg-SD.pdf".format(m)),
+                title="Avg. results for tasks (error bars show std. dev.)",
+                subplot_title_fmt="Learner: {}",
+                xlabel="Number of instances",
+                ylabel=m)
+            plot_multiple(plot_desc_ci95,
+                os.path.join(results_path, "{}-avg-CI.pdf".format(m)),
+                title="Avg. results for tasks (error bars show 95% conf. "
+                    "intervals)",
+                subplot_title_fmt="Learner: {}",
+                xlabel="Number of instances",
+                ylabel=m)
+    
+
+class SubtasksMTLTester(MTLTester):
+    
+    """Sub-class of the MTLTester which implements dividing tasks into sub-tasks
+    by dividing the tasks' learning set into subsets.
+    
+    """
+    
+    def _prepare_tasks_data(self, test_prop=0.3, subtasks_split=(3, 5)):
+        """Iterate through the tasks' data stored in self._tasks_data and divide
+        them to learn and test sets.
+        Create a random number of sub-tasks by dividing the tasks' learning set
+        to subsets.
+        Create a dictionary mapping from tasks' ids to their Task objects and
+        store it in the self._tasks variable.
+        
+        Keyword arguments:
+        test_prop -- float (in range 0.0 - 1.0) indicating the proportion of
+            data that should be used for testing
+        subtasks_split -- tuple of the form (a, b), where a and b indicate the
+            minimal and maximal number (respectively) of sub-tasks the task is
+            divided into
+        
+        """
+        self._tasks = OrderedDict()
+        for td in self._tasks_data:
+            # divide task's data to learn and test sets
+            X, y = td.data, td.target
+            X_train, X_test, y_train, y_test = cross_validation.\
+                train_test_split(X, y, test_size=test_prop,
+                                 random_state=self._random.randint(0, 100))
+            # create a random number of subtasks by dividing the task's learn
+            # set to an appropriate number of subsets
+            n_subtasks = self._random.choice(subtasks_split)
+            for i, (_, test_m) in enumerate(cross_validation.KFold(len(y_train),
+                n_folds=n_subtasks, indices=False, shuffle=True,
+                random_state=self._random.randint(0, 100))):
+                tid = "{} (part {})".format(td.ID, i + 1)
+                learn = X_train[test_m], y_train[test_m]
+                test = X_test, y_test
+                self._tasks[tid] = Task(tid, learn, test)
+                
+
+class CVMTLTester(MTLTester):
     
     """Contains methods for testing various learning algorithms on the given
     multi-task learning (MTL) problem.
@@ -284,9 +786,9 @@ class MTLProblem:
     """
     
     def __init__(self, tasks_data, seed):
-        """Iterate through the given tasks data and create a new Task object for
+        """Iterate through the given tasks data and create a new CVTask object for
         each task.
-        Create a dictionary mapping from tasks' ids to their Task objects and
+        Create a dictionary mapping from tasks' ids to their CVTask objects and
         store it in the self._tasks variable.
         Create a private Random object with the given seed and store it in the
         self._random variable.
@@ -299,7 +801,7 @@ class MTLProblem:
         """
         self._tasks = OrderedDict()
         for td in tasks_data:
-            self._tasks[td.ID] = Task(td.ID, td)
+            self._tasks[td.ID] = CVTask(td.ID, td)
         self._random = random.Random(seed)
         # dictionary that will hold the TestingResults objects, one for each
         # tested base learner
@@ -451,7 +953,7 @@ class MTLProblem:
                 for l in learners:
                     start = time.clock()
                     R = learners[l](self._tasks, base_learners[bl])
-                    fold_scores[i][bl][l] = self._test_tasks(R["user_models"],
+                    fold_scores[i][bl][l] = self._test_tasks(R["task_models"],
                                                              measures)
                     end = time.clock()
                     logger.debug("Finished fold: {}, base learner: {}, "
@@ -639,8 +1141,10 @@ class MTLProblem:
                 ylabel=m)
 
 def test_tasks(tasks_data, results_path_fmt, base_learners,
-               measures, learners, rnd_seed=50, keep=0, test=True,
-               unpickle=False, visualize=True):
+               measures, learners, tester_type, rnd_seed=50, keep=0,
+               test=True, unpickle=False, visualize=True,
+               test_prop=None, subtasks_split=None, cv_folds=None,
+               repeats=None):
     """Test the given tasks data corresponding to a MTL problem according to the
     given parameters and save the results where indicated.
     
@@ -658,7 +1162,7 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
         learner is a merging learning algorithm (e.g. ERM, NoMerging, ...)
     
     Keyword arguments:
-    rnd_seed -- integer indicating the random seed to be used for the MTLProblem
+    rnd_seed -- integer indicating the random seed to be used for the MTLTester
         object
     keep -- integer indicating the number of random tasks to keep in the MTL
         problem; if 0 (Default), then all tasks are kept
@@ -682,33 +1186,49 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
     global logger
     logger = create_logger(name="PyMTL", console_level=logging.INFO,
                            file_name=log_file)
-    # create a MTL problem with tasks' data (and select a random subset of tasks
-    # if keep > 0)
-    mtlp = MTLProblem(tasks_data, rnd_seed)
+    # create a MTL tester with tasks' data
+    if tester_type == "train_test_split":
+        if test_prop == None or repeats == None:
+            raise ValueError("'test_prop' and 'repeats' keyword arguments "
+                             "should not be None.")
+        mtlt = MTLTester(tasks_data, rnd_seed, test_prop=test_prop,
+                         repeats=repeats)
+    elif tester_type == "subtasks_split":
+        if test_prop == None or subtasks_split == None or repeats == None:
+            raise ValueError("'test_prop', 'subtasks_split' and 'repeats' "
+                             "keyword arguments should not be None.")
+        mtlt = SubtasksMTLTester(tasks_data, rnd_seed, test_prop=test_prop,
+                                 subtasks_split=subtasks_split, repeats=repeats)
+    elif tester_type == "cv":
+        if cv_folds == None:
+            raise ValueError("'cv_folds' should not be None.")
+        mtlt = CVMTLTester(tasks_data, rnd_seed, cv_folds=cv_folds)
+    else:
+        raise ValueError("Unknown MTL tester type: '{}'".format(tester_type))
+    # select a random subset of tasks if keep > 0
     if keep > 0:
-        mtlp.only_keep_k_tasks(keep)
+        mtlt.only_keep_k_tasks(keep)
     # test all combinations of learners and base learners (compute the testing
     # results with the defined measures) and save the results if test == True
     if test:
-        mtlp.test_tasks(learners, base_learners, measures, results_path)
-        mtlp.pickle_test_results(pickle_path_fmt)
+        mtlt.test_tasks(learners, base_learners, measures, results_path)
+        mtlt.pickle_test_results(pickle_path_fmt)
     # find previously computed testing results and check if they were computed
     # using the same data tables and cross-validation indices if
     # unpickle == True
     if unpickle:
-        mtlp.find_pickled_test_results(pickle_path_fmt)
-        if not mtlp.check_test_results_compatible():
+        mtlt.find_pickled_test_results(pickle_path_fmt)
+        if not mtlt.check_test_results_compatible():
             raise ValueError("Test results for different base learners are not "
                              "compatible.")
     # visualize the results of the current tasks for each combination of base
     # learners, learners and measures that are in the MTL problem
     if visualize:
-        bls = mtlp.get_base_learners()
-        ls = mtlp.get_learners()
-        ms = mtlp.get_measures()
-        mtlp.visualize_results(bls, ls, ms, results_path,
-            colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
-            plot_type="line")
+        bls = mtlt.get_base_learners()
+        ls = mtlt.get_learners()
+        ms = mtlt.get_measures()
+        mtlt.visualize_results(bls, ls, ms, results_path,
+            colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"})
     remove_logger(logger)
 
 if __name__ == "__main__":
@@ -753,8 +1273,8 @@ if __name__ == "__main__":
     learners = OrderedDict()
     learners["NoMerging"] = learning.NoMergingLearner()
     learners["MergeAll"] = learning.MergeAllLearner()
-    no_filter = prefiltering.NoFilter()
-    learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
+#    no_filter = prefiltering.NoFilter()
+#    learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
     
     if test_config == 1:
         tasks_data = data.load_usps_digits_data()
@@ -763,6 +1283,19 @@ if __name__ == "__main__":
         rnd_seeds = [51]#range(51, 54)
         for rnd_seed in rnd_seeds:
             test_tasks(tasks_data, results_path_fmt, base_learners,
-                       measures, learners, rnd_seed=rnd_seed, test=test,
-                       unpickle=unpickle, visualize=visualize)
+                       measures, learners, "train_test_split",
+                       rnd_seed=rnd_seed,
+                       test=test, unpickle=unpickle, visualize=visualize,
+                       test_prop=0.3, repeats=3)
+
+    if test_config == 2:
+        tasks_data = data.load_usps_digits_data()
+        results_path_fmt = os.path.join(path_prefix, "results/usps_digits-"
+                                        "seed{}-keep{}")
+        rnd_seeds = [51]#range(51, 54)
+        for rnd_seed in rnd_seeds:
+            test_tasks(tasks_data, results_path_fmt, base_learners,
+                       measures, learners, "subtasks_split", rnd_seed=rnd_seed,
+                       test=test, unpickle=unpickle, visualize=visualize,
+                       test_prop=0.5, subtasks_split=(3, 5), repeats=3)
     
