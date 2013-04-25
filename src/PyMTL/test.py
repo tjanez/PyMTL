@@ -1141,18 +1141,18 @@ class CVMTLTester(MTLTester):
                 ylabel=m)
 
 def test_tasks(tasks_data, results_path_fmt, base_learners,
-               measures, learners, tester_type, rnd_seed=50, keep=0,
+               measures, learners, tester_type, rnd_seed=50,
                test=True, unpickle=False, visualize=True,
-               test_prop=None, subtasks_split=None, cv_folds=None,
-               repeats=None):
-    """Test the given tasks data corresponding to a MTL problem according to the
-    given parameters and save the results where indicated.
+               test_prop=0.3, subtasks_split=(3, 5), cv_folds=5,
+               repeats=1):
+    """Test the given tasks' data corresponding to a MTL problem according to
+    the given parameters and save the results where indicated.
     
     Arguments:
     tasks_data -- list of Bunch objects that hold tasks' data
     results_path_fmt -- string representing a template for the results path;
         it must contain exactly two pairs of braces ({}), where the rnd_seed and
-        keep parameters will be put
+        repeats parameters will be put
     base_learners -- ordered dictionary with items of the form (name, learner),
         where name is a string representing the base learner's name and learner
         is a scikit-learn estimator object
@@ -1160,12 +1160,13 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
     learners -- ordered dictionary with items of the form (name, learner),
         where name is a string representing the learner's name and
         learner is a merging learning algorithm (e.g. ERM, NoMerging, ...)
+    tester_type -- string indicating which (sub)class of MTLTester to use;
+        currently, only "train_test_split", "subtasks_split" and "cv" are
+        supported
     
     Keyword arguments:
     rnd_seed -- integer indicating the random seed to be used for the MTLTester
         object
-    keep -- integer indicating the number of random tasks to keep in the MTL
-        problem; if 0 (Default), then all tasks are kept
     test -- boolean indicating whether to perform tests on the MTL problem (with
         the given base_learners, measures and learners)
     unpickle -- boolean indicating whether to search for previously computed
@@ -1173,9 +1174,14 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
     visualize -- boolean indicating whether to visualize the results of the
         current tasks (for each combination of base learners, measures and
         learners in the MTL problem)
+    test_prop -- parameter for MTLTester and SubtasksMTLTester
+    subtasks_split -- parameter for the SubtasksMTLTester
+    cv_folds -- integer indicating how many folds to use with the CVMTLTester
+    repeats -- integer indicating how many times the MTLTester should repeat the
+        experiment
     
     """
-    results_path = results_path_fmt.format(rnd_seed, keep)
+    results_path = results_path_fmt.format(rnd_seed, repeats)
     if not os.path.exists(results_path):
         os.makedirs(results_path)
     pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
@@ -1188,26 +1194,15 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
                            file_name=log_file)
     # create a MTL tester with tasks' data
     if tester_type == "train_test_split":
-        if test_prop == None or repeats == None:
-            raise ValueError("'test_prop' and 'repeats' keyword arguments "
-                             "should not be None.")
         mtlt = MTLTester(tasks_data, rnd_seed, test_prop=test_prop,
                          repeats=repeats)
     elif tester_type == "subtasks_split":
-        if test_prop == None or subtasks_split == None or repeats == None:
-            raise ValueError("'test_prop', 'subtasks_split' and 'repeats' "
-                             "keyword arguments should not be None.")
         mtlt = SubtasksMTLTester(tasks_data, rnd_seed, test_prop=test_prop,
                                  subtasks_split=subtasks_split, repeats=repeats)
     elif tester_type == "cv":
-        if cv_folds == None:
-            raise ValueError("'cv_folds' should not be None.")
         mtlt = CVMTLTester(tasks_data, rnd_seed, cv_folds=cv_folds)
     else:
         raise ValueError("Unknown MTL tester type: '{}'".format(tester_type))
-    # select a random subset of tasks if keep > 0
-    if keep > 0:
-        mtlt.only_keep_k_tasks(keep)
     # test all combinations of learners and base learners (compute the testing
     # results with the defined measures) and save the results if test == True
     if test:
@@ -1279,14 +1274,15 @@ if __name__ == "__main__":
     if test_config == 1:
         tasks_data = data.load_usps_digits_data()
         results_path_fmt = os.path.join(path_prefix, "results/usps_digits-"
-                                        "seed{}-keep{}")
-        rnd_seeds = [51]#range(51, 54)
-        for rnd_seed in rnd_seeds:
+                                        "seed{}-repeats{}")
+        rnd_seed = 51
+        repeats_list = [20]
+        for repeats in repeats_list:
             test_tasks(tasks_data, results_path_fmt, base_learners,
                        measures, learners, "train_test_split",
                        rnd_seed=rnd_seed,
                        test=test, unpickle=unpickle, visualize=visualize,
-                       test_prop=0.3, repeats=3)
+                       test_prop=0.5, repeats=repeats)
 
     if test_config == 2:
         tasks_data = data.load_usps_digits_data()
