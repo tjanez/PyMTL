@@ -311,42 +311,6 @@ def _compute_avg_scores(fold_scores):
     return avg_scores
 
 
-def _merge_repetition_scores(rpt_scores):
-    """Compute the average scores of the given fold scores.
-    Return a four-dimensional dictionary with:
-        first key corresponding to the base learner's name,
-        second key corresponding to the learner's name,
-        third key corresponding to the task's id,
-        fourth key corresponding to the scoring measure's name,
-        value corresponding to the average value of the scoring measure.
-    
-    Keyword arguments:
-    rpt_scores -- five-dimensional dictionary with:
-        first key corresponding to the fold number,
-        second key corresponding to the base learner's name,
-        third key corresponding to the learner's name,
-        fourth key corresponding to the task's id,
-        fifth key corresponding to the scoring measure's name,
-        value corresponding to the scoring measure's value.
-    
-    """
-    mrg_scores = dict()
-    for bl in rpt_scores[0]:
-        mrg_scores[bl] = dict()
-        for l in rpt_scores[0][bl]:
-            mrg_scores[bl][l] = dict()
-            for task_id in rpt_scores[0][bl][l]:
-                mrg_scores[bl][l][task_id] = dict()
-                for m_name in rpt_scores[0][bl][l][task_id]:
-                    t_scores = []
-                    for i in rpt_scores:
-                        t_score = rpt_scores[i][bl][l][task_id][m_name]
-                        if t_score != None:
-                            t_scores.append(t_score)
-                    mrg_scores[bl][l][task_id][m_name] = t_scores
-    return mrg_scores
-
-
 class TestingResults:
 
     """Contains data of testing a particular base learning method on a
@@ -459,6 +423,41 @@ class MTLTester:
             self._tasks[td.ID] = Task(td.ID, (X_train, y_train),
                                       (X_test, y_test))
     
+    def _merge_repetition_scores(self, rpt_scores):
+        """Merge the given repetition scores.
+        Return a four-dimensional dictionary with:
+            first key corresponding to the base learner's name,
+            second key corresponding to the learner's name,
+            third key corresponding to the task's id,
+            fourth key corresponding to the scoring measure's name,
+            value corresponding to a list of values of the scoring measure.
+        
+        Keyword arguments:
+        rpt_scores -- five-dimensional dictionary with:
+            first key corresponding to the repetition number,
+            second key corresponding to the base learner's name,
+            third key corresponding to the learner's name,
+            fourth key corresponding to the task's id,
+            fifth key corresponding to the scoring measure's name,
+            value corresponding to the scoring measure's value.
+        
+        """
+        mrg_scores = dict()
+        for bl in rpt_scores[0]:
+            mrg_scores[bl] = dict()
+            for l in rpt_scores[0][bl]:
+                mrg_scores[bl][l] = dict()
+                for task_id in rpt_scores[0][bl][l]:
+                    mrg_scores[bl][l][task_id] = dict()
+                    for m_name in rpt_scores[0][bl][l][task_id]:
+                        t_scores = []
+                        for i in rpt_scores:
+                            t_score = rpt_scores[i][bl][l][task_id][m_name]
+                            if t_score != None:
+                                t_scores.append(t_score)
+                        mrg_scores[bl][l][task_id][m_name] = t_scores
+        return mrg_scores
+    
     def _test_tasks(self, models, measures):
         """Test the given tasks' models on their testing data sets. Compute
         the given scoring measures of the testing results.
@@ -560,7 +559,7 @@ class MTLTester:
                             title="Merging history of ERM with base learner {}"
                             " (repeat {})".format(bl, i))
         # merge results of all repetitions
-        scores = _merge_repetition_scores(rpt_scores)
+        scores = self._merge_repetition_scores(rpt_scores)
         # get tasks' hashes
         task_hashes = OrderedDict()
         for tid, task in self._tasks.iteritems():
@@ -660,7 +659,7 @@ class MTLTester:
     def _compute_task_stats(self, base_learner, learner, measure):
         """Compute the statistics (average, std. deviation and 95% confidence
         interval) of the performance of the given base learner and learner with
-        the given measure for each task in self._tasks.
+        the given measure for each task.
         Return a triple (avgs, stds, ci95s), where:
             avgs -- list of averages, one for each task
             stds -- list of standard deviations, one for each task
@@ -673,11 +672,10 @@ class MTLTester:
         stds = []
         ci95s = []
         # get the scores for the given base learner
-        bl_avg_scores = self._test_res[base_learner].avg_scores
-        for tid, t in self._tasks.iteritems():
-            # get the scores of the current task for the given learner and
-            # scoring measure
-            scores = bl_avg_scores[learner][tid][measure]
+        bl_l_scores = self._test_res[base_learner].avg_scores[learner]
+        for tid in bl_l_scores:
+            # get the scores of the current task for the given scoring measure
+            scores = bl_l_scores[tid][measure]
             avgs.append(stat.mean(scores))
             stds.append(stat.unbiased_std(scores))
             ci95s.append(stat.ci95(scores))
@@ -779,6 +777,51 @@ class SubtasksMTLTester(MTLTester):
                 self._tasks[tid] = Task(tid, learn, test)
             logger.debug("Splitted task '{}' into {} sub-tasks.".format(td.ID,
                                                                     n_subtasks))
+    
+    def _merge_repetition_scores(self, rpt_scores):
+        """Merge the given repetition scores. The scores of all sub-tasks should
+        be merged into a single list.
+        Return a four-dimensional dictionary with:
+            first key corresponding to the base learner's name,
+            second key corresponding to the learner's name,
+            third key corresponding to the (unsplitted) task's id,
+            fourth key corresponding to the scoring measure's name,
+            value corresponding to a list of values of the scoring measure.
+        
+        Keyword arguments:
+        rpt_scores -- five-dimensional dictionary with:
+            first key corresponding to the repetition number,
+            second key corresponding to the base learner's name,
+            third key corresponding to the learner's name,
+            fourth key corresponding to the (splitted) task's id,
+            fifth key corresponding to the scoring measure's name,
+            value corresponding to the scoring measure's value.
+        
+        """
+        mrg_scores = dict()
+        for bl in rpt_scores[0]:
+            mrg_scores[bl] = dict()
+            for l in rpt_scores[0][bl]:
+                mrg_scores[bl][l] = dict()
+                for rpt in rpt_scores:
+                    for task_id in rpt_scores[rpt][bl][l]:
+                        # extract the original task's id from the task's id
+                        match = re.search(r"^[^(]+", task_id)
+                        if match:
+                            orig_task_id = match.group().rstrip()
+                        else:
+                            raise ValueError("Could not extract the original "
+                                    "task's id from '{}'".format(task_id))
+                        if orig_task_id not in mrg_scores[bl][l]:
+                            mrg_scores[bl][l][orig_task_id] = dict()
+                        for m_name in rpt_scores[rpt][bl][l][task_id]:
+                            if m_name not in mrg_scores[bl][l][orig_task_id]:
+                                mrg_scores[bl][l][orig_task_id][m_name] = []
+                            t_score = rpt_scores[rpt][bl][l][task_id][m_name]
+                            if t_score != None:
+                                mrg_scores[bl][l][orig_task_id][m_name].\
+                                    append(t_score)
+        return mrg_scores
                 
 
 class CVMTLTester(MTLTester):
@@ -1271,8 +1314,8 @@ if __name__ == "__main__":
     learners = OrderedDict()
     learners["NoMerging"] = learning.NoMergingLearner()
     learners["MergeAll"] = learning.MergeAllLearner()
-#    no_filter = prefiltering.NoFilter()
-#    learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
+    no_filter = prefiltering.NoFilter()
+    learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
     
     if test_config == 1:
         tasks_data = data.load_usps_digits_data()
