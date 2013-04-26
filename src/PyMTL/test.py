@@ -318,7 +318,7 @@ class TestingResults:
     
     """
     
-    def __init__(self, name, task_hashes, avg_scores):
+    def __init__(self, name, task_hashes, scores, dend_info):
         """Initialize a TestingResults object. Store the given arguments as
         attributes.
         
@@ -326,16 +326,21 @@ class TestingResults:
         name -- string representing the base learner's name
         task_hashes -- OrderedDictionary with keys corresponding to tasks' ids
             and values to tasks' hashes
-        avg_scores -- three-dimensional dictionary with:
+        scores -- three-dimensional dictionary with:
             first key corresponding to the learner's name,
             second key corresponding to the task's id,
             third key corresponding to the scoring measure's name,
-            value corresponding to the average value of the scoring measure
+            value corresponding to a list of values of the scoring measure.
+        dend_info -- ordered dictionary with keys corresponding to the
+            experiment's repetition numbers and values corresponding to lists of
+            tuples (one for each merged task) as returned by the
+            convert_merg_history_to_scipy_linkage function
         
         """
         self.name = name
         self.task_hashes = task_hashes
-        self.avg_scores = avg_scores
+        self.scores = scores
+        self.dend_info = dend_info
 
 
 class MTLTester:
@@ -390,7 +395,7 @@ class MTLTester:
         
         """
         rnd_bl = self.get_base_learners()[0]
-        return tuple(self._test_res[rnd_bl].avg_scores.iterkeys())
+        return tuple(self._test_res[rnd_bl].scores.iterkeys())
     
     def get_measures(self):
         """Return a tuple with the names of the scoring measures that have
@@ -399,8 +404,8 @@ class MTLTester:
         """
         rnd_bl = self.get_base_learners()[0]
         rnd_l = self.get_learners()[0]
-        rnd_u = tuple(self._test_res[rnd_bl].avg_scores[rnd_l].iterkeys())[0]
-        return tuple(self._test_res[rnd_bl].avg_scores[rnd_l][rnd_u].iterkeys())
+        rnd_u = tuple(self._test_res[rnd_bl].scores[rnd_l].iterkeys())[0]
+        return tuple(self._test_res[rnd_bl].scores[rnd_l][rnd_u].iterkeys())
     
     def _prepare_tasks_data(self, test_prop=0.3):
         """Iterate through the tasks' data stored in self._tasks_data and create
@@ -519,7 +524,9 @@ class MTLTester:
         given scoring measures.
         Combine the scores of all repetitions and store them in TestingResults
         objects, one for each base learner, along with tasks' hashes (used for
-        comparing the results of multiple experiments).
+        comparing the results of multiple experiments) and dend_info objects
+        (used for plotting dendrograms showing merging history of the ERM MTL
+        method).
         Store the created TestingResults objects in self._test_res, which is
         a dictionary with keys corresponding to base learner's names and values
         corresponding to their TestingResults objects. 
@@ -534,11 +541,12 @@ class MTLTester:
         measures -- list of strings representing measure's names (currently,
             only CA and AUC are supported)
         results_path -- string representing the path where to save any extra
-            information about the running of this test (currently, just ERM's
-            dendrograms)
+            information about the running of this test (currently, not used
+            anywhere)
         
         """
         rpt_scores = OrderedDict()
+        dend_info = {bl : OrderedDict() for bl in base_learners.iterkeys()}
         for i in range(self._repeats):
             self._prepare_tasks_data(**self._tasks_data_params)
             rpt_scores[i] = {bl : dict() for bl in base_learners.iterkeys()}
@@ -551,23 +559,20 @@ class MTLTester:
                     end = time.clock()
                     logger.debug("Finished repetition: {}, base learner: {}, "
                         "learner: {} in {:.2f}s".format(i, bl, l, end-start))
-                    # plot a dendrogram showing merging history if the results
-                    # contain dendrogram info 
+                    # store dendrogram info if the results contain it 
                     if "dend_info" in R:
-                        plot_dendrograms(R["dend_info"], os.path.join(
-                            results_path, "dend-{}-repeat{}.png".format(bl, i)),
-                            title="Merging history of ERM with base learner {}"
-                            " (repeat {})".format(bl, i))
+                        dend_info[bl][i] = R["dend_info"]
         # merge results of all repetitions
         scores = self._merge_repetition_scores(rpt_scores)
         # get tasks' hashes
         task_hashes = OrderedDict()
         for tid, task in self._tasks.iteritems():
             task_hashes[tid] = task.get_hash()
-        # store the average scores of each base learner in a separate
-        # TestingResults object
+        # store the scores and dend_info objects of each base learner in a
+        # separate TestingResults object
         for bl in scores:
-            self._test_res[bl] = TestingResults(bl, task_hashes, scores[bl])
+            self._test_res[bl] = TestingResults(bl, task_hashes, scores[bl],
+                                                dend_info[bl])
     
     def pickle_test_results(self, pickle_path_fmt):
         """Pickle the TestingResults objects in self._test_res to the given
@@ -672,7 +677,7 @@ class MTLTester:
         stds = []
         ci95s = []
         # get the scores for the given base learner
-        bl_l_scores = self._test_res[base_learner].avg_scores[learner]
+        bl_l_scores = self._test_res[base_learner].scores[learner]
         for tid in bl_l_scores:
             # get the scores of the current task for the given scoring measure
             scores = bl_l_scores[tid][measure]
@@ -693,7 +698,7 @@ class MTLTester:
         scoring measure. Each big plot has one subplot for each base learner.
         Each subplot shows the comparison between different learning algorithms.
         The same big plots are drawn for averages and 95% conf. intervals.
-        Save the drawn plots to the files with the given path prefix.
+        Save the drawn plots to the given results' path.
         
         Arguments:
         base_learners -- list of strings representing the names of base learners
@@ -732,6 +737,27 @@ class MTLTester:
                 subplot_title_fmt="Learner: {}",
                 xlabel="Number of instances",
                 ylabel=m)
+    
+    def visualize_dendrograms(self, base_learners, results_path):
+        """Visualize the dendrograms showing merging history of the ERM MTL
+        method with the given base learning algorithms.
+        Save the draws plots (one for each repetition of the experiment) to
+        the given results' path.
+        
+        Arguments:
+        base_learners -- list of strings representing the names of base learners
+        results_path -- string representing the path where to save the generated
+            dendrograms
+        
+        """
+        for bl in base_learners:
+            if len(self._test_res[bl].dend_info) > 0:
+                for i, dend_info in self._test_res[bl].dend_info.iteritems():
+                    save_path = os.path.join(results_path, "dend-{}-repeat{}."
+                                             "png".format(bl, i))
+                    plot_dendrograms(dend_info, save_path, title="Merging "
+                                     "history of ERM with base learner {} "
+                                     "(repetition {})".format(bl, i))
     
 
 class SubtasksMTLTester(MTLTester):
@@ -1263,13 +1289,15 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
             raise ValueError("Test results for different base learners are not "
                              "compatible.")
     # visualize the results of the current tasks for each combination of base
-    # learners, learners and measures that are in the MTL problem
+    # learners, learners and measures that are in the MTL problem; in addition,
+    # visualize the dendrograms showing merging history of ERM
     if visualize:
         bls = mtlt.get_base_learners()
         ls = mtlt.get_learners()
         ms = mtlt.get_measures()
         mtlt.visualize_results(bls, ls, ms, results_path,
             colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"})
+        mtlt.visualize_dendrograms(base_learners, results_path)
     remove_logger(logger)
 
 if __name__ == "__main__":
