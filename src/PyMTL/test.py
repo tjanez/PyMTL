@@ -754,7 +754,7 @@ class MTLTester:
             if len(self._test_res[bl].dend_info) > 0:
                 for i, dend_info in self._test_res[bl].dend_info.iteritems():
                     save_path = os.path.join(results_path, "dend-{}-repeat{}."
-                                             "png".format(bl, i))
+                                             "pdf".format(bl, i))
                     plot_dendrograms(dend_info, save_path, title="Merging "
                                      "history of ERM with base learner {} "
                                      "(repetition {})".format(bl, i))
@@ -1303,6 +1303,8 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
 if __name__ == "__main__":
     # boolean indicating which testing configuration to use:
     # 1 -- USPS digits data
+    # 2 -- USPS digits data (repeats=10, subtasks=(3, 5))
+    # 2 -- USPS digits data (repeats=10, subtasks=(5, 10))
     test_config = 2
     
     # boolean indicating whether to perform the tests on the MTL problem
@@ -1361,12 +1363,22 @@ if __name__ == "__main__":
     if test_config == 2:
         tasks_data = data.load_usps_digits_data()
         results_path_fmt = os.path.join(path_prefix, "results/usps_digits-"
-                                        "seed{}-repeats{}-subtasks")
-        rnd_seeds = [51]
-        repeats = 3
-        for rnd_seed in rnd_seeds:
-            test_tasks(tasks_data, results_path_fmt, base_learners,
-                       measures, learners, "subtasks_split", rnd_seed=rnd_seed,
-                       test=test, unpickle=unpickle, visualize=visualize,
-                       test_prop=0.5, subtasks_split=(3, 5), repeats=repeats)
+                                        "seed{}-repeats{}-subtasks3_5")
+        rnd_seed = 51
+        repeats = 10
+        test_tasks(tasks_data, results_path_fmt, base_learners,
+                   measures, learners, "subtasks_split", rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=0.5, subtasks_split=(3, 5), repeats=repeats)
+    
+    if test_config == 3:
+        tasks_data = data.load_usps_digits_data()
+        results_path_fmt = os.path.join(path_prefix, "results/usps_digits-"
+                                        "seed{}-repeats{}-subtasks5_10")
+        rnd_seed = 51
+        repeats = 10
+        test_tasks(tasks_data, results_path_fmt, base_learners,
+                   measures, learners, "subtasks_split", rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=0.5, subtasks_split=(5, 10), repeats=repeats)
     

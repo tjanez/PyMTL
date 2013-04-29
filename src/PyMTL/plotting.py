@@ -116,10 +116,10 @@ def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel=""):
     # 0.9-times this number
     x_min = min(pd.x[0] for pd in plot_descs)
     axes.set_xlim(left=int(0.9 * x_min))
-    # set x-axis scale to logarithmic and also display labels of minor ticks
-    axes.set_xscale("log")
-    axes.xaxis.set_minor_formatter(plt.FormatStrFormatter("%d"))
-    axes.tick_params(axis='x', which="minor", labelsize="x-small")
+#    # set x-axis scale to logarithmic and also display labels of minor ticks
+#    axes.set_xscale("log")
+#    axes.xaxis.set_minor_formatter(plt.FormatStrFormatter("%d"))
+#    axes.tick_params(axis='x', which="minor", labelsize="x-small")
     axes.set_ylim(0.0, 1.0)
     axes.grid(b=True)
     axes.legend(loc="upper right", fancybox=True,
@@ -238,7 +238,8 @@ def plot_dendrograms(dend_info, file_name, title="", ylabel=""):
     nplots = len(dend_info)
     nrows = nplots
     ncols = 1
-    fig = plt.figure()
+    # make figure the size of an A4 page
+    fig = plt.figure(figsize=(8.3, 11.7))
     # create an empty object array to hold all axes; it's easiest to make it 1-d
     # so we can just append subplots upon creation
     axarr = np.empty(nplots, dtype=object)
@@ -258,7 +259,7 @@ def plot_dendrograms(dend_info, file_name, title="", ylabel=""):
     ax.text(.05, 0.5, ylabel, rotation="vertical",
             horizontalalignment="center", verticalalignment="center")
     # adjust figure parameters to make it look nicer
-    fig.subplots_adjust(top=0.90, bottom=0.03, left=0.15, right=0.97,
+    fig.subplots_adjust(top=0.90, bottom=0.03, left=0.20, right=0.97,
                         wspace=0.1, hspace=0.05)
     fig.savefig(file_name)
 
