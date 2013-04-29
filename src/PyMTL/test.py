@@ -1304,8 +1304,11 @@ if __name__ == "__main__":
     # boolean indicating which testing configuration to use:
     # 1 -- USPS digits data
     # 2 -- USPS digits data (repeats=10, subtasks=(3, 5))
-    # 2 -- USPS digits data (repeats=10, subtasks=(5, 10))
-    test_config = 2
+    # 3 -- USPS digits data (repeats=10, subtasks=(5, 10))
+    # 4 -- MNIST digits data
+    # 5 -- MNIST digits data (repeats=10, subtasks=(3, 5))
+    # 6 -- MNIST digits data (repeats=10, subtasks=(5, 10))
+    test_config = 4
     
     # boolean indicating whether to perform the tests on the MTL problem
     test = True
@@ -1382,3 +1385,37 @@ if __name__ == "__main__":
                    test=test, unpickle=unpickle, visualize=visualize,
                    test_prop=0.5, subtasks_split=(5, 10), repeats=repeats)
     
+    if test_config == 4:
+        tasks_data = data.load_mnist_digits_data()
+        results_path_fmt = os.path.join(path_prefix, "results/mnist_digits-"
+                                        "seed{}-repeats{}")
+        rnd_seed = 51
+        repeats_list = [10]
+        for repeats in repeats_list:
+            test_tasks(tasks_data, results_path_fmt, base_learners,
+                       measures, learners, "train_test_split",
+                       rnd_seed=rnd_seed,
+                       test=test, unpickle=unpickle, visualize=visualize,
+                       test_prop=0.5, repeats=repeats)
+    
+    if test_config == 5:
+        tasks_data = data.load_mnist_digits_data()
+        results_path_fmt = os.path.join(path_prefix, "results/mnist_digits-"
+                                        "seed{}-repeats{}-subtasks3_5")
+        rnd_seed = 51
+        repeats = 10
+        test_tasks(tasks_data, results_path_fmt, base_learners,
+                   measures, learners, "subtasks_split", rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=0.5, subtasks_split=(3, 5), repeats=repeats)
+    
+    if test_config == 6:
+        tasks_data = data.load_mnist_digits_data()
+        results_path_fmt = os.path.join(path_prefix, "results/mnist_digits-"
+                                        "seed{}-repeats{}-subtasks5_10")
+        rnd_seed = 51
+        repeats = 10
+        test_tasks(tasks_data, results_path_fmt, base_learners,
+                   measures, learners, "subtasks_split", rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=0.5, subtasks_split=(5, 10), repeats=repeats)
