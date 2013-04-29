@@ -711,6 +711,9 @@ class MTLTester:
         
         """
         for m in measures:
+            # x points and labels
+            x_labels = list(self._test_res[base_learners[0]].scores[learners[0]].keys())
+            x_points = np.arange(len(x_labels))
             # plot descriptions for averages and std. deviations
             plot_desc_sd = OrderedDict()
             # plot descriptions for averages and 95% conf. intervals
@@ -720,23 +723,27 @@ class MTLTester:
                 plot_desc_ci95[bl] = []
                 for l in learners:
                     avgs, stds, ci95s = self._compute_task_stats(bl, l, m)
-                    plot_desc_sd[bl].append(LinePlotDesc(np.arange(len(avgs)),
+                    plot_desc_sd[bl].append(LinePlotDesc(x_points,
                         avgs, stds, l, color=colors[l], ecolor=colors[l]))
-                    plot_desc_ci95[bl].append(LinePlotDesc(np.arange(len(avgs)),
+                    plot_desc_ci95[bl].append(LinePlotDesc(x_points,
                         avgs, ci95s, l, color=colors[l], ecolor=colors[l]))
             plot_multiple(plot_desc_sd,
                 os.path.join(results_path, "{}-avg-SD.pdf".format(m)),
                 title="Avg. results for tasks (error bars show std. dev.)",
                 subplot_title_fmt="Learner: {}",
                 xlabel="Number of instances",
-                ylabel=m)
+                ylabel=m,
+                x_tick_points=x_points,
+                x_tick_labels=x_labels)
             plot_multiple(plot_desc_ci95,
                 os.path.join(results_path, "{}-avg-CI.pdf".format(m)),
                 title="Avg. results for tasks (error bars show 95% conf. "
                     "intervals)",
                 subplot_title_fmt="Learner: {}",
                 xlabel="Number of instances",
-                ylabel=m)
+                ylabel=m,
+                x_tick_points=x_points,
+                x_tick_labels=x_labels)
     
     def visualize_dendrograms(self, base_learners, results_path):
         """Visualize the dendrograms showing merging history of the ERM MTL
@@ -784,7 +791,11 @@ class SubtasksMTLTester(MTLTester):
         
         """
         self._tasks = OrderedDict()
+        # list of original tasks' ids
+        # NOTE: This is used later to order the tasks when plotting the results.
+        self._orig_task_ids = []
         for td in self._tasks_data:
+            self._orig_task_ids.append(td.ID)
             # divide task's data to learn and test sets
             X, y = td.data, td.target
             X_train, X_test, y_train, y_test = cross_validation.\
@@ -828,7 +839,11 @@ class SubtasksMTLTester(MTLTester):
         for bl in rpt_scores[0]:
             mrg_scores[bl] = dict()
             for l in rpt_scores[0][bl]:
-                mrg_scores[bl][l] = dict()
+                # prepare an OrderedDict with original tasks' ids
+                # NOTE: OrderedDict is used to keep the order the tasks so that
+                # their results are plotted correctly.
+                mrg_scores[bl][l] = OrderedDict([(tid, dict()) for tid in
+                                                 self._orig_task_ids])
                 for rpt in rpt_scores:
                     for task_id in rpt_scores[rpt][bl][l]:
                         # extract the original task's id from the task's id
@@ -839,7 +854,8 @@ class SubtasksMTLTester(MTLTester):
                             raise ValueError("Could not extract the original "
                                     "task's id from '{}'".format(task_id))
                         if orig_task_id not in mrg_scores[bl][l]:
-                            mrg_scores[bl][l][orig_task_id] = dict()
+                            raise ValueError("Original task's id: {} not "\
+                                             "found.".format(orig_task_id))
                         for m_name in rpt_scores[rpt][bl][l][task_id]:
                             if m_name not in mrg_scores[bl][l][orig_task_id]:
                                 mrg_scores[bl][l][orig_task_id][m_name] = []

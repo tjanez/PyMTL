@@ -85,7 +85,8 @@ class LinePlotDesc:
         self.ecolor = ecolor
         self.label = label
 
-def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel=""):
+def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel="",
+                  x_tick_points=None, x_tick_labels=None):
     """Draw the given (bar or line) plots on the given Axes object.
     
     Arguments:
@@ -97,6 +98,9 @@ def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel=""):
     title -- string representing plot's title
     xlabel -- string representing x axis's label
     ylabel -- string representing y axis's label
+    x_tick_points -- list of floats (or integers) representing x axis tick
+        positions
+    x_tick_labels -- list of strings representing x axis tick labels
     
     """
     for pd in plot_descs:
@@ -112,21 +116,22 @@ def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel=""):
     axes.set_title(title, size="small")
     axes.set_xlabel(xlabel, size="small")
     axes.set_ylabel(ylabel, size="small")
-    # find the left-most point of all lines and set the x-axis left limit to
-    # 0.9-times this number
-    x_min = min(pd.x[0] for pd in plot_descs)
-    axes.set_xlim(left=int(0.9 * x_min))
-#    # set x-axis scale to logarithmic and also display labels of minor ticks
-#    axes.set_xscale("log")
-#    axes.xaxis.set_minor_formatter(plt.FormatStrFormatter("%d"))
-#    axes.tick_params(axis='x', which="minor", labelsize="x-small")
+    # set x-axis' left limit a bit to the left and x-axis' right limit a bit to
+    # the right so that the resulting plot looks nicer
+    margin = (x_tick_points[1] - x_tick_points[0]) / 2.0
+    axes.set_xlim(left=x_tick_points[0] - margin,
+                  right=x_tick_points[-1] + margin)
+    if x_tick_points != None and x_tick_labels != None:
+        axes.set_xticks(x_tick_points)
+        axes.set_xticklabels(x_tick_labels)
     axes.set_ylim(0.0, 1.0)
     axes.grid(b=True)
-    axes.legend(loc="upper right", fancybox=True,
+    axes.legend(loc="lower right", fancybox=True,
                prop=FontProperties(size="x-small"))
 
 def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
-                  xlabel="", ylabel=""):
+                  xlabel="", ylabel="",
+                  x_tick_points=None, x_tick_labels=None):
     """Plot multiple subplots on one figure.
     The method can draw from one up to eight subplots on a figure. It
     automatically arranges the subplots into the appropriate number of rows and
@@ -146,6 +151,9 @@ def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
         learner's name will be put
     xlabel -- string representing subplots' x axis's labels
     ylabel -- string representing subplots' y axis's labels
+    x_tick_points -- list of floats (or integers) representing subplots' x axis
+        tick positions
+    x_tick_labels -- list of strings representing subplots' x axis tick labels
      
     """
     # figure sizes in inches (width, height)
@@ -179,7 +187,8 @@ def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
     # draw plots to the subplots
     for i, (bl, plot_descs) in enumerate(plot_descs_mult.iteritems()):
         _draw_subplot(axarr[i], plot_descs, title=subplot_title_fmt.format(bl),
-                  xlabel=xlabel, ylabel=ylabel)
+                  xlabel=xlabel, ylabel=ylabel, x_tick_points=x_tick_points,
+                  x_tick_labels=x_tick_labels)
     fig.suptitle(title)
     # adjust figure parameters to make it look nicer
     fig.subplots_adjust(top=0.93, bottom=0.08, left=0.10, right=0.95,
