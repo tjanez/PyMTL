@@ -451,9 +451,12 @@ class MTLTester:
         for bl in rpt_scores[0]:
             mrg_scores[bl] = dict()
             for l in rpt_scores[0][bl]:
-                mrg_scores[bl][l] = dict()
+                # prepare an OrderedDict with tasks' ids
+                # NOTE: OrderedDict is used to keep the order the tasks so that
+                # their results are plotted correctly.
+                mrg_scores[bl][l] = OrderedDict([(tid, dict()) for tid in
+                                                 self._tasks])
                 for task_id in rpt_scores[0][bl][l]:
-                    mrg_scores[bl][l][task_id] = dict()
                     for m_name in rpt_scores[0][bl][l][task_id]:
                         t_scores = []
                         for i in rpt_scores:
@@ -1318,13 +1321,13 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
 
 if __name__ == "__main__":
     # boolean indicating which testing configuration to use:
-    # 1 -- USPS digits data
+    # 1 -- USPS digits data (repeats=10)
     # 2 -- USPS digits data (repeats=10, subtasks=(3, 5))
     # 3 -- USPS digits data (repeats=10, subtasks=(5, 10))
-    # 4 -- MNIST digits data
+    # 4 -- MNIST digits data (repeats=10)
     # 5 -- MNIST digits data (repeats=10, subtasks=(3, 5))
     # 6 -- MNIST digits data (repeats=10, subtasks=(5, 10))
-    test_config = 4
+    test_config = 1
     
     # boolean indicating whether to perform the tests on the MTL problem
     test = True
@@ -1371,13 +1374,12 @@ if __name__ == "__main__":
         results_path_fmt = os.path.join(path_prefix, "results/usps_digits-"
                                         "seed{}-repeats{}")
         rnd_seed = 51
-        repeats_list = [20]
-        for repeats in repeats_list:
-            test_tasks(tasks_data, results_path_fmt, base_learners,
-                       measures, learners, "train_test_split",
-                       rnd_seed=rnd_seed,
-                       test=test, unpickle=unpickle, visualize=visualize,
-                       test_prop=0.5, repeats=repeats)
+        repeats = 10
+        test_tasks(tasks_data, results_path_fmt, base_learners,
+                   measures, learners, "train_test_split",
+                   rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=0.5, repeats=repeats)
 
     if test_config == 2:
         tasks_data = data.load_usps_digits_data()
@@ -1406,13 +1408,12 @@ if __name__ == "__main__":
         results_path_fmt = os.path.join(path_prefix, "results/mnist_digits-"
                                         "seed{}-repeats{}")
         rnd_seed = 51
-        repeats_list = [10]
-        for repeats in repeats_list:
-            test_tasks(tasks_data, results_path_fmt, base_learners,
-                       measures, learners, "train_test_split",
-                       rnd_seed=rnd_seed,
-                       test=test, unpickle=unpickle, visualize=visualize,
-                       test_prop=0.5, repeats=repeats)
+        repeats = 10
+        test_tasks(tasks_data, results_path_fmt, base_learners,
+                   measures, learners, "train_test_split",
+                   rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=0.5, repeats=repeats)
     
     if test_config == 5:
         tasks_data = data.load_mnist_digits_data()
