@@ -1,0 +1,161 @@
+[2013-04-30 13:44:23] PyMTL           DEBUG  : Splitted task '0 vs. others' into 8 sub-tasks.
+[2013-04-30 13:44:23] PyMTL           DEBUG  : Splitted task '1 vs. others' into 6 sub-tasks.
+[2013-04-30 13:44:23] PyMTL           DEBUG  : Splitted task '2 vs. others' into 7 sub-tasks.
+[2013-04-30 13:44:23] PyMTL           DEBUG  : Splitted task '3 vs. others' into 8 sub-tasks.
+[2013-04-30 13:44:23] PyMTL           DEBUG  : Splitted task '4 vs. others' into 7 sub-tasks.
+[2013-04-30 13:44:23] PyMTL           DEBUG  : Splitted task '5 vs. others' into 10 sub-tasks.
+[2013-04-30 13:44:23] PyMTL           DEBUG  : Splitted task '6 vs. others' into 6 sub-tasks.
+[2013-04-30 13:44:23] PyMTL           DEBUG  : Splitted task '7 vs. others' into 6 sub-tasks.
+[2013-04-30 13:44:23] PyMTL           DEBUG  : Splitted task '8 vs. others' into 9 sub-tasks.
+[2013-04-30 13:44:23] PyMTL           DEBUG  : Splitted task '9 vs. others' into 6 sub-tasks.
+[2013-04-30 13:44:24] PyMTL           DEBUG  : Finished repetition: 0, base learner: log_reg, learner: NoMerging in 1.64s
+[2013-04-30 13:44:24] PyMTL.learning.learning DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-04-30 13:44:26] PyMTL           DEBUG  : Finished repetition: 0, base learner: log_reg, learner: MergeAll in 1.88s
+[2013-04-30 13:44:26] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (2628 pairs)
+[2013-04-30 13:48:39] PyMTL.learning.learning DEBUG  : Processing 218 candidate pairs for merging
+[2013-04-30 13:57:56] PyMTL           DEBUG  : Finished repetition: 0, base learner: log_reg, learner: ERM in 803.68s
+[2013-04-30 13:57:56] PyMTL           DEBUG  : Splitted task '0 vs. others' into 10 sub-tasks.
+[2013-04-30 13:57:56] PyMTL           DEBUG  : Splitted task '1 vs. others' into 10 sub-tasks.
+[2013-04-30 13:57:56] PyMTL           DEBUG  : Splitted task '2 vs. others' into 9 sub-tasks.
+[2013-04-30 13:57:56] PyMTL           DEBUG  : Splitted task '3 vs. others' into 10 sub-tasks.
+[2013-04-30 13:57:56] PyMTL           DEBUG  : Splitted task '4 vs. others' into 7 sub-tasks.
+[2013-04-30 13:57:56] PyMTL           DEBUG  : Splitted task '5 vs. others' into 10 sub-tasks.
+[2013-04-30 13:57:56] PyMTL           DEBUG  : Splitted task '6 vs. others' into 8 sub-tasks.
+[2013-04-30 13:57:56] PyMTL           DEBUG  : Splitted task '7 vs. others' into 7 sub-tasks.
+[2013-04-30 13:57:56] PyMTL           DEBUG  : Splitted task '8 vs. others' into 8 sub-tasks.
+[2013-04-30 13:57:56] PyMTL           DEBUG  : Splitted task '9 vs. others' into 9 sub-tasks.
+[2013-04-30 13:57:58] PyMTL           DEBUG  : Finished repetition: 1, base learner: log_reg, learner: NoMerging in 1.93s
+[2013-04-30 13:57:58] PyMTL.learning.learning DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-04-30 13:58:00] PyMTL           DEBUG  : Finished repetition: 1, base learner: log_reg, learner: MergeAll in 2.17s
+[2013-04-30 13:58:00] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (3828 pairs)
+[2013-04-30 14:03:05] PyMTL.learning.learning DEBUG  : Processing 315 candidate pairs for merging
+[2013-04-30 14:15:09] PyMTL           DEBUG  : Finished repetition: 1, base learner: log_reg, learner: ERM in 1020.66s
+[2013-04-30 14:15:09] PyMTL           DEBUG  : Splitted task '0 vs. others' into 8 sub-tasks.
+[2013-04-30 14:15:09] PyMTL           DEBUG  : Splitted task '1 vs. others' into 9 sub-tasks.
+[2013-04-30 14:15:09] PyMTL           DEBUG  : Splitted task '2 vs. others' into 10 sub-tasks.
+[2013-04-30 14:15:09] PyMTL           DEBUG  : Splitted task '3 vs. others' into 5 sub-tasks.
+[2013-04-30 14:15:09] PyMTL           DEBUG  : Splitted task '4 vs. others' into 8 sub-tasks.
+[2013-04-30 14:15:09] PyMTL           DEBUG  : Splitted task '5 vs. others' into 9 sub-tasks.
+[2013-04-30 14:15:09] PyMTL           DEBUG  : Splitted task '6 vs. others' into 10 sub-tasks.
+[2013-04-30 14:15:09] PyMTL           DEBUG  : Splitted task '7 vs. others' into 8 sub-tasks.
+[2013-04-30 14:15:09] PyMTL           DEBUG  : Splitted task '8 vs. others' into 8 sub-tasks.
+[2013-04-30 14:15:09] PyMTL           DEBUG  : Splitted task '9 vs. others' into 7 sub-tasks.
+[2013-04-30 14:15:11] PyMTL           DEBUG  : Finished repetition: 2, base learner: log_reg, learner: NoMerging in 1.83s
+[2013-04-30 14:15:11] PyMTL.learning.learning DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-04-30 14:15:13] PyMTL           DEBUG  : Finished repetition: 2, base learner: log_reg, learner: MergeAll in 2.05s
+[2013-04-30 14:15:13] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (3321 pairs)
+[2013-04-30 14:19:57] PyMTL.learning.learning DEBUG  : Processing 279 candidate pairs for merging
+[2013-04-30 14:31:59] PyMTL           DEBUG  : Finished repetition: 2, base learner: log_reg, learner: ERM in 998.82s
+[2013-04-30 14:31:59] PyMTL           DEBUG  : Splitted task '0 vs. others' into 7 sub-tasks.
+[2013-04-30 14:31:59] PyMTL           DEBUG  : Splitted task '1 vs. others' into 7 sub-tasks.
+[2013-04-30 14:31:59] PyMTL           DEBUG  : Splitted task '2 vs. others' into 8 sub-tasks.
+[2013-04-30 14:31:59] PyMTL           DEBUG  : Splitted task '3 vs. others' into 8 sub-tasks.
+[2013-04-30 14:31:59] PyMTL           DEBUG  : Splitted task '4 vs. others' into 6 sub-tasks.
+[2013-04-30 14:31:59] PyMTL           DEBUG  : Splitted task '5 vs. others' into 9 sub-tasks.
+[2013-04-30 14:31:59] PyMTL           DEBUG  : Splitted task '6 vs. others' into 9 sub-tasks.
+[2013-04-30 14:31:59] PyMTL           DEBUG  : Splitted task '7 vs. others' into 10 sub-tasks.
+[2013-04-30 14:31:59] PyMTL           DEBUG  : Splitted task '8 vs. others' into 10 sub-tasks.
+[2013-04-30 14:31:59] PyMTL           DEBUG  : Splitted task '9 vs. others' into 8 sub-tasks.
+[2013-04-30 14:32:01] PyMTL           DEBUG  : Finished repetition: 3, base learner: log_reg, learner: NoMerging in 1.83s
+[2013-04-30 14:32:01] PyMTL.learning.learning DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-04-30 14:32:03] PyMTL           DEBUG  : Finished repetition: 3, base learner: log_reg, learner: MergeAll in 1.97s
+[2013-04-30 14:32:03] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (3321 pairs)
+[2013-04-30 14:36:46] PyMTL.learning.learning DEBUG  : Processing 275 candidate pairs for merging
+[2013-04-30 14:47:57] PyMTL           DEBUG  : Finished repetition: 3, base learner: log_reg, learner: ERM in 947.25s
+[2013-04-30 14:47:57] PyMTL           DEBUG  : Splitted task '0 vs. others' into 8 sub-tasks.
+[2013-04-30 14:47:57] PyMTL           DEBUG  : Splitted task '1 vs. others' into 6 sub-tasks.
+[2013-04-30 14:47:57] PyMTL           DEBUG  : Splitted task '2 vs. others' into 5 sub-tasks.
+[2013-04-30 14:47:57] PyMTL           DEBUG  : Splitted task '3 vs. others' into 7 sub-tasks.
+[2013-04-30 14:47:57] PyMTL           DEBUG  : Splitted task '4 vs. others' into 6 sub-tasks.
+[2013-04-30 14:47:57] PyMTL           DEBUG  : Splitted task '5 vs. others' into 10 sub-tasks.
+[2013-04-30 14:47:57] PyMTL           DEBUG  : Splitted task '6 vs. others' into 10 sub-tasks.
+[2013-04-30 14:47:57] PyMTL           DEBUG  : Splitted task '7 vs. others' into 8 sub-tasks.
+[2013-04-30 14:47:57] PyMTL           DEBUG  : Splitted task '8 vs. others' into 9 sub-tasks.
+[2013-04-30 14:47:57] PyMTL           DEBUG  : Splitted task '9 vs. others' into 10 sub-tasks.
+[2013-04-30 14:47:59] PyMTL           DEBUG  : Finished repetition: 4, base learner: log_reg, learner: NoMerging in 1.76s
+[2013-04-30 14:47:59] PyMTL.learning.learning DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-04-30 14:48:01] PyMTL           DEBUG  : Finished repetition: 4, base learner: log_reg, learner: MergeAll in 1.92s
+[2013-04-30 14:48:01] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (3081 pairs)
+[2013-04-30 14:52:34] PyMTL.learning.learning DEBUG  : Processing 255 candidate pairs for merging
+[2013-04-30 15:03:26] PyMTL           DEBUG  : Finished repetition: 4, base learner: log_reg, learner: ERM in 918.65s
+[2013-04-30 15:03:26] PyMTL           DEBUG  : Splitted task '0 vs. others' into 9 sub-tasks.
+[2013-04-30 15:03:26] PyMTL           DEBUG  : Splitted task '1 vs. others' into 9 sub-tasks.
+[2013-04-30 15:03:26] PyMTL           DEBUG  : Splitted task '2 vs. others' into 8 sub-tasks.
+[2013-04-30 15:03:26] PyMTL           DEBUG  : Splitted task '3 vs. others' into 8 sub-tasks.
+[2013-04-30 15:03:26] PyMTL           DEBUG  : Splitted task '4 vs. others' into 10 sub-tasks.
+[2013-04-30 15:03:26] PyMTL           DEBUG  : Splitted task '5 vs. others' into 5 sub-tasks.
+[2013-04-30 15:03:26] PyMTL           DEBUG  : Splitted task '6 vs. others' into 6 sub-tasks.
+[2013-04-30 15:03:26] PyMTL           DEBUG  : Splitted task '7 vs. others' into 7 sub-tasks.
+[2013-04-30 15:03:26] PyMTL           DEBUG  : Splitted task '8 vs. others' into 5 sub-tasks.
+[2013-04-30 15:03:26] PyMTL           DEBUG  : Splitted task '9 vs. others' into 10 sub-tasks.
+[2013-04-30 15:03:28] PyMTL           DEBUG  : Finished repetition: 5, base learner: log_reg, learner: NoMerging in 1.73s
+[2013-04-30 15:03:28] PyMTL.learning.learning DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-04-30 15:03:30] PyMTL           DEBUG  : Finished repetition: 5, base learner: log_reg, learner: MergeAll in 1.88s
+[2013-04-30 15:03:30] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (2926 pairs)
+[2013-04-30 15:07:57] PyMTL.learning.learning DEBUG  : Processing 256 candidate pairs for merging
+[2013-04-30 15:18:10] PyMTL           DEBUG  : Finished repetition: 5, base learner: log_reg, learner: ERM in 873.76s
+[2013-04-30 15:18:10] PyMTL           DEBUG  : Splitted task '0 vs. others' into 8 sub-tasks.
+[2013-04-30 15:18:10] PyMTL           DEBUG  : Splitted task '1 vs. others' into 7 sub-tasks.
+[2013-04-30 15:18:10] PyMTL           DEBUG  : Splitted task '2 vs. others' into 7 sub-tasks.
+[2013-04-30 15:18:10] PyMTL           DEBUG  : Splitted task '3 vs. others' into 10 sub-tasks.
+[2013-04-30 15:18:10] PyMTL           DEBUG  : Splitted task '4 vs. others' into 6 sub-tasks.
+[2013-04-30 15:18:10] PyMTL           DEBUG  : Splitted task '5 vs. others' into 9 sub-tasks.
+[2013-04-30 15:18:10] PyMTL           DEBUG  : Splitted task '6 vs. others' into 9 sub-tasks.
+[2013-04-30 15:18:10] PyMTL           DEBUG  : Splitted task '7 vs. others' into 5 sub-tasks.
+[2013-04-30 15:18:10] PyMTL           DEBUG  : Splitted task '8 vs. others' into 5 sub-tasks.
+[2013-04-30 15:18:10] PyMTL           DEBUG  : Splitted task '9 vs. others' into 6 sub-tasks.
+[2013-04-30 15:18:12] PyMTL           DEBUG  : Finished repetition: 6, base learner: log_reg, learner: NoMerging in 1.63s
+[2013-04-30 15:18:12] PyMTL.learning.learning DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-04-30 15:18:14] PyMTL           DEBUG  : Finished repetition: 6, base learner: log_reg, learner: MergeAll in 1.87s
+[2013-04-30 15:18:14] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (2556 pairs)
+[2013-04-30 15:22:24] PyMTL.learning.learning DEBUG  : Processing 215 candidate pairs for merging
+[2013-04-30 15:32:02] PyMTL           DEBUG  : Finished repetition: 6, base learner: log_reg, learner: ERM in 821.80s
+[2013-04-30 15:32:02] PyMTL           DEBUG  : Splitted task '0 vs. others' into 7 sub-tasks.
+[2013-04-30 15:32:02] PyMTL           DEBUG  : Splitted task '1 vs. others' into 9 sub-tasks.
+[2013-04-30 15:32:02] PyMTL           DEBUG  : Splitted task '2 vs. others' into 7 sub-tasks.
+[2013-04-30 15:32:02] PyMTL           DEBUG  : Splitted task '3 vs. others' into 7 sub-tasks.
+[2013-04-30 15:32:02] PyMTL           DEBUG  : Splitted task '4 vs. others' into 5 sub-tasks.
+[2013-04-30 15:32:02] PyMTL           DEBUG  : Splitted task '5 vs. others' into 5 sub-tasks.
+[2013-04-30 15:32:02] PyMTL           DEBUG  : Splitted task '6 vs. others' into 6 sub-tasks.
+[2013-04-30 15:32:02] PyMTL           DEBUG  : Splitted task '7 vs. others' into 7 sub-tasks.
+[2013-04-30 15:32:02] PyMTL           DEBUG  : Splitted task '8 vs. others' into 9 sub-tasks.
+[2013-04-30 15:32:02] PyMTL           DEBUG  : Splitted task '9 vs. others' into 10 sub-tasks.
+[2013-04-30 15:32:04] PyMTL           DEBUG  : Finished repetition: 7, base learner: log_reg, learner: NoMerging in 1.63s
+[2013-04-30 15:32:04] PyMTL.learning.learning DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-04-30 15:32:05] PyMTL           DEBUG  : Finished repetition: 7, base learner: log_reg, learner: MergeAll in 1.84s
+[2013-04-30 15:32:05] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (2556 pairs)
+[2013-04-30 15:36:15] PyMTL.learning.learning DEBUG  : Processing 215 candidate pairs for merging
+[2013-04-30 15:46:06] PyMTL           DEBUG  : Finished repetition: 7, base learner: log_reg, learner: ERM in 834.45s
+[2013-04-30 15:46:06] PyMTL           DEBUG  : Splitted task '0 vs. others' into 7 sub-tasks.
+[2013-04-30 15:46:06] PyMTL           DEBUG  : Splitted task '1 vs. others' into 7 sub-tasks.
+[2013-04-30 15:46:06] PyMTL           DEBUG  : Splitted task '2 vs. others' into 9 sub-tasks.
+[2013-04-30 15:46:06] PyMTL           DEBUG  : Splitted task '3 vs. others' into 8 sub-tasks.
+[2013-04-30 15:46:06] PyMTL           DEBUG  : Splitted task '4 vs. others' into 5 sub-tasks.
+[2013-04-30 15:46:06] PyMTL           DEBUG  : Splitted task '5 vs. others' into 9 sub-tasks.
+[2013-04-30 15:46:06] PyMTL           DEBUG  : Splitted task '6 vs. others' into 9 sub-tasks.
+[2013-04-30 15:46:06] PyMTL           DEBUG  : Splitted task '7 vs. others' into 5 sub-tasks.
+[2013-04-30 15:46:06] PyMTL           DEBUG  : Splitted task '8 vs. others' into 10 sub-tasks.
+[2013-04-30 15:46:06] PyMTL           DEBUG  : Splitted task '9 vs. others' into 7 sub-tasks.
+[2013-04-30 15:46:08] PyMTL           DEBUG  : Finished repetition: 8, base learner: log_reg, learner: NoMerging in 1.70s
+[2013-04-30 15:46:08] PyMTL.learning.learning DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-04-30 15:46:10] PyMTL           DEBUG  : Finished repetition: 8, base learner: log_reg, learner: MergeAll in 1.87s
+[2013-04-30 15:46:10] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (2850 pairs)
+[2013-04-30 15:50:34] PyMTL.learning.learning DEBUG  : Processing 245 candidate pairs for merging
+[2013-04-30 16:00:46] PyMTL           DEBUG  : Finished repetition: 8, base learner: log_reg, learner: ERM in 869.92s
+[2013-04-30 16:00:46] PyMTL           DEBUG  : Splitted task '0 vs. others' into 10 sub-tasks.
+[2013-04-30 16:00:46] PyMTL           DEBUG  : Splitted task '1 vs. others' into 10 sub-tasks.
+[2013-04-30 16:00:46] PyMTL           DEBUG  : Splitted task '2 vs. others' into 7 sub-tasks.
+[2013-04-30 16:00:46] PyMTL           DEBUG  : Splitted task '3 vs. others' into 7 sub-tasks.
+[2013-04-30 16:00:46] PyMTL           DEBUG  : Splitted task '4 vs. others' into 6 sub-tasks.
+[2013-04-30 16:00:46] PyMTL           DEBUG  : Splitted task '5 vs. others' into 9 sub-tasks.
+[2013-04-30 16:00:46] PyMTL           DEBUG  : Splitted task '6 vs. others' into 7 sub-tasks.
+[2013-04-30 16:00:46] PyMTL           DEBUG  : Splitted task '7 vs. others' into 5 sub-tasks.
+[2013-04-30 16:00:46] PyMTL           DEBUG  : Splitted task '8 vs. others' into 10 sub-tasks.
+[2013-04-30 16:00:46] PyMTL           DEBUG  : Splitted task '9 vs. others' into 6 sub-tasks.
+[2013-04-30 16:00:48] PyMTL           DEBUG  : Finished repetition: 9, base learner: log_reg, learner: NoMerging in 1.73s
+[2013-04-30 16:00:48] PyMTL.learning.learning DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-04-30 16:00:50] PyMTL           DEBUG  : Finished repetition: 9, base learner: log_reg, learner: MergeAll in 1.89s
+[2013-04-30 16:00:50] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (2926 pairs)
+[2013-04-30 16:05:15] PyMTL.learning.learning DEBUG  : Processing 250 candidate pairs for merging
+[2013-04-30 16:15:14] PyMTL           DEBUG  : Finished repetition: 9, base learner: log_reg, learner: ERM in 858.38s
+[2013-04-30 16:15:14] PyMTL           DEBUG  : Successfully pickled the results of base learner: log_reg to file: /home/tadej/PyMTL/results/mnist_digits-seed51-repeats10-subtasks5_10/bl-log_reg.pkl
