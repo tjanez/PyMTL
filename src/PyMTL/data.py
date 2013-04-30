@@ -60,12 +60,15 @@ def load_usps_digits_data():
                         mat["digit_testx"]), axis=0)
     y = np.concatenate((mat["digit_trainy"], mat["digit_validy"],
                         mat["digit_testy"]), axis=0)
+    # y contains elements from 1 to 10; convert them to proper digits from
+    # 0 to 9
+    y -= 1
     # convert this multi-way classification problem to a MTL problem
     # (as described in Kang et al., ICML 2011)
     tasks = []
     for c in np.unique(y):
         descr = "USPS digits data: {} vs. other classes".format(c)
-        id = "{} vs. other".format(c)
+        id = "{} vs. others".format(c)
         cur_y = np.array(y, copy=True)
         cur_y[y == c] = 1
         cur_y[y != c] = 0
@@ -108,12 +111,15 @@ def load_mnist_digits_data():
                         mat["digit_testx"]), axis=0)
     y = np.concatenate((mat["digit_trainy"], mat["digit_validy"],
                         mat["digit_testy"]), axis=0)
+    # y contains elements from 1 to 10; convert them to proper digits from
+    # 0 to 9
+    y -= 1
     # convert this multi-way classification problem to a MTL problem
     # (as described in Kang et al., ICML 2011)
     tasks = []
     for c in np.unique(y):
         descr = "MNIST digits data: {} vs. other classes".format(c)
-        id = "{} vs. other".format(c)
+        id = "{} vs. others".format(c)
         cur_y = np.array(y, copy=True)
         cur_y[y == c] = 1
         cur_y[y != c] = 0
