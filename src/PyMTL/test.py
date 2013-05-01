@@ -734,7 +734,7 @@ class MTLTester:
                 os.path.join(results_path, "{}-avg-SD.pdf".format(m)),
                 title="Avg. results for tasks (error bars show std. dev.)",
                 subplot_title_fmt="Learner: {}",
-                xlabel="Number of instances",
+                xlabel="Task name",
                 ylabel=m,
                 x_tick_points=x_points,
                 x_tick_labels=x_labels)
@@ -743,7 +743,7 @@ class MTLTester:
                 title="Avg. results for tasks (error bars show 95% conf. "
                     "intervals)",
                 subplot_title_fmt="Learner: {}",
-                xlabel="Number of instances",
+                xlabel="Task name",
                 ylabel=m,
                 x_tick_points=x_points,
                 x_tick_labels=x_labels)
