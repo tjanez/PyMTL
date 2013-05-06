@@ -37,7 +37,7 @@ def load_usps_digits_data():
     - 2000 samples
     - 64 features (original images were pre-processed with PCA and their
         dimensionality was reduced to 64, which retains ~95% of the total
-        variance.
+        variance).
     - 10 classes, one for each of the 10 digits
     
     Note
@@ -88,7 +88,7 @@ def load_mnist_digits_data():
     - 2000 samples
     - 87 features (original images were pre-processed with PCA and their
         dimensionality was reduced to 87, which retains ~95% of the total
-        variance.
+        variance).
     - 10 classes, one for each of the 10 digits
     
     Note
@@ -131,6 +131,60 @@ def load_mnist_digits_data():
     return tasks
 
 
+def load_school_data():
+    """Load School data set.
+    
+    The data set's properties are:
+    - 15362 samples
+    - 28 features (original features were:
+        - year of examination,
+        - 4 school-specific features,
+        - 3 student-specific features.
+        Categorical features were replaced with a binary feature for each
+        possible feature value. In total this resulted in 27 features. The last
+        feature is the bias term) 
+    - regression task of predicting student's exam score
+    
+    Note
+    ----
+    The data set is the one provided by "Argyriou, Evgeniou, Pontil - Convex
+    multi-task feature learning - ML 2008" on their web site.
+    
+    Returns
+    -------
+    tasks -- list
+        A list of Bunch objects that correspond to regression tasks, each task
+        corresponding to one school.
+    
+    """
+    matlab_file = os.path.join(path_prefix, "data/school/school_b.mat")
+    mat = loadmat(matlab_file)
+    # extract combined X and y data
+    X = mat["x"].T.astype("float")
+    y = mat["y"].astype("float")
+#    # DEBUG
+#    print "Inspection of values of features for School data"
+#    for i in range(X.shape[1]):
+#        col = X[:, i]
+#        if not np.all(np.unique(col) == np.array([0, 1])):
+#            print "Column {} has non-binary unique values: {}".format(i, np.unique(col))
+    # extract starting indices of tasks and subtract 1 since MATLAB uses 1-based
+    # indexing
+    start_ind = np.ravel(mat["task_indexes"] - 1)
+    # split the data to separate tasks
+    for i in range(len(start_ind)):
+        start = start_ind[i]
+        if i == len(start_ind) - 1:
+            end = -1
+        else:
+            end = start_ind[i + 1]
+        descr = "School data: school {}".format(i + 1)
+        id = "School {}".format(i + 1)
+        tasks.append(Bunch(data=X[start:end],
+                           target=y[start:end],
+                           DESCR=descr,
+                           ID=id))
+
 if __name__ == "__main__":
     tasks = load_usps_digits_data()
     print "Loaded the USPS digits MTL problem with the {} tasks:".\
@@ -144,3 +198,6 @@ if __name__ == "__main__":
         format(len(tasks))
     for t in tasks:
         print t.DESCR
+    print
+    
+    tasks = load_school_data()
