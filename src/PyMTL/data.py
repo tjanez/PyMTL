@@ -186,6 +186,7 @@ def load_school_data():
                            target=y[start:end],
                            DESCR=descr,
                            ID=id))
+    return tasks
 
 if __name__ == "__main__":
     tasks = load_usps_digits_data()
@@ -203,3 +204,4 @@ if __name__ == "__main__":
     print
     
     tasks = load_school_data()
+    print "Loaded the School MTL problem with {} tasks.".format(len(tasks))
