@@ -167,11 +167,13 @@ def load_school_data():
 #    for i in range(X.shape[1]):
 #        col = X[:, i]
 #        if not np.all(np.unique(col) == np.array([0, 1])):
-#            print "Column {} has non-binary unique values: {}".format(i, np.unique(col))
+#            print "Column {} has non-binary unique values: {}".format(i,
+#                                                                np.unique(col))
     # extract starting indices of tasks and subtract 1 since MATLAB uses 1-based
     # indexing
     start_ind = np.ravel(mat["task_indexes"] - 1)
     # split the data to separate tasks
+    tasks = []
     for i in range(len(start_ind)):
         start = start_ind[i]
         if i == len(start_ind) - 1:
