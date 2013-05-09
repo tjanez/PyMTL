@@ -26,6 +26,7 @@ from collections import OrderedDict
 import numpy as np
 from sklearn import metrics
 from sklearn import cross_validation
+from sklearn.base import ClassifierMixin, RegressorMixin
 
 from PyMTL import data, stat
 from PyMTL.learning import prefiltering, learning
@@ -148,12 +149,20 @@ class Task:
         """
         return self._learn
     
+    def get_learn_size(self):
+        """Return the number of examples in the learning data. """
+        return len(self._learn[0])
+    
     def get_test_data(self):
         """Return the testing data as a tuple of instances and their class
         values.
         
         """
         return self._test
+    
+    def get_test_size(self):
+        """Return the number of examples in the testing data. """
+        return len(self._test[0])
     
     def get_hash(self):
         """Return a SHA1 hex digest based on task's id and its learning and
@@ -318,7 +327,7 @@ class TestingResults:
     
     """
     
-    def __init__(self, name, task_hashes, scores, dend_info):
+    def __init__(self, name, task_hashes, task_sizes, scores, dend_info):
         """Initialize a TestingResults object. Store the given arguments as
         attributes.
         
@@ -326,6 +335,8 @@ class TestingResults:
         name -- string representing the base learner's name
         task_hashes -- OrderedDictionary with keys corresponding to tasks' ids
             and values to tasks' hashes
+        task_sizes -- OrderedDictionary with keys corresponding to tasks' ids
+            and values to the number of examples of the task
         scores -- three-dimensional dictionary with:
             first key corresponding to the learner's name,
             second key corresponding to the task's id,
@@ -339,6 +350,7 @@ class TestingResults:
         """
         self.name = name
         self.task_hashes = task_hashes
+        self.task_sizes = task_sizes
         self.scores = scores
         self.dend_info = dend_info
 
@@ -485,10 +497,11 @@ class MTLTester:
         scores = dict()
         comp_errors = {measure : 0 for measure in measures}
         for tid, task in self._tasks.iteritems():
+            scores[tid] = dict()
             X_test, y_test = task.get_test_data()
             y_pred = models[tid].predict(X_test)
-            y_pred_proba = models[tid].predict_proba(X_test)
-            scores[tid] = dict()
+            if isinstance(models[tid], ClassifierMixin):
+                y_pred_proba = models[tid].predict_proba(X_test)            
             for measure in measures:
                 if measure == "AUC":
                     try:
@@ -506,6 +519,12 @@ class MTLTester:
                             raise e
                 elif measure == "CA":
                     score = metrics.accuracy_score(y_test, y_pred)
+                elif measure == "MAE":
+                    score = metrics.mean_absolute_error(y_test, y_pred)
+                elif measure == "MSE":
+                    score = metrics.mean_squared_error(y_test, y_pred)
+                elif measure == "Explained variance":
+                    score = metrics.explained_variance_score(y_test, y_pred)
                 else:
                     raise ValueError("Unknown scoring measure: {}".\
                                      format(measure))
@@ -567,15 +586,17 @@ class MTLTester:
                         dend_info[bl][i] = R["dend_info"]
         # merge results of all repetitions
         scores = self._merge_repetition_scores(rpt_scores)
-        # get tasks' hashes
+        # get tasks' hashes and sizes
         task_hashes = OrderedDict()
+        task_sizes = OrderedDict()
         for tid, task in self._tasks.iteritems():
             task_hashes[tid] = task.get_hash()
+            task_sizes[tid] = task.get_learn_size() + task.get_test_size()
         # store the scores and dend_info objects of each base learner in a
         # separate TestingResults object
         for bl in scores:
-            self._test_res[bl] = TestingResults(bl, task_hashes, scores[bl],
-                                                dend_info[bl])
+            self._test_res[bl] = TestingResults(bl, task_hashes, task_sizes,
+                                                scores[bl], dend_info[bl])
     
     def pickle_test_results(self, pickle_path_fmt):
         """Pickle the TestingResults objects in self._test_res to the given
@@ -649,17 +670,17 @@ class MTLTester:
                     return False
             # check if learning algorithms match for all base learning
             # algorithms
-            if len(test_res_bl.avg_scores) != len(test_res_ref.avg_scores):
+            if len(test_res_bl.scores) != len(test_res_ref.scores):
                 return False
-            for l in test_res_ref.avg_scores:
-                if l not in test_res_bl.avg_scores:
+            for l in test_res_ref.scores:
+                if l not in test_res_bl.scores:
                     return False
             # check if scoring measures match for all combinations of base
             # learning algorithms and learning algorithms
-            for l in test_res_ref.avg_scores:
-                rnd_id = tuple(test_res_ref.avg_scores[l].iterkeys())[0]
-                set_ref = set(test_res_ref.avg_scores[l][rnd_id].iterkeys())
-                set_bl = set(test_res_bl.avg_scores[l][rnd_id].iterkeys())
+            for l in test_res_ref.scores:
+                rnd_id = tuple(test_res_ref.scores[l].iterkeys())[0]
+                set_ref = set(test_res_ref.scores[l][rnd_id].iterkeys())
+                set_bl = set(test_res_bl.scores[l][rnd_id].iterkeys())
                 if set_ref != set_bl:
                     return False
         return True
@@ -679,7 +700,7 @@ class MTLTester:
         avgs = []
         stds = []
         ci95s = []
-        # get the scores for the given base learner
+        # get the scores for the given base learner and learner
         bl_l_scores = self._test_res[base_learner].scores[learner]
         for tid in bl_l_scores:
             # get the scores of the current task for the given scoring measure
@@ -714,8 +735,14 @@ class MTLTester:
         
         """
         for m in measures:
+            # default y-axis limits
+            ylim_bottom = 0
+            ylim_top = None
+            if m in ["CA", "AUC"]:
+                ylim_top = 1
             # x points and labels
-            x_labels = list(self._test_res[base_learners[0]].scores[learners[0]].keys())
+            x_labels = list(self._test_res[base_learners[0]].\
+                            scores[learners[0]].keys())
             x_points = np.arange(len(x_labels))
             # plot descriptions for averages and std. deviations
             plot_desc_sd = OrderedDict()
@@ -737,7 +764,8 @@ class MTLTester:
                 xlabel="Task name",
                 ylabel=m,
                 x_tick_points=x_points,
-                x_tick_labels=x_labels)
+                x_tick_labels=x_labels,
+                ylim_bottom=ylim_bottom, ylim_top=ylim_top)
             plot_multiple(plot_desc_ci95,
                 os.path.join(results_path, "{}-avg-CI.pdf".format(m)),
                 title="Avg. results for tasks (error bars show 95% conf. "
@@ -746,7 +774,8 @@ class MTLTester:
                 xlabel="Task name",
                 ylabel=m,
                 x_tick_points=x_points,
-                x_tick_labels=x_labels)
+                x_tick_labels=x_labels,
+                ylim_bottom=ylim_bottom, ylim_top=ylim_top)
     
     def visualize_dendrograms(self, base_learners, results_path):
         """Visualize the dendrograms showing merging history of the ERM MTL
@@ -769,6 +798,91 @@ class MTLTester:
                                      "history of ERM with base learner {} "
                                      "(repetition {})".format(bl, i))
     
+    def _compute_overall_stats(self, base_learner, learner, measure,
+                               weighting="all_equal"):
+        """Compute the overall results for the given learning algorithm,
+        base learning algorithm and scoring measure.
+        First, compute the weighted average of the scoring measure over all
+        tasks. Return the average, std. deviation and 95% conf.
+        interval of these values over all repetitions of the experiment.
+        
+        Arguments:
+        base_learner -- string representing the name of the base learner
+        learner -- strings representing the name of the learner
+        measures -- string representing the name of the scoring measure
+        
+        Keyword arguments:
+        weighting -- string representing the weighting method to use when
+            computing the average of the scoring measure over all tasks;
+            currently, two options are implemented:
+            - all_equal -- all tasks have equal weight
+            - task_sizes -- tasks' weights correspond to their sizes
+        
+        """
+        # get the scores for the given base learner and learner
+        bl_l_scores = self._test_res[base_learner].scores[learner]
+        # get the task sizes
+        task_sizes = self._test_res[base_learner].task_sizes
+        # extract the number of repetitions of the experiment
+        rep = len(bl_l_scores[bl_l_scores.keys()[0]][measure])
+        # create a matrix, where element (i, j) represents the score of task j
+        # at repetition i
+        scores = np.zeros((rep, len(task_sizes)))
+        for j, tid in enumerate(task_sizes):
+            # get the scores of the current task for the given scoring measure
+            scores[:, j] = bl_l_scores[tid][measure]
+        # compute the weighted average scores across all tasks
+        if weighting == "all_equal":
+            weights = np.ones(len(task_sizes))
+        elif weighting == "task_sizes":
+            weights = np.array(list(task_sizes.values()))
+        else:
+            raise ValueError("Unknown weighting method: {}".format(weighting))
+        avg_scores = np.dot(scores, weights) / np.sum(weights)
+        # compute the average of the above average scores across all repetitions
+        # of the experiment
+        return (stat.mean(avg_scores), stat.unbiased_std(avg_scores),
+                stat.ci95(avg_scores))
+    
+    def compute_overall_results(self, base_learners, learners, measures,
+                              results_path, weighting="all_equal"):
+        """Compute the overall results for the given learning algorithms with
+        the given base learning algorithms and the given scoring measures on
+        the MTL problem.
+        First, compute the weighted average of the scoring measure over all
+        tasks. Then compute the averages, std. deviations and 95% conf.
+        intervals of these values over all repetitions of the experiment.
+        Write the results to the given results' path.
+        
+        Arguments:
+        base_learners -- list of strings representing the names of base learners
+        learners -- list of strings representing the names of learners
+        measures -- list of strings representing names of the scoring measures
+        results_path -- string representing the path where to write the computed
+            results
+        
+        Keyword arguments:
+        weighting -- string representing the weighting method to use when
+            computing the average of the scoring measure over all tasks;
+            currently, two options are implemented:
+            - all_equal -- all tasks have equal weight
+            - task_sizes -- tasks' weights correspond to their sizes
+        
+        """
+        offset = "  "
+        with open(os.path.join(results_path, "overall_results.txt"), 'w') as r:
+            for m in measures:
+                s = "Results for {} (weighting method: {})".format(m, weighting)
+                r.write(s + "\n")
+                r.write("-"*len(s) + "\n")
+                for bl in base_learners:
+                    r.write(offset + "- Base learner: {}".format(bl) + "\n")
+                    for l in learners:
+                        avg, std, ci95 = self._compute_overall_stats(bl, l, m,
+                                                weighting=weighting)
+                        r.write(3*offset + "* {}\t\t{:.2f} +/- {:.2f}".\
+                                 format(l, avg, std) + "\n")
+                r.write("\n")
 
 class SubtasksMTLTester(MTLTester):
     
@@ -867,7 +981,7 @@ class SubtasksMTLTester(MTLTester):
                                 mrg_scores[bl][l][orig_task_id][m_name].\
                                     append(t_score)
         return mrg_scores
-                
+
 
 class CVMTLTester(MTLTester):
     
@@ -1235,7 +1349,7 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
                measures, learners, tester_type, rnd_seed=50,
                test=True, unpickle=False, visualize=True,
                test_prop=0.3, subtasks_split=(3, 5), cv_folds=5,
-               repeats=1):
+               repeats=1, weighting="all_equal"):
     """Test the given tasks' data corresponding to a MTL problem according to
     the given parameters and save the results where indicated.
     
@@ -1270,6 +1384,8 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
     cv_folds -- integer indicating how many folds to use with the CVMTLTester
     repeats -- integer indicating how many times the MTLTester should repeat the
         experiment
+    weighting -- string indicating the type of weighting to use when computing the
+        over results
     
     """
     results_path = results_path_fmt.format(rnd_seed, repeats)
@@ -1317,6 +1433,8 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
         mtlt.visualize_results(bls, ls, ms, results_path,
             colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"})
         mtlt.visualize_dendrograms(base_learners, results_path)
+        mtlt.compute_overall_results(bls, ls, ms, results_path,
+                                     weighting=weighting)
     remove_logger(logger)
 
 if __name__ == "__main__":
@@ -1327,7 +1445,8 @@ if __name__ == "__main__":
     # 4 -- MNIST digits data (repeats=10)
     # 5 -- MNIST digits data (repeats=10, subtasks=(3, 5))
     # 6 -- MNIST digits data (repeats=10, subtasks=(5, 10))
-    test_config = 1
+    # 7 -- School data
+    test_config = 7
     
     # boolean indicating whether to perform the tests on the MTL problem
     test = True
@@ -1342,14 +1461,15 @@ if __name__ == "__main__":
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     path_prefix = os.path.abspath(os.path.join(cur_dir, "../../"))
     
-    base_learners = OrderedDict()
+    # base learners for classification problems
+    base_learners_clas = OrderedDict()
     from sklearn.linear_model import LogisticRegression
 #    from sklearn.pipeline import Pipeline
 #    from sklearn_utils import MeanImputer
 #    clf = Pipeline([("imputer", MeanImputer()),
 #                    ("log_reg", LogisticRegression())])
     clf = LogisticRegression()
-    base_learners["log_reg"] = clf
+    base_learners_clas["log_reg"] = clf
 #    from sklearn.dummy import DummyClassifier
 #    from sklearn.pipeline import Pipeline
 #    from sklearn_utils import MeanImputer
@@ -1357,11 +1477,23 @@ if __name__ == "__main__":
 #                    ("majority", DummyClassifier(strategy="most_frequent"))])
 #    from sklearn.dummy import DummyClassifier
 #    clf = DummyClassifier(strategy="most_frequent")
-#    base_learners["majority"] = clf
+#    base_learners_clas["majority"] = clf
+    # base learners for regression problems
+    base_learners_regr = OrderedDict()
+    from sklearn.linear_model import Ridge, RidgeCV
+    base_learners_regr["ridge"] = Ridge(normalize=True)
+    base_learners_regr["ridge_cv"] = RidgeCV(alphas=np.logspace(-1, 1, 5),
+                                             normalize=True)
     
-    measures = []
-    measures.append("CA")
-    measures.append("AUC")
+    # scoring measures for classification problems
+    measures_clas = []
+    measures_clas.append("CA")
+    measures_clas.append("AUC")
+    # scoring measures for regression problems
+    measures_regr = []
+    measures_regr.append("MAE")
+    measures_regr.append("MSE")
+    measures_regr.append("Explained variance")
     
     learners = OrderedDict()
     learners["NoMerging"] = learning.NoMergingLearner()
@@ -1375,8 +1507,8 @@ if __name__ == "__main__":
                                         "seed{}-repeats{}")
         rnd_seed = 51
         repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners,
-                   measures, learners, "train_test_split",
+        test_tasks(tasks_data, results_path_fmt, base_learners_clas,
+                   measures_clas, learners, "train_test_split",
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
                    test_prop=0.5, repeats=repeats)
@@ -1387,8 +1519,8 @@ if __name__ == "__main__":
                                         "seed{}-repeats{}-subtasks3_5")
         rnd_seed = 51
         repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners,
-                   measures, learners, "subtasks_split", rnd_seed=rnd_seed,
+        test_tasks(tasks_data, results_path_fmt, base_learners_clas,
+                   measures_clas, learners, "subtasks_split", rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
                    test_prop=0.5, subtasks_split=(3, 5), repeats=repeats)
     
@@ -1398,8 +1530,8 @@ if __name__ == "__main__":
                                         "seed{}-repeats{}-subtasks5_10")
         rnd_seed = 51
         repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners,
-                   measures, learners, "subtasks_split", rnd_seed=rnd_seed,
+        test_tasks(tasks_data, results_path_fmt, base_learners_clas,
+                   measures_clas, learners, "subtasks_split", rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
                    test_prop=0.5, subtasks_split=(5, 10), repeats=repeats)
     
@@ -1409,8 +1541,8 @@ if __name__ == "__main__":
                                         "seed{}-repeats{}")
         rnd_seed = 51
         repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners,
-                   measures, learners, "train_test_split",
+        test_tasks(tasks_data, results_path_fmt, base_learners_clas,
+                   measures_clas, learners, "train_test_split",
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
                    test_prop=0.5, repeats=repeats)
@@ -1421,8 +1553,8 @@ if __name__ == "__main__":
                                         "seed{}-repeats{}-subtasks3_5")
         rnd_seed = 51
         repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners,
-                   measures, learners, "subtasks_split", rnd_seed=rnd_seed,
+        test_tasks(tasks_data, results_path_fmt, base_learners_clas,
+                   measures_clas, learners, "subtasks_split", rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
                    test_prop=0.5, subtasks_split=(3, 5), repeats=repeats)
     
@@ -1432,7 +1564,19 @@ if __name__ == "__main__":
                                         "seed{}-repeats{}-subtasks5_10")
         rnd_seed = 51
         repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners,
-                   measures, learners, "subtasks_split", rnd_seed=rnd_seed,
+        test_tasks(tasks_data, results_path_fmt, base_learners_clas,
+                   measures_clas, learners, "subtasks_split", rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
                    test_prop=0.5, subtasks_split=(5, 10), repeats=repeats)
+    
+    if test_config == 7:
+        tasks_data = data.load_school_data()
+        results_path_fmt = os.path.join(path_prefix, "results/school-"
+                                        "seed{}-repeats{}")
+        rnd_seed = 61
+        repeats = 10
+        test_tasks(tasks_data, results_path_fmt, base_learners_regr,
+                   measures_regr, learners, "train_test_split",
+                   rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=0.25, repeats=repeats, weighting="task_sizes")
