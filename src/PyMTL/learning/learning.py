@@ -389,7 +389,7 @@ class ERMLearner:
     
     """
     
-    def __init__(self, folds, seed, prefilter):
+    def __init__(self, folds, seed, prefilter, error_func=None):
         """Initialize the ERMLearner object. Copy the given arguments to private
         attributes.
         
@@ -401,11 +401,16 @@ class ERMLearner:
         prefilter -- pre-filter object which can be called with a pair of tasks
             and returns a boolean value indicating whether or not the given pair
             of tasks passes the filtering criteria
+        error_func -- function that takes the tuple (y_true, y_pred) as input
+            and returns a numpy.array with the error value for each sample (this
+            only needs to be specified if the base_learner is a regression
+            estimator)
         
         """
         self._folds = folds
         self._random = random.Random(seed)
         self._prefilter = prefilter
+        self.error_func = error_func
     
     def __call__(self, tasks, base_learner):
         """Run the merging algorithm for the given tasks. Perform the
@@ -556,7 +561,8 @@ class ERMLearner:
         learn2 = self._tasks[t2].get_learn_data()
         pred_errs, avg_pred_errs = testing.generalized_cross_validation(
             self._base_learner, learn1, learn2, self._folds,
-            self._random.randint(0, 100), self._random.randint(0, 100))
+            self._random.randint(0, 100), self._random.randint(0, 100),
+            self.error_func)
         p_values = {}
         # perform a pair-wise one-sided t-test testing H_0:
         # avg_pred_errs["dataM"]["dataM"] >= avg_pred_errs["data1"]["dataM"] 

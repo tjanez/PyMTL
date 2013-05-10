@@ -22,7 +22,8 @@ import numpy as np
 import numpy.ma as ma
 from scipy import sparse
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import _num_samples, warn_if_not_float
+from sklearn.utils.validation import _num_samples, check_arrays, \
+    warn_if_not_float
 
 def check_arrays_without_finite_check(*arrays, **options):
     """Checked that all arrays have consistent first dimensions
@@ -222,6 +223,49 @@ def change_dummy_classes(estimator, new_classes):
     estimator.n_classes_ = len(new_classes)
     estimator.class_prior_ = new_class_prior
 
+
+def absolute_error(y_true, y_pred):
+    """Compute the absolute error.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape = [n_samples]
+        Ground truth (correct) target values.
+
+    y_pred : array-like of shape = [n_samples]
+        Estimated target values.
+
+    Returns
+    -------
+    errors : array of shape = [n_samples]
+        Absolute error of each sample.
+    
+    """
+    y_true, y_pred = check_arrays(y_true, y_pred)
+    return np.abs(y_pred - y_true)
+
+
+def squared_error(y_true, y_pred):
+    """Compute the squared error.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape = [n_samples]
+        Ground truth (correct) target values.
+
+    y_pred : array-like of shape = [n_samples]
+        Estimated target values.
+
+    Returns
+    -------
+    errors : array of shape = [n_samples]
+        Squared error of each sample.
+    
+    """
+    y_true, y_pred = check_arrays(y_true, y_pred)
+    return (y_pred - y_true) ** 2
+
+
 if __name__ == "__main__":
     X = np.array([[180., 8.],
                   [np.NaN, 10.],
@@ -241,3 +285,8 @@ if __name__ == "__main__":
     
     test = np.array([[200, 5]])
     print clf.predict(test)
+    
+    y = np.array([1.78, 1.89, 1.93, 2.01])
+    y_pred = np.array([1.67, 1.94, 2.10, 1.82])
+    print "Absolute errors: ", absolute_error(y, y_pred)
+    print "Squared errors: ", squared_error(y, y_pred)

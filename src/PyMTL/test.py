@@ -32,6 +32,7 @@ from PyMTL import data, stat
 from PyMTL.learning import prefiltering, learning
 from PyMTL.plotting import BarPlotDesc, LinePlotDesc, plot_multiple, \
     plot_dendrograms
+from PyMTL.sklearn_utils import absolute_error, squared_error
 
 def create_logger(name=None, level=logging.DEBUG,
                   console_level=logging.DEBUG,
@@ -1482,8 +1483,8 @@ if __name__ == "__main__":
     base_learners_regr = OrderedDict()
     from sklearn.linear_model import Ridge, RidgeCV
     base_learners_regr["ridge"] = Ridge(normalize=True)
-    base_learners_regr["ridge_cv"] = RidgeCV(alphas=np.logspace(-1, 1, 5),
-                                             normalize=True)
+#    base_learners_regr["ridge_cv"] = RidgeCV(alphas=np.logspace(-1, 1, 5),
+#                                             normalize=True)
     
     # scoring measures for classification problems
     measures_clas = []
@@ -1499,7 +1500,8 @@ if __name__ == "__main__":
     learners["NoMerging"] = learning.NoMergingLearner()
     learners["MergeAll"] = learning.MergeAllLearner()
     no_filter = prefiltering.NoFilter()
-    learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter)
+    learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter,
+                                          error_func=squared_error)
     
     if test_config == 1:
         tasks_data = data.load_usps_digits_data()

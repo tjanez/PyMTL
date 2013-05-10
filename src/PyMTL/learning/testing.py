@@ -21,7 +21,7 @@
 import logging
 
 import numpy as np
-from sklearn.base import clone
+from sklearn.base import clone, ClassifierMixin, RegressorMixin
 from sklearn import cross_validation, pipeline
 from sklearn.dummy import DummyClassifier
 
@@ -195,7 +195,7 @@ def generalized_leave_one_out(learner, data1, data2):
     
     return pred_errs, _compute_average_prediction_errors(pred_errs)
 
-def _generalized_cross_validation(learner, data1, data2, cv_folds1):
+def _generalized_cross_validation_clas(learner, data1, data2, cv_folds1):
     """Perform one part of the generalized version of the cross-validation
     testing method on the given data sets.
     Perform cross-validation over data set data1. For each fold of data1,
@@ -210,7 +210,7 @@ def _generalized_cross_validation(learner, data1, data2, cv_folds1):
             merged data set for instances in data1
     
     Arguments:
-    learner -- scikit-learn estimator
+    learner -- scikit-learn classification estimator
     data1 -- tuple (X, y) representing the first data set, where:
         X -- numpy.array which holds the attribute values
         y -- numpy.array which holds the class value
@@ -291,8 +291,96 @@ def _generalized_cross_validation(learner, data1, data2, cv_folds1):
                                                test_y]
     return pred_errs1, pred_errs2, pred_errsm
 
+
+class _RegressionGeneralizedCVWrapper:
+    
+    """Class that wraps the call to the _generalized_cross_validation_regr()
+    function.
+    It stores the given error_func as an attribute and uses it when calling this
+    wrapped method.
+    
+    """
+    
+    def __init__(self, error_func):
+        self.error_func = error_func
+    
+    def __call__(self, *args):
+        aug_args = list(args) + [self.error_func]
+        return _generalized_cross_validation_regr(*aug_args)
+    
+
+def _generalized_cross_validation_regr(learner, data1, data2, cv_folds1,
+                                      error_func):
+    """Perform one part of the generalized version of the cross-validation
+    testing method on the given data sets.
+    Perform cross-validation over data set data1. For each fold of data1,
+    build models on the remaining folds of data1, the whole data set data2 and
+    the merged data set and test them on the selected fold of data1.
+    Return a tuple (errs1, errs2, errsm), where:
+        errs1 -- numpy.array of errors (computed with error_func) of the model
+            built on the remaining folds of data1 for instances in data1
+        errs2 -- numpy.array of errors (computed with error_func) of the model
+            built on the whole data set data2 for instances in data1
+        errsm -- numpy.array of errors (computed with error_func) of the model
+            built on the merged data set for instances in data1
+    
+    Arguments:
+    learner -- scikit-learn regression estimator
+    data1 -- tuple (X, y) representing the first data set, where:
+        X -- numpy.array which holds the attribute values
+        y -- numpy.array which holds the target value
+    data2 -- tuple (X, y) representing the second data set, where:
+        X -- numpy.array which holds the attribute values
+        y -- numpy.array which holds the target value
+    cv_folds1 -- list of tuples (learn, test) to perform cross-validation over
+        data1, where:
+        learn -- numpy.array with a Boolean mask for selecting learning
+            instances
+        test -- numpy.array with a Boolean mask for selecting testing instances
+    error_func -- function that takes the tuple (y_true, y_pred) as input and
+        returns a numpy.array with the error value for each sample
+        
+    """
+    # unpack the data1 and data2 tuples
+    X1, y1 = data1
+    X2, y2 = data2
+    # build a model on data2
+    # NOTE: The model does not change throughout cross-validation on data1
+    # NOTE: The scikit-learn estimator must be cloned so that each data set
+    # gets its own classifier
+    model2 = clone(learner)
+    model2.fit(X2, y2)
+    # errors of models computed with the given error function
+    # (errors of the model built on data2 can be computed right away)
+    pred2 = model2.predict(X1)
+    errs2 = error_func(y1, pred2)
+    errs1 = -np.ones(y1.shape)
+    errsm = -np.ones(y1.shape)
+    # perform generalized cross-validation on data1
+    for learn_ind, test_ind in cv_folds1:
+        # create testing data arrays for the current fold
+        test_X, test_y = X1[test_ind], y1[test_ind]
+        # create learning data arrays for the current fold
+        learn1 = X1[learn_ind], y1[learn_ind]
+        learnm = (np.concatenate((X1[learn_ind], X2), axis=0),
+                  np.concatenate((y1[learn_ind], y2), axis=0))
+        # build models
+        # NOTE: The scikit-learn estimator must be cloned so that each data
+        # set gets its own classifier
+        model1 = clone(learner)
+        model1.fit(*learn1)
+        modelm = clone(learner)
+        modelm.fit(*learnm)
+        # compute the errors of both models on the current testing data
+        pred1 = model1.predict(test_X)
+        errs1[test_ind] = error_func(test_y, pred1)
+        predm = modelm.predict(test_X)
+        errsm[test_ind] = error_func(test_y, predm)
+    return errs1, errs2, errsm
+        
+
 def generalized_cross_validation(learner, data1, data2, folds, rand_seed1,
-                                 rand_seed2):
+                                 rand_seed2, error_func=None):
     """Perform a generalized version of the cross-validation testing method on
     the given data sets.
     Estimate the prediction errors of models built on all combinations of the
@@ -325,8 +413,24 @@ def generalized_cross_validation(learner, data1, data2, folds, rand_seed1,
         random folds for data1
     rand_seed2 -- integer used as the random seed for creating cross-validation
         random folds for data2
+    error_func -- function that takes the tuple (y_true, y_pred) as input and
+        returns a numpy.array with the error value for each sample (this only
+        needs to be specified if the learner is a regression estimator)
     
     """
+    # select the generalized cross-validation function according to the
+    # learner type
+    if (isinstance(learner, ClassifierMixin) or
+        (isinstance(learner, pipeline.Pipeline) and
+         isinstance(learner.steps[-1][1], ClassifierMixin))):
+        generalized_cv = _generalized_cross_validation_clas
+    elif (isinstance(learner, RegressorMixin) or
+          (isinstance(learner, pipeline.Pipeline) and
+           isinstance(learner.steps[-1][1], RegressorMixin))):
+        if error_func == None:
+            raise ValueError("Parameter 'error_func' must be specified for "
+                             "regression problems.")
+        generalized_cv = _RegressionGeneralizedCVWrapper(error_func=error_func)
     # unpack the data1 and data2 tuples
     _, y1 = data1
     _, y2 = data2
@@ -340,14 +444,14 @@ def generalized_cross_validation(learner, data1, data2, folds, rand_seed1,
     cv_folds2 = cross_validation.KFold(len(y2), folds, indices=False,
                                        shuffle=True, random_state=rand_seed2)
     # first part of cross-validation (on data1)
-    pred_errs1, pred_errs2, pred_errsm = _generalized_cross_validation(learner,
-                                            data1, data2, cv_folds1)
+    pred_errs1, pred_errs2, pred_errsm = generalized_cv(learner, data1, data2,
+                                                        cv_folds1)
     pred_errs["data1"]["data1"] = pred_errs1
     pred_errs["data2"]["data1"] = pred_errs2
     pred_errs["dataM"]["data1"] = pred_errsm
     # second part of cross-validation (on data2)
-    pred_errs2, pred_errs1, pred_errsm = _generalized_cross_validation(learner,
-                                            data2, data1, cv_folds2)
+    pred_errs2, pred_errs1, pred_errsm = generalized_cv(learner, data2, data1,
+                                                        cv_folds2)
     pred_errs["data1"]["data2"] = pred_errs1
     pred_errs["data2"]["data2"] = pred_errs2
     pred_errs["dataM"]["data2"] = pred_errsm
@@ -356,6 +460,7 @@ def generalized_cross_validation(learner, data1, data2, folds, rand_seed1,
         pred_errs[data]["dataM"] = np.concatenate((pred_errs[data]["data1"],
                                         pred_errs[data]["data2"]), axis=0)
     return pred_errs, _compute_average_prediction_errors(pred_errs)
+
 
 if __name__ == "__main__":
     import random
