@@ -1,0 +1,61 @@
+[2013-05-13 10:45:24] PyMTL           DEBUG  : Finished repetition: 0, base learner: ridge, learner: NoMerging in 0.09s
+[2013-05-13 10:45:24] PyMTL.learning.learning DEBUG  : Merged data has 28 attributes and 11471 examples.
+[2013-05-13 10:45:24] PyMTL           DEBUG  : Finished repetition: 0, base learner: ridge, learner: MergeAll in 0.04s
+[2013-05-13 10:45:24] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (9591 pairs)
+[2013-05-13 10:47:28] PyMTL.learning.learning DEBUG  : Processing 4506 candidate pairs for merging
+[2013-05-13 10:52:05] PyMTL           DEBUG  : Finished repetition: 0, base learner: ridge, learner: ERM in 432.61s
+[2013-05-13 10:52:05] PyMTL           DEBUG  : Finished repetition: 1, base learner: ridge, learner: NoMerging in 0.09s
+[2013-05-13 10:52:05] PyMTL.learning.learning DEBUG  : Merged data has 28 attributes and 11471 examples.
+[2013-05-13 10:52:05] PyMTL           DEBUG  : Finished repetition: 1, base learner: ridge, learner: MergeAll in 0.04s
+[2013-05-13 10:52:05] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (9591 pairs)
+[2013-05-13 10:54:05] PyMTL.learning.learning DEBUG  : Processing 4676 candidate pairs for merging
+[2013-05-13 10:58:52] PyMTL           DEBUG  : Finished repetition: 1, base learner: ridge, learner: ERM in 442.28s
+[2013-05-13 10:58:52] PyMTL           DEBUG  : Finished repetition: 2, base learner: ridge, learner: NoMerging in 0.08s
+[2013-05-13 10:58:52] PyMTL.learning.learning DEBUG  : Merged data has 28 attributes and 11471 examples.
+[2013-05-13 10:58:52] PyMTL           DEBUG  : Finished repetition: 2, base learner: ridge, learner: MergeAll in 0.05s
+[2013-05-13 10:58:52] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (9591 pairs)
+[2013-05-13 11:00:51] PyMTL.learning.learning DEBUG  : Processing 4284 candidate pairs for merging
+[2013-05-13 11:04:46] PyMTL           DEBUG  : Finished repetition: 2, base learner: ridge, learner: ERM in 373.13s
+[2013-05-13 11:04:46] PyMTL           DEBUG  : Finished repetition: 3, base learner: ridge, learner: NoMerging in 0.09s
+[2013-05-13 11:04:46] PyMTL.learning.learning DEBUG  : Merged data has 28 attributes and 11471 examples.
+[2013-05-13 11:04:46] PyMTL           DEBUG  : Finished repetition: 3, base learner: ridge, learner: MergeAll in 0.05s
+[2013-05-13 11:04:46] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (9591 pairs)
+[2013-05-13 11:06:46] PyMTL.learning.learning DEBUG  : Processing 4345 candidate pairs for merging
+[2013-05-13 11:11:00] PyMTL           DEBUG  : Finished repetition: 3, base learner: ridge, learner: ERM in 397.86s
+[2013-05-13 11:11:00] PyMTL           DEBUG  : Finished repetition: 4, base learner: ridge, learner: NoMerging in 0.08s
+[2013-05-13 11:11:00] PyMTL.learning.learning DEBUG  : Merged data has 28 attributes and 11471 examples.
+[2013-05-13 11:11:00] PyMTL           DEBUG  : Finished repetition: 4, base learner: ridge, learner: MergeAll in 0.04s
+[2013-05-13 11:11:00] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (9591 pairs)
+[2013-05-13 11:12:59] PyMTL.learning.learning DEBUG  : Processing 4495 candidate pairs for merging
+[2013-05-13 11:17:12] PyMTL           DEBUG  : Finished repetition: 4, base learner: ridge, learner: ERM in 395.50s
+[2013-05-13 11:17:12] PyMTL           DEBUG  : Finished repetition: 5, base learner: ridge, learner: NoMerging in 0.09s
+[2013-05-13 11:17:12] PyMTL.learning.learning DEBUG  : Merged data has 28 attributes and 11471 examples.
+[2013-05-13 11:17:13] PyMTL           DEBUG  : Finished repetition: 5, base learner: ridge, learner: MergeAll in 0.04s
+[2013-05-13 11:17:13] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (9591 pairs)
+[2013-05-13 11:19:14] PyMTL.learning.learning DEBUG  : Processing 4521 candidate pairs for merging
+[2013-05-13 11:23:45] PyMTL           DEBUG  : Finished repetition: 5, base learner: ridge, learner: ERM in 419.36s
+[2013-05-13 11:23:45] PyMTL           DEBUG  : Finished repetition: 6, base learner: ridge, learner: NoMerging in 0.10s
+[2013-05-13 11:23:45] PyMTL.learning.learning DEBUG  : Merged data has 28 attributes and 11471 examples.
+[2013-05-13 11:23:45] PyMTL           DEBUG  : Finished repetition: 6, base learner: ridge, learner: MergeAll in 0.05s
+[2013-05-13 11:23:45] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (9591 pairs)
+[2013-05-13 11:25:49] PyMTL.learning.learning DEBUG  : Processing 4169 candidate pairs for merging
+[2013-05-13 11:29:26] PyMTL           DEBUG  : Finished repetition: 6, base learner: ridge, learner: ERM in 353.03s
+[2013-05-13 11:29:26] PyMTL           DEBUG  : Finished repetition: 7, base learner: ridge, learner: NoMerging in 0.09s
+[2013-05-13 11:29:26] PyMTL.learning.learning DEBUG  : Merged data has 28 attributes and 11471 examples.
+[2013-05-13 11:29:26] PyMTL           DEBUG  : Finished repetition: 7, base learner: ridge, learner: MergeAll in 0.04s
+[2013-05-13 11:29:26] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (9591 pairs)
+[2013-05-13 11:31:52] PyMTL.learning.learning DEBUG  : Processing 4455 candidate pairs for merging
+[2013-05-13 11:35:13] PyMTL           DEBUG  : Finished repetition: 7, base learner: ridge, learner: ERM in 352.92s
+[2013-05-13 11:35:13] PyMTL           DEBUG  : Finished repetition: 8, base learner: ridge, learner: NoMerging in 0.09s
+[2013-05-13 11:35:13] PyMTL.learning.learning DEBUG  : Merged data has 28 attributes and 11471 examples.
+[2013-05-13 11:35:13] PyMTL           DEBUG  : Finished repetition: 8, base learner: ridge, learner: MergeAll in 0.04s
+[2013-05-13 11:35:13] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (9591 pairs)
+[2013-05-13 11:37:25] PyMTL.learning.learning DEBUG  : Processing 4230 candidate pairs for merging
+[2013-05-13 11:41:55] PyMTL           DEBUG  : Finished repetition: 8, base learner: ridge, learner: ERM in 430.89s
+[2013-05-13 11:41:55] PyMTL           DEBUG  : Finished repetition: 9, base learner: ridge, learner: NoMerging in 0.08s
+[2013-05-13 11:41:55] PyMTL.learning.learning DEBUG  : Merged data has 28 attributes and 11471 examples.
+[2013-05-13 11:41:55] PyMTL           DEBUG  : Finished repetition: 9, base learner: ridge, learner: MergeAll in 0.05s
+[2013-05-13 11:41:55] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (9591 pairs)
+[2013-05-13 11:43:56] PyMTL.learning.learning DEBUG  : Processing 4234 candidate pairs for merging
+[2013-05-13 11:48:00] PyMTL           DEBUG  : Finished repetition: 9, base learner: ridge, learner: ERM in 388.07s
+[2013-05-13 11:48:01] PyMTL           DEBUG  : Successfully pickled the results of base learner: ridge to file: /home/tadej/Workspace/PyMTL/results/school-seed61-repeats10/bl-ridge.pkl
