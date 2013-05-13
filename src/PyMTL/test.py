@@ -395,6 +395,25 @@ class MTLTester:
         return "{} tasks: ".format(len(self._tasks)) + \
             ",".join(sorted(self._tasks.iterkeys()))
     
+    def only_keep_k_tasks(self, k):
+        """Reduce the size of the MTL problem to k randomly chosen tasks.
+        If the MTL problem's size is smaller than k, keep all tasks.
+        
+        Note: This is useful when the number of tasks is large (> 100), since
+        it makes some MTL methods (e.g. ERM) computationally tractable.
+        
+        Arguments:
+        k -- integer representing the number of tasks to keep
+        
+        """
+        new_tasks_data = list()
+        for _ in range(min(k, len(self._tasks_data))):
+            r = self._random.randrange(0, len(self._tasks_data))
+            new_tasks_data.append(self._tasks_data.pop(r))
+        logger.info("Kept {} randomly chosen tasks, {} tasks discarded".\
+                     format(len(new_tasks_data), len(self._tasks_data)))
+        self._tasks_data = new_tasks_data
+    
     def get_base_learners(self):
         """Return a tuple with the names of the base learning algorithms that
         have their results stored in the self._test_res TestingResults object.
@@ -1013,6 +1032,14 @@ class CVMTLTester(MTLTester):
         # tested base learner
         self._test_res = OrderedDict()
     
+    def __str__(self):
+        """Return a "pretty" representation of the MTL problem by indicating
+        tasks' ids.
+        
+        """
+        return "{} tasks: ".format(len(self._tasks)) + \
+            ",".join(sorted(self._tasks.iterkeys()))
+    
     def only_keep_k_tasks(self, k):
         """Reduce the size of the MTL problem to k randomly chosen tasks.
         If the MTL problem's size is smaller than k, keep all tasks.
@@ -1032,14 +1059,6 @@ class CVMTLTester(MTLTester):
         logger.info("Kept {} randomly chosen tasks, {} tasks discarded".\
                      format(len(new_tasks), len(self._tasks)))
         self._tasks = new_tasks
-    
-    def __str__(self):
-        """Return a "pretty" representation of the MTL problem by indicating
-        tasks' ids.
-        
-        """
-        return "{} tasks: ".format(len(self._tasks)) + \
-            ",".join(sorted(self._tasks.iterkeys()))
     
     def get_base_learners(self):
         """Return a tuple with the names of the base learning algorithms that
@@ -1346,19 +1365,18 @@ class CVMTLTester(MTLTester):
                 xlabel="Number of instances",
                 ylabel=m)
 
-def test_tasks(tasks_data, results_path_fmt, base_learners,
+def test_tasks(tasks_data, results_path, base_learners,
                measures, learners, tester_type, rnd_seed=50,
                test=True, unpickle=False, visualize=True,
                test_prop=0.3, subtasks_split=(3, 5), cv_folds=5,
-               repeats=1, weighting="all_equal"):
+               repeats=1, keep=0, weighting="all_equal"):
     """Test the given tasks' data corresponding to a MTL problem according to
     the given parameters and save the results where indicated.
     
     Arguments:
     tasks_data -- list of Bunch objects that hold tasks' data
-    results_path_fmt -- string representing a template for the results path;
-        it must contain exactly two pairs of braces ({}), where the rnd_seed and
-        repeats parameters will be put
+    results_path -- string representing the path where to store the results
+        (if it doesn't exist, it will be created)
     base_learners -- ordered dictionary with items of the form (name, learner),
         where name is a string representing the base learner's name and learner
         is a scikit-learn estimator object
@@ -1385,11 +1403,12 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
     cv_folds -- integer indicating how many folds to use with the CVMTLTester
     repeats -- integer indicating how many times the MTLTester should repeat the
         experiment
-    weighting -- string indicating the type of weighting to use when computing the
-        over results
+    keep -- integer indicating the number of random tasks of the MTL problem to
+        keep; if 0 (Default), then all tasks are kept
+    weighting -- string indicating the type of weighting to use when computing
+        the overall results
     
     """
-    results_path = results_path_fmt.format(rnd_seed, repeats)
     if not os.path.exists(results_path):
         os.makedirs(results_path)
     pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
@@ -1411,6 +1430,9 @@ def test_tasks(tasks_data, results_path_fmt, base_learners,
         mtlt = CVMTLTester(tasks_data, rnd_seed, cv_folds=cv_folds)
     else:
         raise ValueError("Unknown MTL tester type: '{}'".format(tester_type))
+    # select a random subset of tasks if keep > 0
+    if keep > 0:
+        mtlt.only_keep_k_tasks(keep)
     # test all combinations of learners and base learners (compute the testing
     # results with the defined measures) and save the results if test == True
     if test:
@@ -1505,11 +1527,11 @@ if __name__ == "__main__":
     
     if test_config == 1:
         tasks_data = data.load_usps_digits_data()
-        results_path_fmt = os.path.join(path_prefix, "results/usps_digits-"
-                                        "seed{}-repeats{}")
         rnd_seed = 51
         repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners_clas,
+        results_path = os.path.join(path_prefix, "results/usps_digits-"
+                                "seed{}-repeats{}".format(rnd_seed, repeats))
+        test_tasks(tasks_data, results_path, base_learners_clas,
                    measures_clas, learners, "train_test_split",
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
@@ -1517,33 +1539,39 @@ if __name__ == "__main__":
 
     if test_config == 2:
         tasks_data = data.load_usps_digits_data()
-        results_path_fmt = os.path.join(path_prefix, "results/usps_digits-"
-                                        "seed{}-repeats{}-subtasks3_5")
         rnd_seed = 51
         repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners_clas,
+        subtasks_split = (3, 5)
+        results_path = os.path.join(path_prefix, "results/usps_digits-"
+                                "seed{0}-repeats{1}-subtasks{2[0]}_{2[1]}".\
+                                format(rnd_seed, repeats, subtasks))
+        test_tasks(tasks_data, results_path, base_learners_clas,
                    measures_clas, learners, "subtasks_split", rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
-                   test_prop=0.5, subtasks_split=(3, 5), repeats=repeats)
+                   test_prop=0.5, subtasks_split=subtasks_split,
+                   repeats=repeats)
     
     if test_config == 3:
         tasks_data = data.load_usps_digits_data()
-        results_path_fmt = os.path.join(path_prefix, "results/usps_digits-"
-                                        "seed{}-repeats{}-subtasks5_10")
         rnd_seed = 51
         repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners_clas,
+        subtasks_split = (5, 10)
+        results_path = os.path.join(path_prefix, "results/usps_digits-"
+                                "seed{0}-repeats{1}-subtasks{2[0]}_{2[1]}".\
+                                format(rnd_seed, repeats, subtasks))
+        test_tasks(tasks_data, results_path, base_learners_clas,
                    measures_clas, learners, "subtasks_split", rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
-                   test_prop=0.5, subtasks_split=(5, 10), repeats=repeats)
+                   test_prop=0.5, subtasks_split=subtasks_split,
+                   repeats=repeats)
     
     if test_config == 4:
         tasks_data = data.load_mnist_digits_data()
-        results_path_fmt = os.path.join(path_prefix, "results/mnist_digits-"
-                                        "seed{}-repeats{}")
         rnd_seed = 51
         repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners_clas,
+        results_path = os.path.join(path_prefix, "results/mnist_digits-"
+                                "seed{}-repeats{}".format(rnd_seed, repeats))
+        test_tasks(tasks_data, results_path, base_learners_clas,
                    measures_clas, learners, "train_test_split",
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
@@ -1551,34 +1579,42 @@ if __name__ == "__main__":
     
     if test_config == 5:
         tasks_data = data.load_mnist_digits_data()
-        results_path_fmt = os.path.join(path_prefix, "results/mnist_digits-"
-                                        "seed{}-repeats{}-subtasks3_5")
         rnd_seed = 51
         repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners_clas,
+        subtasks_split = (3, 5)
+        results_path = os.path.join(path_prefix, "results/mnist_digits-"
+                                "seed{0}-repeats{1}-subtasks{2[0]}_{2[1]}".\
+                                format(rnd_seed, repeats, subtasks))
+        test_tasks(tasks_data, results_path, base_learners_clas,
                    measures_clas, learners, "subtasks_split", rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
-                   test_prop=0.5, subtasks_split=(3, 5), repeats=repeats)
+                   test_prop=0.5, subtasks_split=subtasks_split,
+                   repeats=repeats)
     
     if test_config == 6:
         tasks_data = data.load_mnist_digits_data()
-        results_path_fmt = os.path.join(path_prefix, "results/mnist_digits-"
-                                        "seed{}-repeats{}-subtasks5_10")
         rnd_seed = 51
         repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners_clas,
+        subtasks_split = (5, 10)
+        results_path = os.path.join(path_prefix, "results/mnist_digits-"
+                                "seed{0}-repeats{1}-subtasks{2[0]}_{2[1]}".\
+                                format(rnd_seed, repeats, subtasks))
+        test_tasks(tasks_data, results_path, base_learners_clas,
                    measures_clas, learners, "subtasks_split", rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
-                   test_prop=0.5, subtasks_split=(5, 10), repeats=repeats)
+                   test_prop=0.5, subtasks_split=subtasks_split,
+                   repeats=repeats)
     
     if test_config == 7:
         tasks_data = data.load_school_data()
-        results_path_fmt = os.path.join(path_prefix, "results/school-"
-                                        "seed{}-repeats{}")
         rnd_seed = 61
-        repeats = 10
-        test_tasks(tasks_data, results_path_fmt, base_learners_regr,
+        repeats = 3
+        keep = 10
+        results_path = os.path.join(path_prefix, "results/school-seed{}-"
+                            "repeats{}-keep{}".format(rnd_seed, repeats, keep))
+        test_tasks(tasks_data, results_path, base_learners_regr,
                    measures_regr, learners, "train_test_split",
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
-                   test_prop=0.25, repeats=repeats, weighting="task_sizes")
+                   test_prop=0.25, repeats=repeats, keep=keep,
+                   weighting="task_sizes")
