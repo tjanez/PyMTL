@@ -127,7 +127,11 @@ def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel="",
                   right=x_tick_points[-1] + margin)
     if x_tick_points != None and x_tick_labels != None:
         axes.set_xticks(x_tick_points)
-        axes.set_xticklabels(x_tick_labels)
+        if len(x_tick_points) > 20:
+            axes.set_xticklabels(x_tick_labels, rotation="vertical",
+                                 size="small")
+        else:
+            axes.set_xticklabels(x_tick_labels, size="small")
     if ylim_bottom != None:
         axes.set_ylim(bottom=ylim_bottom)
     if ylim_top != None:
@@ -202,7 +206,7 @@ def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
                   ylim_top=ylim_top)
     fig.suptitle(title)
     # adjust figure parameters to make it look nicer
-    fig.subplots_adjust(top=0.93, bottom=0.08, left=0.10, right=0.95,
+    fig.subplots_adjust(top=0.93, bottom=0.10, left=0.10, right=0.95,
                         wspace=0.2, hspace=0.25)
     fig.savefig(file_name)
 
