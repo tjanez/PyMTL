@@ -1,0 +1,28 @@
+Results for MSE (weighting method: task_sizes)
+----------------------------------------------
+  - Base learner: ridge
+      * ERM                 111.43 +/- 2.17
+      * NoMerging           110.81 +/- 2.16
+      * MergeAll            115.99 +/- 2.81
+
+Results for MAE (weighting method: task_sizes)
+----------------------------------------------
+  - Base learner: ridge
+      * ERM                 8.44 +/- 0.07
+      * NoMerging           8.39 +/- 0.07
+      * MergeAll            8.62 +/- 0.09
+
+Results for Explained variance (weighting method: task_sizes)
+-------------------------------------------------------------
+  - Base learner: ridge
+      * ERM                 0.23 +/- 0.01
+      * NoMerging           0.22 +/- 0.01
+      * MergeAll            0.24 +/- 0.01
+
+Results for RMSE (weighting method: task_sizes)
+-----------------------------------------------
+  - Base learner: ridge
+      * ERM                 10.39 +/- 0.10
+      * NoMerging           10.37 +/- 0.10
+      * MergeAll            10.58 +/- 0.13
+
