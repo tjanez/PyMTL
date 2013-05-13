@@ -543,6 +543,8 @@ class MTLTester:
                     score = metrics.mean_absolute_error(y_test, y_pred)
                 elif measure == "MSE":
                     score = metrics.mean_squared_error(y_test, y_pred)
+                elif measure == "RMSE":
+                    score = np.sqrt(metrics.mean_squared_error(y_test, y_pred))
                 elif measure == "Explained variance":
                     score = metrics.explained_variance_score(y_test, y_pred)
                 else:
@@ -704,6 +706,10 @@ class MTLTester:
                 if set_ref != set_bl:
                     return False
         return True
+    
+    def contains_test_results(self):
+        """Return True if the MTLTester contains any testing results."""
+        return len(self._test_res) > 0
     
     def _compute_task_stats(self, base_learner, learner, measure):
         """Compute the statistics (average, std. deviation and 95% confidence
@@ -900,8 +906,8 @@ class MTLTester:
                     for l in learners:
                         avg, std, ci95 = self._compute_overall_stats(bl, l, m,
                                                 weighting=weighting)
-                        r.write(3*offset + "* {}\t\t{:.2f} +/- {:.2f}".\
-                                 format(l, avg, std) + "\n")
+                        r.write(3*offset + "* {:<20}{:.2f} +/- {:.2f}".\
+                                format(l, avg, std) + "\n")
                 r.write("\n")
 
 class SubtasksMTLTester(MTLTester):
@@ -1450,6 +1456,9 @@ def test_tasks(tasks_data, results_path, base_learners,
     # learners, learners and measures that are in the MTL problem; in addition,
     # visualize the dendrograms showing merging history of ERM
     if visualize:
+        if not mtlt.contains_test_results():
+            raise ValueError("The MTLTester object doesn't contain any testing"
+                             " results.")
         bls = mtlt.get_base_learners()
         ls = mtlt.get_learners()
         ms = mtlt.get_measures()
@@ -1469,7 +1478,8 @@ if __name__ == "__main__":
     # 5 -- MNIST digits data (repeats=10, subtasks=(3, 5))
     # 6 -- MNIST digits data (repeats=10, subtasks=(5, 10))
     # 7 -- School data
-    test_config = 7
+    # 8 -- School data (only a subset of tasks)
+    test_config = 8
     
     # boolean indicating whether to perform the tests on the MTL problem
     test = True
@@ -1516,6 +1526,7 @@ if __name__ == "__main__":
     measures_regr = []
     measures_regr.append("MAE")
     measures_regr.append("MSE")
+    measures_regr.append("RMSE")
     measures_regr.append("Explained variance")
     
     learners = OrderedDict()
@@ -1606,6 +1617,19 @@ if __name__ == "__main__":
                    repeats=repeats)
     
     if test_config == 7:
+        tasks_data = data.load_school_data()
+        rnd_seed = 61
+        repeats = 10
+        results_path = os.path.join(path_prefix, "results/school-seed{}-"
+                            "repeats{}".format(rnd_seed, repeats))
+        test_tasks(tasks_data, results_path, base_learners_regr,
+                   measures_regr, learners, "train_test_split",
+                   rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=0.25, repeats=repeats,
+                   weighting="task_sizes")
+    
+    if test_config == 8:
         tasks_data = data.load_school_data()
         rnd_seed = 61
         repeats = 3
