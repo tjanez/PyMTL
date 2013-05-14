@@ -465,13 +465,13 @@ class MTLTester:
         Return a four-dimensional dictionary with:
             first key corresponding to the base learner's name,
             second key corresponding to the learner's name,
-            third key corresponding to the task's id,
+            third key corresponding to the task's id (ordered),
             fourth key corresponding to the scoring measure's name,
             value corresponding to a list of values of the scoring measure.
         
         Keyword arguments:
         rpt_scores -- five-dimensional dictionary with:
-            first key corresponding to the repetition number,
+            first key corresponding to the repetition number (ordered),
             second key corresponding to the base learner's name,
             third key corresponding to the learner's name,
             fourth key corresponding to the task's id,
@@ -560,52 +560,31 @@ class MTLTester:
                     100.*m_errors/n))
         return scores
     
-    def test_tasks(self, learners, base_learners, measures, results_path):
-        """Repeat the following experiment self._repeats times:
-        Prepare tasks' data with the _prepare_tasks_data() function.
-        Test the performance of the given learning algorithms with the given
-        base learning algorithms and compute the testing results using the
-        given scoring measures.
-        Combine the scores of all repetitions and store them in TestingResults
-        objects, one for each base learner, along with tasks' hashes (used for
-        comparing the results of multiple experiments) and dend_info objects
-        (used for plotting dendrograms showing merging history of the ERM MTL
-        method).
+    def _process_repetition_scores(self, rpt_scores, dend_info):
+        """Combine the scores of the given repetitions of the experiment and
+        store them in TestingResults objects, one for each base learner, along
+        with tasks' hashes (used for comparing the results of multiple
+        experiments) and dend_info objects (used for plotting dendrograms
+        showing merging history of the ERM MTL method).
         Store the created TestingResults objects in self._test_res, which is
         a dictionary with keys corresponding to base learner's names and values
-        corresponding to their TestingResults objects. 
+        corresponding to their TestingResults objects.
         
         Arguments:
-        learners -- ordered dictionary with items of the form (name, learner),
-            where name is a string representing the learner's name and
-            learner is a MTL method (e.g. ERM, NoMerging, ...) 
-        base learners -- ordered dictionary with items of the form (name,
-            learner), where name is a string representing the base learner's
-            name and learner is a scikit-learn estimator object
-        measures -- list of strings representing measure's names (currently,
-            only CA and AUC are supported)
-        results_path -- string representing the path where to save any extra
-            information about the running of this test (currently, not used
-            anywhere)
+        rpt_scores -- five-dimensional dictionary with:
+            first key corresponding to the repetition number (ordered),
+            second key corresponding to the base learner's name,
+            third key corresponding to the learner's name,
+            fourth key corresponding to the task's id,
+            fifth key corresponding to the scoring measure's name,
+            value corresponding to the scoring measure's value.
+        dend_info -- two-dimensional dictionary with:
+            first key corresponding to the base learner's name,
+            second key corresponding to the repetition number (ordered)
+            value corresponding to a dend_info objects as described in the
+            plotting.plot_dendrograms's docstring
         
         """
-        rpt_scores = OrderedDict()
-        dend_info = {bl : OrderedDict() for bl in base_learners.iterkeys()}
-        for i in range(self._repeats):
-            self._prepare_tasks_data(**self._tasks_data_params)
-            rpt_scores[i] = {bl : dict() for bl in base_learners.iterkeys()}
-            for bl in base_learners:
-                for l in learners:
-                    start = time.clock()
-                    R = learners[l](self._tasks, base_learners[bl])
-                    rpt_scores[i][bl][l] = self._test_tasks(R["task_models"],
-                                                            measures)
-                    end = time.clock()
-                    logger.debug("Finished repetition: {}, base learner: {}, "
-                        "learner: {} in {:.2f}s".format(i, bl, l, end-start))
-                    # store dendrogram info if the results contain it 
-                    if "dend_info" in R:
-                        dend_info[bl][i] = R["dend_info"]
         # merge results of all repetitions
         scores = self._merge_repetition_scores(rpt_scores)
         # get tasks' hashes and sizes
@@ -619,6 +598,68 @@ class MTLTester:
         for bl in scores:
             self._test_res[bl] = TestingResults(bl, task_hashes, task_sizes,
                                                 scores[bl], dend_info[bl])
+    
+    def test_tasks(self, learners, base_learners, measures, results_path):
+        """Repeat the following experiment self._repeats times:
+        Prepare tasks' data with the _prepare_tasks_data() function.
+        Test the performance of the given learning algorithms with the given
+        base learning algorithms and compute the testing results using the
+        given scoring measures.
+        Process the obtained repetition scores with the
+        _process_repetition_scores() function.
+        
+        Arguments:
+        learners -- ordered dictionary with items of the form (name, learner),
+            where name is a string representing the learner's name and
+            learner is a MTL method (e.g. ERM, NoMerging, ...) 
+        base learners -- ordered dictionary with items of the form (name,
+            learner), where name is a string representing the base learner's
+            name and learner is a scikit-learn estimator object
+        measures -- list of strings representing measure's names (currently,
+            only CA and AUC are supported)
+        results_path -- string representing the path where to save any extra
+            information about the running of this test (currently, only used
+            for pickling the results when there is an error in calling the
+            learner)
+        
+        """
+        rpt_scores = OrderedDict()
+        dend_info = {bl : OrderedDict() for bl in base_learners.iterkeys()}
+        for i in range(self._repeats):
+            self._prepare_tasks_data(**self._tasks_data_params)
+            rpt_scores[i] = {bl : dict() for bl in base_learners.iterkeys()}
+            for bl in base_learners:
+                for l in learners:
+                    start = time.clock()
+                    try:
+                        R = learners[l](self._tasks, base_learners[bl])
+                    except Exception as e:
+                        logger.info("There was an error during repetition: {} "
+                            "with base learner: {} and learner: {}. Saving the "
+                            "results of previous repetitions.".format(i, bl, l))
+                        if i > 0:
+                            # remove the scores of the last repetition
+                            del rpt_scores[i]
+                            # process the remaining repetition scores
+                            self._process_repetition_scores(rpt_scores,
+                                                            dend_info)
+                            # pickle them to a file
+                            pickle_path_fmt = os.path.join(results_path,
+                                                           "bl-{}.pkl")
+                            self.pickle_test_results(pickle_path_fmt)
+                        # re-raise the original exception
+                        import sys
+                        exc_info = sys.exc_info()
+                        raise exc_info[1], None, exc_info[2]
+                    rpt_scores[i][bl][l] = self._test_tasks(R["task_models"],
+                                                            measures)
+                    end = time.clock()
+                    logger.debug("Finished repetition: {}, base learner: {}, "
+                        "learner: {} in {:.2f}s".format(i, bl, l, end-start))
+                    # store dendrogram info if the results contain it 
+                    if "dend_info" in R:
+                        dend_info[bl][i] = R["dend_info"]
+        self._process_repetition_scores(rpt_scores, dend_info)
     
     def pickle_test_results(self, pickle_path_fmt):
         """Pickle the TestingResults objects in self._test_res to the given
@@ -1618,7 +1659,7 @@ if __name__ == "__main__":
     
     if test_config == 7:
         tasks_data = data.load_school_data()
-        rnd_seed = 61
+        rnd_seed = 62
         repeats = 10
         results_path = os.path.join(path_prefix, "results/school-seed{}-"
                             "repeats{}".format(rnd_seed, repeats))
