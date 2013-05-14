@@ -634,10 +634,12 @@ class MTLTester:
                     try:
                         R = learners[l](self._tasks, base_learners[bl])
                     except Exception as e:
-                        logger.info("There was an error during repetition: {} "
-                            "with base learner: {} and learner: {}. Saving the "
-                            "results of previous repetitions.".format(i, bl, l))
+                        logger.exception("There was an error during repetition:"
+                            " {} with base learner: {} and learner: {}.".\
+                            format(i, bl, l))
                         if i > 0:
+                            logger.info("Saving the results of previous "
+                                        "repetitions.")
                             # remove the scores of the last repetition
                             del rpt_scores[i]
                             # process the remaining repetition scores
@@ -1520,7 +1522,7 @@ if __name__ == "__main__":
     # 6 -- MNIST digits data (repeats=10, subtasks=(5, 10))
     # 7 -- School data
     # 8 -- School data (only a subset of tasks)
-    test_config = 8
+    test_config = 7
     
     # boolean indicating whether to perform the tests on the MTL problem
     test = True
