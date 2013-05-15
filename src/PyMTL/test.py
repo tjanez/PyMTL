@@ -1535,8 +1535,9 @@ if __name__ == "__main__":
     # 5 -- MNIST digits data (repeats=10, subtasks=(3, 5))
     # 6 -- MNIST digits data (repeats=10, subtasks=(5, 10))
     # 7 -- School data
-    # 8 -- School data (only a subset of tasks)
-    test_config = 7
+    # 8 -- School data (train-test split is 60-40 instead of 75-25)
+    # 9 -- School data (only a subset of tasks)
+    test_config = 8
     
     # boolean indicating whether to perform the tests on the MTL problem
     test = True
@@ -1684,9 +1685,22 @@ if __name__ == "__main__":
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
                    test_prop=0.25, repeats=repeats,
-                   weighting="task_sizes", error_margin="ci95")
+                   weighting="task_sizes", error_margin="std")
     
     if test_config == 8:
+        tasks_data = data.load_school_data()
+        rnd_seed = 63
+        repeats = 10
+        results_path = os.path.join(path_prefix, "results/school-seed{}-"
+                        "repeats{}-train_test_60-40".format(rnd_seed, repeats))
+        test_tasks(tasks_data, results_path, base_learners_regr,
+                   measures_regr, learners, "train_test_split",
+                   rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=0.40, repeats=repeats,
+                   weighting="task_sizes", error_margin="std")
+    
+    if test_config == 9:
         tasks_data = data.load_school_data()
         rnd_seed = 61
         repeats = 3
