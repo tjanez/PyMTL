@@ -1507,7 +1507,7 @@ def test_tasks(tasks_data, results_path, base_learners,
         ms = mtlt.get_measures()
         mtlt.visualize_results(bls, ls, ms, results_path,
             colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"})
-        mtlt.visualize_dendrograms(base_learners, results_path)
+        mtlt.visualize_dendrograms(bls, results_path)
         mtlt.compute_overall_results(bls, ls, ms, results_path,
                                      weighting=weighting)
     remove_logger(logger)
