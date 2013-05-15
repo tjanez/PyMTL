@@ -914,7 +914,7 @@ class MTLTester:
                 stat.ci95(avg_scores))
     
     def compute_overall_results(self, base_learners, learners, measures,
-                              results_path, weighting="all_equal"):
+            results_path, weighting="all_equal", error_margin="std"):
         """Compute the overall results for the given learning algorithms with
         the given base learning algorithms and the given scoring measures on
         the MTL problem.
@@ -936,12 +936,17 @@ class MTLTester:
             currently, two options are implemented:
             - all_equal -- all tasks have equal weight
             - task_sizes -- tasks' weights correspond to their sizes
+        error_margin -- string representing the measure of the margin of error;
+            currently, two options are implemented:
+            - std -- margin of error is std. deviation
+            - ci95 -- margin of error is 95% conf. interval of the mean
         
         """
         offset = "  "
         with open(os.path.join(results_path, "overall_results.txt"), 'w') as r:
             for m in measures:
-                s = "Results for {} (weighting method: {})".format(m, weighting)
+                s = "Results for {} (weighting method: {}, error margin " \
+                    "measure: {})".format(m, weighting, error_margin)
                 r.write(s + "\n")
                 r.write("-"*len(s) + "\n")
                 for bl in base_learners:
@@ -949,8 +954,15 @@ class MTLTester:
                     for l in learners:
                         avg, std, ci95 = self._compute_overall_stats(bl, l, m,
                                                 weighting=weighting)
+                        if error_margin == "std":
+                            em = std
+                        elif error_margin == "ci95":
+                            em = ci95
+                        else:
+                            raise ValueError("Unknown error margin measure: "
+                                             "{}".format(error_margin))
                         r.write(3*offset + "* {:<20}{:.2f} +/- {:.2f}".\
-                                format(l, avg, std) + "\n")
+                                format(l, avg, em) + "\n")
                 r.write("\n")
 
 class SubtasksMTLTester(MTLTester):
@@ -1418,7 +1430,7 @@ def test_tasks(tasks_data, results_path, base_learners,
                measures, learners, tester_type, rnd_seed=50,
                test=True, unpickle=False, visualize=True,
                test_prop=0.3, subtasks_split=(3, 5), cv_folds=5,
-               repeats=1, keep=0, weighting="all_equal"):
+               repeats=1, keep=0, weighting="all_equal", error_margin="std"):
     """Test the given tasks' data corresponding to a MTL problem according to
     the given parameters and save the results where indicated.
     
@@ -1456,6 +1468,8 @@ def test_tasks(tasks_data, results_path, base_learners,
         keep; if 0 (Default), then all tasks are kept
     weighting -- string indicating the type of weighting to use when computing
         the overall results
+    error_margin -- string indicating which measure to use for error margins
+        when computing the overall results
     
     """
     if not os.path.exists(results_path):
@@ -1509,7 +1523,7 @@ def test_tasks(tasks_data, results_path, base_learners,
             colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"})
         mtlt.visualize_dendrograms(bls, results_path)
         mtlt.compute_overall_results(bls, ls, ms, results_path,
-                                     weighting=weighting)
+                weighting=weighting, error_margin=error_margin)
     remove_logger(logger)
 
 if __name__ == "__main__":
@@ -1661,7 +1675,7 @@ if __name__ == "__main__":
     
     if test_config == 7:
         tasks_data = data.load_school_data()
-        rnd_seed = 62
+        rnd_seed = 63
         repeats = 10
         results_path = os.path.join(path_prefix, "results/school-seed{}-"
                             "repeats{}".format(rnd_seed, repeats))
@@ -1670,7 +1684,7 @@ if __name__ == "__main__":
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
                    test_prop=0.25, repeats=repeats,
-                   weighting="task_sizes")
+                   weighting="task_sizes", error_margin="ci95")
     
     if test_config == 8:
         tasks_data = data.load_school_data()
