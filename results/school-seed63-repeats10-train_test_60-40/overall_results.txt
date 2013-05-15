@@ -1,0 +1,44 @@
+Results for MSE (weighting method: task_sizes, error margin measure: std)
+-------------------------------------------------------------------------
+  - Base learner: ridge
+      * ERM                 112.01 +/- 1.67
+      * NoMerging           112.23 +/- 2.03
+      * MergeAll            116.16 +/- 1.71
+  - Base learner: ridge_cv
+      * ERM                 105.62 +/- 1.71
+      * NoMerging           110.86 +/- 1.83
+      * MergeAll            107.25 +/- 1.59
+
+Results for MAE (weighting method: task_sizes, error margin measure: std)
+-------------------------------------------------------------------------
+  - Base learner: ridge
+      * ERM                 8.49 +/- 0.05
+      * NoMerging           8.46 +/- 0.06
+      * MergeAll            8.64 +/- 0.05
+  - Base learner: ridge_cv
+      * ERM                 8.13 +/- 0.05
+      * NoMerging           8.33 +/- 0.05
+      * MergeAll            8.20 +/- 0.05
+
+Results for Explained variance (weighting method: task_sizes, error margin measure: std)
+----------------------------------------------------------------------------------------
+  - Base learner: ridge
+      * ERM                 0.23 +/- 0.00
+      * NoMerging           0.22 +/- 0.01
+      * MergeAll            0.24 +/- 0.00
+  - Base learner: ridge_cv
+      * ERM                 0.28 +/- 0.01
+      * NoMerging           0.22 +/- 0.01
+      * MergeAll            0.29 +/- 0.01
+
+Results for RMSE (weighting method: task_sizes, error margin measure: std)
+--------------------------------------------------------------------------
+  - Base learner: ridge
+      * ERM                 10.45 +/- 0.08
+      * NoMerging           10.47 +/- 0.10
+      * MergeAll            10.61 +/- 0.08
+  - Base learner: ridge_cv
+      * ERM                 10.15 +/- 0.09
+      * NoMerging           10.40 +/- 0.09
+      * MergeAll            10.21 +/- 0.08
+
