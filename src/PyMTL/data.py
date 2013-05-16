@@ -188,6 +188,58 @@ def load_school_data():
                            ID=id))
     return tasks
 
+
+def load_computer_survey_data():
+    """Load Computer Survey data set.
+    
+    The data set's properties are:
+    - 20 samples (all subjects have the same samples)
+    - 13 features (describing computer's intrinsic (e.g. CPU speed, RAM) and
+        extrinsic (e.g. Hot line support, Color of unit) features)
+    - regression task of predicting subject's likelihood of purchasing a
+        personal computer
+    
+    Note
+    ----
+    This data set was obtained on pmtkdata project's web site:
+    https://code.google.com/p/pmtkdata/.
+    It was used by "Argyriou, Evgeniou, Pontil - Convex multi-task feature
+    learning - ML 2008" and "Kumar, Daume III - Learning Task Grouping and
+    Overlap in Multi-Task Learning - ICML 2012".
+    
+    Returns
+    -------
+    tasks -- list
+        A list of Bunch objects that correspond to regression tasks, each task
+        corresponding to one subject.
+    
+    """
+    matlab_file = os.path.join(path_prefix, "data/computer_survey/"
+                               "conjointAnalysisComputerBuyers.mat")
+    mat = loadmat(matlab_file)
+    # feature names are taken from the ComputerSurveyFull.xls file, Sheet named
+    # Design Matrix
+    feature_names = ["cnst", "Hot line", "RAM", "Screen size", "CPU speed",
+                     "Hard disk", "CD ROM", "Cache", "Color of unit",
+                     "Availability", "Warranty", "Software", "Guarantee",
+                     "Price"]
+    # extract X and combined y data
+    X = mat["designMarix"].astype("float")
+    y_combined = mat["likeBuy"].astype("float")
+    # create a task for each subject
+    tasks = []
+    for subject in range(len(y_combined)):
+        descr = "Computer Survey data: Subject {}".format(subject)
+        id = "Subject {}".format(subject)
+        y = np.array(y_combined[subject], copy=True)
+        tasks.append(Bunch(data=X,
+                           target=y,
+                           feature_names=feature_names,
+                           DESCR=descr,
+                           ID=id))
+    return tasks
+
+
 if __name__ == "__main__":
     tasks = load_usps_digits_data()
     print "Loaded the USPS digits MTL problem with the {} tasks:".\
@@ -205,3 +257,8 @@ if __name__ == "__main__":
     
     tasks = load_school_data()
     print "Loaded the School MTL problem with {} tasks.".format(len(tasks))
+    print
+    
+    tasks = load_computer_survey_data()
+    print "Loaded the Computer Survey MTL problem with {} tasks.".\
+        format(len(tasks))
