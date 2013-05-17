@@ -1537,7 +1537,7 @@ if __name__ == "__main__":
     # 7 -- School data
     # 8 -- School data (train-test split is 60-40 instead of 75-25)
     # 9 -- School data (only a subset of tasks)
-    test_config = 8
+    test_config = 10
     
     # boolean indicating whether to perform the tests on the MTL problem
     test = True
@@ -1572,9 +1572,9 @@ if __name__ == "__main__":
     # base learners for regression problems
     base_learners_regr = OrderedDict()
     from sklearn.linear_model import Ridge, RidgeCV
-    base_learners_regr["ridge"] = Ridge(normalize=True)
-#    base_learners_regr["ridge_cv"] = RidgeCV(alphas=np.logspace(-1, 1, 5),
-#                                             normalize=True)
+#    base_learners_regr["ridge"] = Ridge(normalize=True)
+    base_learners_regr["ridge_cv"] = RidgeCV(alphas=np.logspace(-1, 1, 5),
+                                             normalize=True)
     
     # scoring measures for classification problems
     measures_clas = []
@@ -1713,3 +1713,16 @@ if __name__ == "__main__":
                    test=test, unpickle=unpickle, visualize=visualize,
                    test_prop=0.25, repeats=repeats, keep=keep,
                    weighting="task_sizes")
+    
+    if test_config == 10:
+        tasks_data = data.load_computer_survey_data()
+        rnd_seed = 71
+        repeats = 10
+        results_path = os.path.join(path_prefix, "results/computer_survey-"
+                            "seed{}-repeats{}".format(rnd_seed, repeats))
+        test_tasks(tasks_data, results_path, base_learners_regr,
+                   measures_regr, learners, "train_test_split",
+                   rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=0.25, repeats=repeats,
+                   weighting="task_sizes", error_margin="std")
