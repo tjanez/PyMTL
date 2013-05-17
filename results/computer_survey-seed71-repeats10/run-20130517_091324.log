@@ -1,0 +1,2 @@
+[2013-05-17 09:13:24] PyMTL           DEBUG  : Successfully unpickled the results of base learner: ridge from file: /home/tadej/Workspace/PyMTL/results/computer_survey-seed71-repeats10/bl-ridge.pkl
+[2013-05-17 09:13:24] PyMTL           DEBUG  : Successfully unpickled the results of base learner: ridge_cv from file: /home/tadej/Workspace/PyMTL/results/computer_survey-seed71-repeats10/bl-ridge_cv.pkl

@@ -1,0 +1,80 @@
+[2013-05-16 17:47:45] PyMTL.learning.learning DEBUG  : Learning data for task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 17:47:46] PyMTL           DEBUG  : Finished repetition: 0, base learner: ridge_cv, learner: NoMerging in 0.19s
+[2013-05-16 17:47:46] PyMTL.learning.learning DEBUG  : Merged data has 14 attributes and 2850 examples.
+[2013-05-16 17:47:46] PyMTL           DEBUG  : Finished repetition: 0, base learner: ridge_cv, learner: MergeAll in 0.05s
+[2013-05-16 17:47:46] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (17955 pairs)
+[2013-05-16 17:53:52] PyMTL.learning.learning DEBUG  : Processing 5381 candidate pairs for merging
+[2013-05-16 17:59:51] PyMTL.learning.learning INFO   : Learning data for merged task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 17:59:51] PyMTL           DEBUG  : Finished repetition: 0, base learner: ridge_cv, learner: ERM in 721.00s
+[2013-05-16 17:59:51] PyMTL.learning.learning DEBUG  : Learning data for task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 17:59:51] PyMTL           DEBUG  : Finished repetition: 1, base learner: ridge_cv, learner: NoMerging in 0.19s
+[2013-05-16 17:59:51] PyMTL.learning.learning DEBUG  : Merged data has 14 attributes and 2850 examples.
+[2013-05-16 17:59:51] PyMTL           DEBUG  : Finished repetition: 1, base learner: ridge_cv, learner: MergeAll in 0.04s
+[2013-05-16 17:59:51] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (17955 pairs)
+[2013-05-16 18:05:26] PyMTL.learning.learning DEBUG  : Processing 5656 candidate pairs for merging
+[2013-05-16 18:11:21] PyMTL.learning.learning INFO   : Learning data for merged task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 18:11:21] PyMTL           DEBUG  : Finished repetition: 1, base learner: ridge_cv, learner: ERM in 686.42s
+[2013-05-16 18:11:22] PyMTL.learning.learning DEBUG  : Learning data for task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 18:11:22] PyMTL           DEBUG  : Finished repetition: 2, base learner: ridge_cv, learner: NoMerging in 0.19s
+[2013-05-16 18:11:22] PyMTL.learning.learning DEBUG  : Merged data has 14 attributes and 2850 examples.
+[2013-05-16 18:11:22] PyMTL           DEBUG  : Finished repetition: 2, base learner: ridge_cv, learner: MergeAll in 0.04s
+[2013-05-16 18:11:22] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (17955 pairs)
+[2013-05-16 18:16:58] PyMTL.learning.learning DEBUG  : Processing 6155 candidate pairs for merging
+[2013-05-16 18:22:53] PyMTL.learning.learning INFO   : Learning data for merged task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 18:22:53] PyMTL           DEBUG  : Finished repetition: 2, base learner: ridge_cv, learner: ERM in 687.58s
+[2013-05-16 18:22:53] PyMTL.learning.learning DEBUG  : Learning data for task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 18:22:53] PyMTL           DEBUG  : Finished repetition: 3, base learner: ridge_cv, learner: NoMerging in 0.19s
+[2013-05-16 18:22:53] PyMTL.learning.learning DEBUG  : Merged data has 14 attributes and 2850 examples.
+[2013-05-16 18:22:53] PyMTL           DEBUG  : Finished repetition: 3, base learner: ridge_cv, learner: MergeAll in 0.04s
+[2013-05-16 18:22:53] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (17955 pairs)
+[2013-05-16 18:28:29] PyMTL.learning.learning DEBUG  : Processing 6053 candidate pairs for merging
+[2013-05-16 18:34:24] PyMTL.learning.learning INFO   : Learning data for merged task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 18:34:24] PyMTL           DEBUG  : Finished repetition: 3, base learner: ridge_cv, learner: ERM in 686.60s
+[2013-05-16 18:34:24] PyMTL.learning.learning DEBUG  : Learning data for task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 18:34:24] PyMTL           DEBUG  : Finished repetition: 4, base learner: ridge_cv, learner: NoMerging in 0.19s
+[2013-05-16 18:34:24] PyMTL.learning.learning DEBUG  : Merged data has 14 attributes and 2850 examples.
+[2013-05-16 18:34:24] PyMTL           DEBUG  : Finished repetition: 4, base learner: ridge_cv, learner: MergeAll in 0.05s
+[2013-05-16 18:34:24] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (17955 pairs)
+[2013-05-16 18:39:59] PyMTL.learning.learning DEBUG  : Processing 6335 candidate pairs for merging
+[2013-05-16 18:45:59] PyMTL           DEBUG  : Finished repetition: 4, base learner: ridge_cv, learner: ERM in 690.75s
+[2013-05-16 18:45:59] PyMTL.learning.learning DEBUG  : Learning data for task Subject 50 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 18:45:59] PyMTL.learning.learning DEBUG  : Learning data for task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 18:45:59] PyMTL           DEBUG  : Finished repetition: 5, base learner: ridge_cv, learner: NoMerging in 0.18s
+[2013-05-16 18:45:59] PyMTL.learning.learning DEBUG  : Merged data has 14 attributes and 2850 examples.
+[2013-05-16 18:45:59] PyMTL           DEBUG  : Finished repetition: 5, base learner: ridge_cv, learner: MergeAll in 0.05s
+[2013-05-16 18:45:59] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (17955 pairs)
+[2013-05-16 18:51:19] PyMTL.learning.learning DEBUG  : Processing 5701 candidate pairs for merging
+[2013-05-16 18:56:54] PyMTL.learning.learning INFO   : Learning data for merged task M(Subject 122,Subject 50) has less than 2 class values. Using DummyClassifier.
+[2013-05-16 18:56:54] PyMTL           DEBUG  : Finished repetition: 5, base learner: ridge_cv, learner: ERM in 651.18s
+[2013-05-16 18:56:54] PyMTL.learning.learning DEBUG  : Learning data for task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 18:56:54] PyMTL           DEBUG  : Finished repetition: 6, base learner: ridge_cv, learner: NoMerging in 0.18s
+[2013-05-16 18:56:54] PyMTL.learning.learning DEBUG  : Merged data has 14 attributes and 2850 examples.
+[2013-05-16 18:56:54] PyMTL           DEBUG  : Finished repetition: 6, base learner: ridge_cv, learner: MergeAll in 0.04s
+[2013-05-16 18:56:54] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (17955 pairs)
+[2013-05-16 19:02:10] PyMTL.learning.learning DEBUG  : Processing 5819 candidate pairs for merging
+[2013-05-16 19:07:48] PyMTL.learning.learning INFO   : Learning data for merged task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 19:07:48] PyMTL           DEBUG  : Finished repetition: 6, base learner: ridge_cv, learner: ERM in 650.13s
+[2013-05-16 19:07:48] PyMTL.learning.learning DEBUG  : Learning data for task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 19:07:48] PyMTL           DEBUG  : Finished repetition: 7, base learner: ridge_cv, learner: NoMerging in 0.18s
+[2013-05-16 19:07:48] PyMTL.learning.learning DEBUG  : Merged data has 14 attributes and 2850 examples.
+[2013-05-16 19:07:48] PyMTL           DEBUG  : Finished repetition: 7, base learner: ridge_cv, learner: MergeAll in 0.04s
+[2013-05-16 19:07:48] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (17955 pairs)
+[2013-05-16 19:13:09] PyMTL.learning.learning DEBUG  : Processing 5505 candidate pairs for merging
+[2013-05-16 19:18:40] PyMTL           DEBUG  : Finished repetition: 7, base learner: ridge_cv, learner: ERM in 648.29s
+[2013-05-16 19:18:40] PyMTL.learning.learning DEBUG  : Learning data for task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 19:18:40] PyMTL           DEBUG  : Finished repetition: 8, base learner: ridge_cv, learner: NoMerging in 0.18s
+[2013-05-16 19:18:40] PyMTL.learning.learning DEBUG  : Merged data has 14 attributes and 2850 examples.
+[2013-05-16 19:18:40] PyMTL           DEBUG  : Finished repetition: 8, base learner: ridge_cv, learner: MergeAll in 0.04s
+[2013-05-16 19:18:40] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (17955 pairs)
+[2013-05-16 19:23:56] PyMTL.learning.learning DEBUG  : Processing 5527 candidate pairs for merging
+[2013-05-16 19:29:26] PyMTL.learning.learning INFO   : Learning data for merged task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 19:29:26] PyMTL           DEBUG  : Finished repetition: 8, base learner: ridge_cv, learner: ERM in 642.35s
+[2013-05-16 19:29:27] PyMTL.learning.learning DEBUG  : Learning data for task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 19:29:27] PyMTL           DEBUG  : Finished repetition: 9, base learner: ridge_cv, learner: NoMerging in 0.18s
+[2013-05-16 19:29:27] PyMTL.learning.learning DEBUG  : Merged data has 14 attributes and 2850 examples.
+[2013-05-16 19:29:27] PyMTL           DEBUG  : Finished repetition: 9, base learner: ridge_cv, learner: MergeAll in 0.04s
+[2013-05-16 19:29:27] PyMTL.learning.learning DEBUG  : Computing candidate pairs for merging (17955 pairs)
+[2013-05-16 19:34:42] PyMTL.learning.learning DEBUG  : Processing 6040 candidate pairs for merging
+[2013-05-16 19:40:15] PyMTL.learning.learning INFO   : Learning data for merged task Subject 122 has less than 2 class values. Using DummyClassifier.
+[2013-05-16 19:40:16] PyMTL           DEBUG  : Finished repetition: 9, base learner: ridge_cv, learner: ERM in 645.17s
+[2013-05-16 19:40:16] PyMTL           DEBUG  : Successfully pickled the results of base learner: ridge_cv to file: /home/tadej/Workspace/PyMTL/results/computer_survey-seed71-repeats10-ridge_cv/bl-ridge_cv.pkl
