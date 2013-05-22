@@ -1537,6 +1537,7 @@ if __name__ == "__main__":
     # 7 -- School data
     # 8 -- School data (train-test split is 60-40 instead of 75-25)
     # 9 -- School data (only a subset of tasks)
+    # 10 -- Computer survey data
     test_config = 10
     
     # boolean indicating whether to perform the tests on the MTL problem
