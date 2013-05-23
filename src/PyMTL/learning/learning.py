@@ -25,9 +25,8 @@ from sklearn.base import clone
 from sklearn.dummy import DummyClassifier
 
 from PyMTL.sklearn_utils import change_dummy_classes
+from PyMTL.util import logger
 
-# create a child logger of the PyMTL logger
-logger = logging.getLogger("PyMTL.learning.learning")
 
 class MergeAllLearner:
     

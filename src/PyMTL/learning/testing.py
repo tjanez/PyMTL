@@ -26,9 +26,8 @@ from sklearn import cross_validation, pipeline
 from sklearn.dummy import DummyClassifier
 
 from PyMTL.sklearn_utils import change_dummy_classes
+from PyMTL.util import logger
 
-# create a child logger of the PyMTL logger
-logger = logging.getLogger("PyMTL.learning.testing")
 
 def _compute_average_prediction_errors(pred_errs):
     """Compute average prediction errors from the given prediction error lists

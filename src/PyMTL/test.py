@@ -33,55 +33,7 @@ from PyMTL.learning import prefiltering, learning
 from PyMTL.plotting import BarPlotDesc, LinePlotDesc, plot_multiple, \
     plot_dendrograms
 from PyMTL.sklearn_utils import absolute_error, squared_error
-
-def create_logger(name=None, level=logging.DEBUG,
-                  console_level=logging.DEBUG,
-                  file_name=None, file_level=logging.DEBUG):
-    """Create and configure a logger for the test module of PyMTL.
-    Return the created Logger instance.
-    
-    Keyword arguments:
-    name -- string representing the logger's name;
-        if None, logging module will default to root logger
-    level -- level of the created logger
-    console_level -- level of the console handler attached to the created logger
-    file_name -- file name of the file handler attached to the created logger;
-        if None, no file handler is created 
-    file_level -- level of the file handler attached to the created logger
-    
-    """
-    # set up logging
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    # create formatter
-    formatter = logging.Formatter(fmt="[%(asctime)s] %(name)-15s "
-                    "%(levelname)-7s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-    # create console handler and configure it
-    ch = logging.StreamHandler()
-    ch.setLevel(console_level)
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
-    # create a file handler and set its level
-    if file_name:
-        fh = logging.FileHandler(file_name)
-        fh.setLevel(file_level)
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
-    return logger
-
-
-def remove_logger(logger):
-    """Remove all handlers of the given Logger object.
-    
-    NOTE: This is a some-what dirty hack since the logging module doesn't
-    support removal of logger objects.
-    
-    Arguments:
-    logger -- logging.Logger object
-    
-    """
-    for handler in list(logger.handlers):
-        logger.removeHandler(handler)
+from PyMTL.util import logger, configure_logger
 
 
 def pickle_obj(obj, file_path):
@@ -1477,11 +1429,7 @@ def test_tasks(tasks_data, results_path, base_learners,
     pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
     log_file = os.path.join(results_path, "run-{}.log".format(time.strftime(
                                                             "%Y%m%d_%H%M%S")))
-    # NOTE: This is not very nice, but we have to declare that logger is a
-    # global variable so it can be used in other functions of this module
-    global logger
-    logger = create_logger(name="PyMTL", console_level=logging.INFO,
-                           file_name=log_file)
+    configure_logger(logger, console_level=logging.INFO, file_name=log_file)
     # create a MTL tester with tasks' data
     if tester_type == "train_test_split":
         mtlt = MTLTester(tasks_data, rnd_seed, test_prop=test_prop,
@@ -1524,7 +1472,6 @@ def test_tasks(tasks_data, results_path, base_learners,
         mtlt.visualize_dendrograms(bls, results_path)
         mtlt.compute_overall_results(bls, ls, ms, results_path,
                 weighting=weighting, error_margin=error_margin)
-    remove_logger(logger)
 
 if __name__ == "__main__":
     # boolean indicating which testing configuration to use:
@@ -1614,7 +1561,7 @@ if __name__ == "__main__":
         subtasks_split = (3, 5)
         results_path = os.path.join(path_prefix, "results/usps_digits-"
                                 "seed{0}-repeats{1}-subtasks{2[0]}_{2[1]}".\
-                                format(rnd_seed, repeats, subtasks))
+                                format(rnd_seed, repeats, subtasks_split))
         test_tasks(tasks_data, results_path, base_learners_clas,
                    measures_clas, learners, "subtasks_split", rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
@@ -1628,7 +1575,7 @@ if __name__ == "__main__":
         subtasks_split = (5, 10)
         results_path = os.path.join(path_prefix, "results/usps_digits-"
                                 "seed{0}-repeats{1}-subtasks{2[0]}_{2[1]}".\
-                                format(rnd_seed, repeats, subtasks))
+                                format(rnd_seed, repeats, subtasks_split))
         test_tasks(tasks_data, results_path, base_learners_clas,
                    measures_clas, learners, "subtasks_split", rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
@@ -1654,7 +1601,7 @@ if __name__ == "__main__":
         subtasks_split = (3, 5)
         results_path = os.path.join(path_prefix, "results/mnist_digits-"
                                 "seed{0}-repeats{1}-subtasks{2[0]}_{2[1]}".\
-                                format(rnd_seed, repeats, subtasks))
+                                format(rnd_seed, repeats, subtasks_split))
         test_tasks(tasks_data, results_path, base_learners_clas,
                    measures_clas, learners, "subtasks_split", rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
@@ -1668,7 +1615,7 @@ if __name__ == "__main__":
         subtasks_split = (5, 10)
         results_path = os.path.join(path_prefix, "results/mnist_digits-"
                                 "seed{0}-repeats{1}-subtasks{2[0]}_{2[1]}".\
-                                format(rnd_seed, repeats, subtasks))
+                                format(rnd_seed, repeats, subtasks_split))
         test_tasks(tasks_data, results_path, base_learners_clas,
                    measures_clas, learners, "subtasks_split", rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
