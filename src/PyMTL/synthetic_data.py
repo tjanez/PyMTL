@@ -25,10 +25,13 @@ import random
 import numpy as np
 from sympy import symbols
 from sympy.logic import And, Or, Not
+from sympy.printing import pretty
 from sklearn.utils import validation
+from sklearn.datasets.base import Bunch
 
+from PyMTL.util import logger
 
-def generate_boolean_function(a, d=8):
+def generate_boolean_function(a, d=8, random_seed=0):
     """Generate a Boolean function in disjunctive normal form according to the
     given parameters.
     Return a tuple (attributes, function), where:
@@ -38,8 +41,8 @@ def generate_boolean_function(a, d=8):
             sympy.logic
     
     Note: This function implements the Boolean function generation algorithm as
-    given in "(1997) Domingos, Pazzani - On the Optimality of the Simple
-    Bayesian Classifier under Zero-One Loss - ML".
+    given in "(2001) Sadohara - Learning of Boolean Functions using Support
+    Vector Machines - ALT".
     
     Arguments:
     a -- integer representing the number of attributes/variables of the
@@ -48,15 +51,18 @@ def generate_boolean_function(a, d=8):
     Keyword arguments:
     d -- integer representing the expected number of attributes/variables in a
         disjunct
+    random_seed -- integer representing the random seed with which to initialize
+        a private Random object
     
     """
+    rand_obj = random.Random(random_seed)
     attributes = symbols("x1:{}".format(a + 1))
     function = []
-    for i in range(2**d - 1):
+    for i in range(2 ** (d - 2)):
         disjunct = []
         for attr in attributes:
-            if random.random() < d / a:
-                if random.random() < 0.5:
+            if rand_obj.random() < d / a:
+                if rand_obj.random() < 0.5:
                     disjunct.append(attr)
                 else:
                     disjunct.append(Not(attr))
@@ -101,10 +107,75 @@ def generate_examples(attributes, function, n=100, random_state=None):
     return X, y
 
 
-if __name__ == "__main__":
-    random.seed(1)
-    attr, func = generate_boolean_function(4, 2)
-    X, y = generate_examples(attr, func, n=10, random_state=10)
-    print func
-    print X, y
+def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
+    """Generate a synthetic MTL problem of learning Boolean functions according
+    to the given parameters.
+    Log the % of True values in y for each task.
     
+    Parameters
+    ----------
+    a -- int
+        Number of attributes/variables of the generated Boolean functions.
+    d -- int
+        The expected number of attributes/variables in a disjunct.
+    n -- int
+        The number of examples for each task to generate.
+    g -- int
+        The number of task groups to generate. Each task group shares the
+        same Boolean functions.
+    tg -- int
+        The number of tasks (with their corresponding data) to generate for
+        each task group.
+    noise -- float
+        The proportion of examples of each task that have their class values
+        determined randomly.
+    random_seed -- int
+        The random seed with which to initialize a private Random object.
+    
+    Returns
+    -------
+    tasks -- list
+        A list of Bunch objects that correspond to regression tasks, each task
+        corresponding to one subject.
+    
+    """
+    rnd = random.Random(random_seed)
+    tasks = []
+    for i in range(g):
+        attr, func = generate_boolean_function(a, d,
+                                               random_seed=rnd.randint(1, 100))
+        for j in range(tg):
+            X, y = generate_examples(attr, func, n,
+                                     random_state=rnd.randint(1, 100))
+            descr = "Synthetic boolean data for task {} of group {} " \
+                "(function: {})".format(j, i, pretty(func))
+            id = "Task {} of group {}".format(j, i)
+            tasks.append(Bunch(data=X,
+                               target=y,
+                               DESCR=descr,
+                               ID=id))
+    logger.debug("Report about the generated synthetic Boolean MTL problem:")
+    logger.debug("% of True values in y for each task:")
+    sum_true = 0
+    sum_total = 0
+    for t in tasks:
+        cur_true = sum(t.target == True)
+        cur_len = len(t.target)
+        sum_true += cur_true
+        sum_total += cur_len
+        logger.debug("{}: {}".format(t.ID, cur_true / cur_len))
+    logger.debug("Average % of True values in y (across all tasks): {}".\
+                 format(sum_true / sum_total))
+    return tasks
+
+
+if __name__ == "__main__":
+    a, d = 4, 2
+    attr, func = generate_boolean_function(a, d, random_seed=1)
+    print "Boolean function (a={}, d={}):".format(a, d), pretty(func)
+    X, y = generate_examples(attr, func, n=10000, random_state=10)
+    print "% of True values in y: {:.2f}".format(100 * sum(y == True) / len(y))
+
+    tasks = generate_boolean_data(16, 8, 200, 20, 5, 0.0, random_seed=1)
+    print "Generated a synthetic Boolean MTL problem with {} tasks.".\
+        format(len(tasks))
