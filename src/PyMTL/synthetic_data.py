@@ -94,8 +94,8 @@ def generate_examples(attributes, function, n=100, random_state=None):
     """
     random_state = validation.check_random_state(random_state)
     a = len(attributes)
-    X = np.zeros((n, a), dtype="bool")
-    y = np.zeros(n, dtype="bool")
+    X = np.zeros((n, a), dtype="int")
+    y = np.zeros(n, dtype="int")
     for i in range(n):
         # choose the values of all attributes according to a random uniform
         # distribution
@@ -103,14 +103,21 @@ def generate_examples(attributes, function, n=100, random_state=None):
         # substitute the attributes in the function with their values
         y_i = function.subs(zip(attributes, X_i))
         X[i] = X_i
-        y[i] = y_i
+        # NOTE: Sometimes, the call to subs() function returns a boolean value
+        # and sometimes it returns a SymPy's Zero (or One) object. If it returns
+        # the latter, the following statement without int() fails with:
+        # TypeError: long() argument must be a string or a number, not 'Zero'
+        y[i] = int(y_i)
     return X, y
 
 
 def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
     """Generate a synthetic MTL problem of learning Boolean functions according
     to the given parameters.
-    Log the % of True values in y for each task.
+    Log the report about the generated MTL problem, which includes:
+    - the Boolean function of each group,
+    - the % of True values in y for each task,
+    - the average % of True values in y (across all tasks).
     
     Parameters
     ----------
@@ -141,9 +148,11 @@ def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
     """
     rnd = random.Random(random_seed)
     tasks = []
+    funcs = []
     for i in range(g):
         attr, func = generate_boolean_function(a, d,
                                                random_seed=rnd.randint(1, 100))
+        funcs.append(func)
         for j in range(tg):
             X, y = generate_examples(attr, func, n,
                                      random_state=rnd.randint(1, 100))
@@ -155,7 +164,10 @@ def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
                                DESCR=descr,
                                ID=id))
     logger.debug("Report about the generated synthetic Boolean MTL problem:")
-    logger.debug("% of True values in y for each task:")
+    logger.debug("  Boolean function of each group:")
+    for i, func in enumerate(funcs):
+        logger.debug("   - Group {}: {}".format(i, pretty(func)))
+    logger.debug("  % of True values in y for each task:")
     sum_true = 0
     sum_total = 0
     for t in tasks:
@@ -163,19 +175,49 @@ def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
         cur_len = len(t.target)
         sum_true += cur_true
         sum_total += cur_len
-        logger.debug("{}: {}".format(t.ID, cur_true / cur_len))
-    logger.debug("Average % of True values in y (across all tasks): {}".\
+        logger.debug("   - {}: {}".format(t.ID, cur_true / cur_len))
+    logger.debug("  Average % of True values in y (across all tasks): {}".\
                  format(sum_true / sum_total))
     return tasks
 
 
 if __name__ == "__main__":
-    a, d = 4, 2
-    attr, func = generate_boolean_function(a, d, random_seed=1)
-    print "Boolean function (a={}, d={}):".format(a, d), pretty(func)
-    X, y = generate_examples(attr, func, n=10000, random_state=10)
+    # generate a Boolean function with 8 variables and disjuncts with an average
+    # length of 4
+    a, d = 8, 4
+    attr, func = generate_boolean_function(a, d, random_seed=2)
+    print "Boolean function (a={}, d={}):".format(a, d), func
+    X, y = generate_examples(attr, func, n=1000, random_state=10)
     print "% of True values in y: {:.2f}".format(100 * sum(y == True) / len(y))
-
-    tasks = generate_boolean_data(16, 8, 200, 20, 5, 0.0, random_seed=1)
-    print "Generated a synthetic Boolean MTL problem with {} tasks.".\
-        format(len(tasks))
+    
+    # try different learning algorithms in scikit-learn and report their
+    # cross-validation scores
+    from sklearn.linear_model import LogisticRegression
+    from sklearn import cross_validation
+    lr = LogisticRegression()
+    print "Log. reg. scores: ", cross_validation.cross_val_score(lr, X, y, cv=5)
+    from sklearn.tree import DecisionTreeClassifier
+    dt = DecisionTreeClassifier()
+    print "Dec. tree scores: ", cross_validation.cross_val_score(dt, X, y, cv=5)
+    from sklearn.naive_bayes import MultinomialNB
+    mnb = MultinomialNB()
+    print "Multnomial naive Bayes scores: ", \
+        cross_validation.cross_val_score(mnb, X, y, cv=5)
+    from sklearn.svm import SVC
+    svc_lin = SVC(kernel="poly", coef0=1, degree=5)
+    print "SVM (poly.) scores: ", cross_validation.cross_val_score(svc_lin, X,
+                                                                   y, cv=5)
+    
+    # generate a PDF with the learned decision tree model
+#    dt = DecisionTreeClassifier()
+#    dt.fit(X, y)
+#    import StringIO, pydot
+#    from sklearn import tree
+#    dot_data = StringIO.StringIO() 
+#    tree.export_graphviz(dt, out_file=dot_data) 
+#    graph = pydot.graph_from_dot_data(dot_data.getvalue()) 
+#    graph.write_pdf("boolean_func_tree.pdf")
+    
+#    tasks = generate_boolean_data(16, 8, 200, 20, 5, 0.0, random_seed=1)
+#    print "Generated a synthetic Boolean MTL problem with {} tasks.".\
+#        format(len(tasks))
