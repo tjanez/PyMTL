@@ -1,0 +1,14 @@
+Results for CA (weighting method: all_equal, error margin measure: std)
+-----------------------------------------------------------------------
+  - Base learner: log_reg
+      * ERM                 0.97 +/- 0.00
+      * NoMerging           0.97 +/- 0.00
+      * MergeAll            0.90 +/- 0.00
+
+Results for AUC (weighting method: all_equal, error margin measure: std)
+------------------------------------------------------------------------
+  - Base learner: log_reg
+      * ERM                 0.98 +/- 0.00
+      * NoMerging           0.98 +/- 0.00
+      * MergeAll            0.44 +/- 0.01
+

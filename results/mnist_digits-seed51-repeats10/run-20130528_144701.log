@@ -1,0 +1,61 @@
+[2013-05-28 14:47:02] PyMTL           DEBUG  : Finished repetition: 0, base learner: log_reg, learner: NoMerging in 0.27s
+[2013-05-28 14:47:02] PyMTL           DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-05-28 14:47:02] PyMTL           DEBUG  : Finished repetition: 0, base learner: log_reg, learner: MergeAll in 0.38s
+[2013-05-28 14:47:02] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-05-28 14:47:26] PyMTL           DEBUG  : Processing 0 candidate pairs for merging
+[2013-05-28 14:47:26] PyMTL           DEBUG  : Finished repetition: 0, base learner: log_reg, learner: ERM in 23.86s
+[2013-05-28 14:47:26] PyMTL           DEBUG  : Finished repetition: 1, base learner: log_reg, learner: NoMerging in 0.27s
+[2013-05-28 14:47:26] PyMTL           DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-05-28 14:47:27] PyMTL           DEBUG  : Finished repetition: 1, base learner: log_reg, learner: MergeAll in 0.40s
+[2013-05-28 14:47:27] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-05-28 14:47:49] PyMTL           DEBUG  : Processing 0 candidate pairs for merging
+[2013-05-28 14:47:49] PyMTL           DEBUG  : Finished repetition: 1, base learner: log_reg, learner: ERM in 22.17s
+[2013-05-28 14:47:49] PyMTL           DEBUG  : Finished repetition: 2, base learner: log_reg, learner: NoMerging in 0.27s
+[2013-05-28 14:47:49] PyMTL           DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-05-28 14:47:50] PyMTL           DEBUG  : Finished repetition: 2, base learner: log_reg, learner: MergeAll in 0.42s
+[2013-05-28 14:47:50] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-05-28 14:48:11] PyMTL           DEBUG  : Processing 0 candidate pairs for merging
+[2013-05-28 14:48:12] PyMTL           DEBUG  : Finished repetition: 2, base learner: log_reg, learner: ERM in 21.66s
+[2013-05-28 14:48:12] PyMTL           DEBUG  : Finished repetition: 3, base learner: log_reg, learner: NoMerging in 0.28s
+[2013-05-28 14:48:12] PyMTL           DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-05-28 14:48:12] PyMTL           DEBUG  : Finished repetition: 3, base learner: log_reg, learner: MergeAll in 0.39s
+[2013-05-28 14:48:12] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-05-28 14:48:34] PyMTL           DEBUG  : Processing 0 candidate pairs for merging
+[2013-05-28 14:48:34] PyMTL           DEBUG  : Finished repetition: 3, base learner: log_reg, learner: ERM in 21.73s
+[2013-05-28 14:48:34] PyMTL           DEBUG  : Finished repetition: 4, base learner: log_reg, learner: NoMerging in 0.27s
+[2013-05-28 14:48:34] PyMTL           DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-05-28 14:48:35] PyMTL           DEBUG  : Finished repetition: 4, base learner: log_reg, learner: MergeAll in 0.39s
+[2013-05-28 14:48:35] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-05-28 14:48:56] PyMTL           DEBUG  : Processing 0 candidate pairs for merging
+[2013-05-28 14:48:56] PyMTL           DEBUG  : Finished repetition: 4, base learner: log_reg, learner: ERM in 21.52s
+[2013-05-28 14:48:57] PyMTL           DEBUG  : Finished repetition: 5, base learner: log_reg, learner: NoMerging in 0.28s
+[2013-05-28 14:48:57] PyMTL           DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-05-28 14:48:57] PyMTL           DEBUG  : Finished repetition: 5, base learner: log_reg, learner: MergeAll in 0.36s
+[2013-05-28 14:48:57] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-05-28 14:49:19] PyMTL           DEBUG  : Processing 0 candidate pairs for merging
+[2013-05-28 14:49:19] PyMTL           DEBUG  : Finished repetition: 5, base learner: log_reg, learner: ERM in 21.64s
+[2013-05-28 14:49:19] PyMTL           DEBUG  : Finished repetition: 6, base learner: log_reg, learner: NoMerging in 0.28s
+[2013-05-28 14:49:19] PyMTL           DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-05-28 14:49:20] PyMTL           DEBUG  : Finished repetition: 6, base learner: log_reg, learner: MergeAll in 0.34s
+[2013-05-28 14:49:20] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-05-28 14:49:41] PyMTL           DEBUG  : Processing 0 candidate pairs for merging
+[2013-05-28 14:49:41] PyMTL           DEBUG  : Finished repetition: 6, base learner: log_reg, learner: ERM in 21.45s
+[2013-05-28 14:49:41] PyMTL           DEBUG  : Finished repetition: 7, base learner: log_reg, learner: NoMerging in 0.28s
+[2013-05-28 14:49:41] PyMTL           DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-05-28 14:49:42] PyMTL           DEBUG  : Finished repetition: 7, base learner: log_reg, learner: MergeAll in 0.35s
+[2013-05-28 14:49:42] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-05-28 14:50:03] PyMTL           DEBUG  : Processing 0 candidate pairs for merging
+[2013-05-28 14:50:04] PyMTL           DEBUG  : Finished repetition: 7, base learner: log_reg, learner: ERM in 21.64s
+[2013-05-28 14:50:04] PyMTL           DEBUG  : Finished repetition: 8, base learner: log_reg, learner: NoMerging in 0.28s
+[2013-05-28 14:50:04] PyMTL           DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-05-28 14:50:04] PyMTL           DEBUG  : Finished repetition: 8, base learner: log_reg, learner: MergeAll in 0.41s
+[2013-05-28 14:50:04] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-05-28 14:50:26] PyMTL           DEBUG  : Processing 0 candidate pairs for merging
+[2013-05-28 14:50:26] PyMTL           DEBUG  : Finished repetition: 8, base learner: log_reg, learner: ERM in 21.51s
+[2013-05-28 14:50:26] PyMTL           DEBUG  : Finished repetition: 9, base learner: log_reg, learner: NoMerging in 0.27s
+[2013-05-28 14:50:26] PyMTL           DEBUG  : Merged data has 87 attributes and 10000 examples.
+[2013-05-28 14:50:26] PyMTL           DEBUG  : Finished repetition: 9, base learner: log_reg, learner: MergeAll in 0.36s
+[2013-05-28 14:50:26] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-05-28 14:50:48] PyMTL           DEBUG  : Processing 0 candidate pairs for merging
+[2013-05-28 14:50:48] PyMTL           DEBUG  : Finished repetition: 9, base learner: log_reg, learner: ERM in 21.48s
+[2013-05-28 14:50:48] PyMTL           DEBUG  : Successfully pickled the results of base learner: log_reg to file: /home/tadej/Workspace/PyMTL/results/mnist_digits-seed51-repeats10/bl-log_reg.pkl

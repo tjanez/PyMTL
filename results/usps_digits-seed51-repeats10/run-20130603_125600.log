@@ -1,0 +1,1 @@
+[2013-06-03 12:56:00] PyMTL           DEBUG  : Successfully unpickled the results of base learner: log_reg from file: /home/tadej/Workspace/PyMTL/results/usps_digits-seed51-repeats10/bl-log_reg.pkl
