@@ -96,4 +96,4 @@ if __name__ == "__main__":
                    measures_clas, learners, "train_test_split",
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
-                   test_prop=test_prop, repeats=repeats)
+                   test_prop=test_prop, repeats=repeats, cfg_logger=False)

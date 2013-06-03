@@ -158,7 +158,7 @@ def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
                                      random_state=rnd.randint(1, 100))
             descr = "Synthetic boolean data for task {} of group {} " \
                 "(function: {})".format(j, i, pretty(func))
-            id = "Task {} of group {}".format(j, i)
+            id = "Group {}, task {}".format(i, j)
             tasks.append(Bunch(data=X,
                                target=y,
                                DESCR=descr,
