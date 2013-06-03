@@ -1387,7 +1387,7 @@ def test_tasks(tasks_data, results_path, base_learners,
                test=True, unpickle=False, visualize=True,
                test_prop=0.3, subtasks_split=(3, 5), cv_folds=5,
                repeats=1, keep=0, weighting="all_equal", error_margin="std",
-               error_bars=True):
+               error_bars=True, cfg_logger=True):
     """Test the given tasks' data corresponding to a MTL problem according to
     the given parameters and save the results where indicated.
     
@@ -1429,14 +1429,17 @@ def test_tasks(tasks_data, results_path, base_learners,
         when computing the overall results
     error_bars -- boolean indicating whether to plot the error bars when
         visualizing the results
+    cfg_logger -- boolean indicating whether to re-configure the global logger
+        object
     
     """
     if not os.path.exists(results_path):
         os.makedirs(results_path)
     pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
-    log_file = os.path.join(results_path, "run-{}.log".format(time.strftime(
-                                                            "%Y%m%d_%H%M%S")))
-    configure_logger(logger, console_level=logging.INFO, file_name=log_file)
+    if cfg_logger:
+        log_file = os.path.join(results_path,
+                            "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
+        configure_logger(logger, console_level=logging.INFO, file_name=log_file)
     # create a MTL tester with tasks' data
     if tester_type == "train_test_split":
         mtlt = MTLTester(tasks_data, rnd_seed, test_prop=test_prop,
