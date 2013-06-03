@@ -87,7 +87,8 @@ class LinePlotDesc:
 
 def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel="",
                   x_tick_points=None, x_tick_labels=None,
-                  ylim_bottom=None, ylim_top=None):
+                  ylim_bottom=None, ylim_top=None,
+                  error_bars=True):
     """Draw the given (bar or line) plots on the given Axes object.
     
     Arguments:
@@ -104,15 +105,17 @@ def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel="",
     x_tick_labels -- list of strings representing x axis tick labels
     ylim_bottom -- float representing y-axis's bottom limit
     ylim_top -- float representing y-axis's top limit
+    error_bars -- boolean indicating whether to plot the error bars when
+        visualizing the results
     
     """
     for pd in plot_descs:
+        yerr = pd.yerr if error_bars else None
         if isinstance(pd, BarPlotDesc):
             axes.bar(pd.left_edges, pd.heights, width=pd.width, yerr=pd.yerr,
                 color=pd.color, ecolor=pd.ecolor, label=pd.label, alpha=0.75)
         elif isinstance(pd, LinePlotDesc):
-            # NOTE: Readd y error bars!
-            axes.errorbar(pd.x, pd.y, color=pd.color,
+            axes.errorbar(pd.x, pd.y, yerr=yerr, color=pd.color,
                 ecolor=pd.ecolor, label=pd.label, alpha=0.75)
         else:
             raise ValueError("Unsupported plot type: '{}'".format(pd.__class__\
@@ -143,7 +146,8 @@ def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel="",
 def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
                   xlabel="", ylabel="",
                   x_tick_points=None, x_tick_labels=None,
-                  ylim_bottom=None, ylim_top=None):
+                  ylim_bottom=None, ylim_top=None,
+                  error_bars=True):
     """Plot multiple subplots on one figure.
     The method can draw from one up to eight subplots on a figure. It
     automatically arranges the subplots into the appropriate number of rows and
@@ -168,6 +172,8 @@ def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
     x_tick_labels -- list of strings representing subplots' x axis tick labels
     ylim_bottom -- float representing y-axis's bottom limit
     ylim_top -- float representing y-axis's top limit
+    error_bars -- boolean indicating whether to plot the error bars when
+        visualizing the results
      
     """
     # figure sizes in inches (width, height)
@@ -203,7 +209,7 @@ def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
         _draw_subplot(axarr[i], plot_descs, title=subplot_title_fmt.format(bl),
                   xlabel=xlabel, ylabel=ylabel, x_tick_points=x_tick_points,
                   x_tick_labels=x_tick_labels, ylim_bottom=ylim_bottom,
-                  ylim_top=ylim_top)
+                  ylim_top=ylim_top, error_bars=error_bars)
     fig.suptitle(title)
     # adjust figure parameters to make it look nicer
     fig.subplots_adjust(top=0.93, bottom=0.10, left=0.10, right=0.95,

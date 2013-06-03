@@ -732,7 +732,7 @@ class MTLTester:
         return avgs, stds, ci95s
     
     def visualize_results(self, base_learners, learners, measures,
-                              results_path, colors):
+                              results_path, colors, error_bars):
         """Visualize the results of the given learning algorithms with the given
         base learning algorithms and the given scoring measures on the MTL
         problem.
@@ -753,6 +753,8 @@ class MTLTester:
             plots
         colors -- dictionary mapping from learners' names to the colors that
             should represent them in the plots
+        error_bars -- boolean indicating whether to plot the error bars when
+            visualizing the results
         
         """
         for m in measures:
@@ -786,7 +788,8 @@ class MTLTester:
                 ylabel=m,
                 x_tick_points=x_points,
                 x_tick_labels=x_labels,
-                ylim_bottom=ylim_bottom, ylim_top=ylim_top)
+                ylim_bottom=ylim_bottom, ylim_top=ylim_top,
+                error_bars=error_bars)
             plot_multiple(plot_desc_ci95,
                 os.path.join(results_path, "{}-avg-CI.pdf".format(m)),
                 title="Avg. results for tasks (error bars show 95% conf. "
@@ -796,7 +799,8 @@ class MTLTester:
                 ylabel=m,
                 x_tick_points=x_points,
                 x_tick_labels=x_labels,
-                ylim_bottom=ylim_bottom, ylim_top=ylim_top)
+                ylim_bottom=ylim_bottom, ylim_top=ylim_top,
+                error_bars=error_bars)
     
     def visualize_dendrograms(self, base_learners, results_path):
         """Visualize the dendrograms showing merging history of the ERM MTL
@@ -1382,7 +1386,8 @@ def test_tasks(tasks_data, results_path, base_learners,
                measures, learners, tester_type, rnd_seed=50,
                test=True, unpickle=False, visualize=True,
                test_prop=0.3, subtasks_split=(3, 5), cv_folds=5,
-               repeats=1, keep=0, weighting="all_equal", error_margin="std"):
+               repeats=1, keep=0, weighting="all_equal", error_margin="std",
+               error_bars=True):
     """Test the given tasks' data corresponding to a MTL problem according to
     the given parameters and save the results where indicated.
     
@@ -1422,6 +1427,8 @@ def test_tasks(tasks_data, results_path, base_learners,
         the overall results
     error_margin -- string indicating which measure to use for error margins
         when computing the overall results
+    error_bars -- boolean indicating whether to plot the error bars when
+        visualizing the results
     
     """
     if not os.path.exists(results_path):
@@ -1468,7 +1475,8 @@ def test_tasks(tasks_data, results_path, base_learners,
         ls = mtlt.get_learners()
         ms = mtlt.get_measures()
         mtlt.visualize_results(bls, ls, ms, results_path,
-            colors={"NoMerging": "blue", "MergeAll": "green", "ERM": "red"})
+            {"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
+            error_bars)
         mtlt.visualize_dendrograms(bls, results_path)
         mtlt.compute_overall_results(bls, ls, ms, results_path,
                 weighting=weighting, error_margin=error_margin)
