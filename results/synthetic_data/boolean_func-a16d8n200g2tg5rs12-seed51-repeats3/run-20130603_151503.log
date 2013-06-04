@@ -1,0 +1,132 @@
+[2013-06-03 15:15:08] PyMTL           DEBUG  : Report about the generated synthetic Boolean MTL problem:
+[2013-06-03 15:15:08] PyMTL           DEBUG  :   Boolean function of each group:
+[2013-06-03 15:15:08] PyMTL           DEBUG  :    - Group 0: (x₆ ∧ ¬ x₁ ∧ ¬ x₂) ∨ (x₁ ∧ x₁₄ ∧ ¬ x₄ ∧ ¬ x₇) ∨ (x₁₄ ∧ x₆ ∧ x₉ ∧ ¬ x₁₀) ∨ (x₃ ∧ x₄ ∧ 
+¬ x₆ ∧ ¬ x₉) ∨ (x₁ ∧ x₁₁ ∧ x₁₃ ∧ x₅ ∧ ¬ x₁₂) ∨ (x₁₂ ∧ x₁₄ ∧ x₄ ∧ x₅ ∧ x₇) ∨ (x₁₃ ∧ ¬ 
+x₁₀ ∧ ¬ x₁₄ ∧ ¬ x₂ ∧ ¬ x₉) ∨ (x₃ ∧ x₄ ∧ ¬ x₁₄ ∧ ¬ x₆ ∧ ¬ x₉) ∨ (x₁ ∧ x₁₅ ∧ x₆ ∧ x₇ ∧ 
+¬ x₅ ∧ ¬ x₈) ∨ (x₁₀ ∧ x₃ ∧ x₄ ∧ x₅ ∧ x₆ ∧ ¬ x₁₅) ∨ (x₁₁ ∧ x₁₆ ∧ x₂ ∧ x₈ ∧ ¬ x₁₀ ∧ ¬ x
+₇) ∨ (¬ x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬ x₁₆ ∧ ¬ x₂ ∧ ¬ x₄) ∨ (x₁ ∧ x₁₀ ∧ x₁₄ ∧ x₃ ∧ x₈ ∧ ¬ x₄
+ ∧ ¬ x₉) ∨ (x₁ ∧ x₁₂ ∧ x₁₃ ∧ x₁₅ ∧ x₉ ∧ ¬ x₁₆ ∧ ¬ x₂) ∨ (x₁ ∧ x₁₆ ∧ x₃ ∧ x₇ ∧ x₈ ∧ ¬ 
+x₁₁ ∧ ¬ x₆) ∨ (x₁ ∧ x₂ ∧ x₃ ∧ ¬ x₁₅ ∧ ¬ x₅ ∧ ¬ x₆ ∧ ¬ x₉) ∨ (x₁₀ ∧ x₃ ∧ ¬ x₁ ∧ ¬ x₁₆ 
+∧ ¬ x₂ ∧ ¬ x₇ ∧ ¬ x₈) ∨ (x₁₁ ∧ x₁₂ ∧ x₃ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₁₃ ∧ ¬ x₅) ∨ (x₁₁ ∧ x₁₂ ∧ x₅
+ ∧ x₆ ∧ ¬ x₁₃ ∧ ¬ x₂ ∧ ¬ x₇) ∨ (x₁₂ ∧ x₁₃ ∧ x₄ ∧ x₉ ∧ ¬ x₁₀ ∧ ¬ x₁₅ ∧ ¬ x₈) ∨ (x₁₃ ∧ 
+x₆ ∧ ¬ x₁₂ ∧ ¬ x₃ ∧ ¬ x₇ ∧ ¬ x₈ ∧ ¬ x₉) ∨ (x₁₄ ∧ x₂ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₁₂ ∧ ¬ x₁₆ ∧ ¬ x
+₈) ∨ (x₁₆ ∧ x₂ ∧ x₇ ∧ x₈ ∧ ¬ x₁ ∧ ¬ x₁₄ ∧ ¬ x₉) ∨ (x₁₆ ∧ x₃ ∧ ¬ x₁₂ ∧ ¬ x₁₄ ∧ ¬ x₇ ∧ 
+¬ x₈ ∧ ¬ x₉) ∨ (x₂ ∧ x₃ ∧ x₄ ∧ ¬ x₁₂ ∧ ¬ x₁₆ ∧ ¬ x₆ ∧ ¬ x₇) ∨ (x₂ ∧ ¬ x₁₁ ∧ ¬ x₃ ∧ ¬ 
+x₄ ∧ ¬ x₆ ∧ ¬ x₈ ∧ ¬ x₉) ∨ (x₃ ∧ x₆ ∧ ¬ x₁ ∧ ¬ x₁₁ ∧ ¬ x₁₃ ∧ ¬ x₁₅ ∧ ¬ x₁₆) ∨ (¬ x₁ ∧
+ ¬ x₁₂ ∧ ¬ x₁₅ ∧ ¬ x₂ ∧ ¬ x₆ ∧ ¬ x₇ ∧ ¬ x₈) ∨ (x₁ ∧ x₁₀ ∧ x₁₆ ∧ x₄ ∧ x₉ ∧ ¬ x₁₁ ∧ ¬ x
+₁₂ ∧ ¬ x₃) ∨ (x₁ ∧ x₁₆ ∧ x₃ ∧ x₅ ∧ x₈ ∧ ¬ x₁₃ ∧ ¬ x₂ ∧ ¬ x₉) ∨ (x₁ ∧ x₆ ∧ x₇ ∧ x₉ ∧ ¬
+ x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₃ ∧ ¬ x₅) ∨ (x₁₀ ∧ x₁₄ ∧ x₁₆ ∧ x₂ ∧ x₄ ∧ x₈ ∧ ¬ x₁₂ ∧ ¬ x₃) ∨ (x₁₀ 
+∧ x₁₄ ∧ x₂ ∧ x₃ ∧ x₇ ∧ ¬ x₁₁ ∧ ¬ x₄ ∧ ¬ x₈) ∨ (x₁₀ ∧ x₁₅ ∧ x₇ ∧ x₉ ∧ ¬ x₁₆ ∧ ¬ x₃ ∧ ¬
+ x₄ ∧ ¬ x₈) ∨ (x₁₀ ∧ x₃ ∧ x₆ ∧ x₉ ∧ ¬ x₁₄ ∧ ¬ x₁₅ ∧ ¬ x₄ ∧ ¬ x₅) ∨ (x₁₁ ∧ x₁₂ ∧ x₁₅ ∧
+ x₁₆ ∧ x₄ ∧ x₈ ∧ ¬ x₁₀ ∧ ¬ x₉) ∨ (x₁₅ ∧ x₃ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₁₃ ∧ ¬ x₄ ∧ ¬ x₅)
+ ∨ (x₁₆ ∧ x₃ ∧ x₅ ∧ x₆ ∧ x₉ ∧ ¬ x₁₁ ∧ ¬ x₁₃ ∧ ¬ x₄) ∨ (x₄ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₁₁ ∧ ¬ x₁₂
+ ∧ ¬ x₃ ∧ ¬ x₅ ∧ ¬ x₇) ∨ (x₁ ∧ x₁₀ ∧ x₁₁ ∧ x₆ ∧ x₈ ∧ ¬ x₁₂ ∧ ¬ x₁₅ ∧ ¬ x₂ ∧ ¬ x₃) ∨ (
+x₁ ∧ x₁₄ ∧ x₁₅ ∧ x₁₆ ∧ ¬ x₂ ∧ ¬ x₄ ∧ ¬ x₅ ∧ ¬ x₆ ∧ ¬ x₈) ∨ (x₁ ∧ x₆ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧
+ ¬ x₁₆ ∧ ¬ x₃ ∧ ¬ x₄ ∧ ¬ x₅ ∧ ¬ x₉) ∨ (x₁₀ ∧ x₁₁ ∧ x₁₃ ∧ x₃ ∧ x₅ ∧ x₈ ∧ x₉ ∧ ¬ x₁₂ ∧ 
+¬ x₁₆) ∨ (x₁₀ ∧ x₁₄ ∧ x₃ ∧ ¬ x₁ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬ x₁₆ ∧ ¬ x₂) ∨ (x₁₀ ∧ x₃ ∧
+ x₄ ∧ ¬ x₁ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₁₆ ∧ ¬ x₇ ∧ ¬ x₈) ∨ (x₁₁ ∧ x₁₆ ∧ x₇ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ 
+¬ x₁₃ ∧ ¬ x₁₄ ∧ ¬ x₅ ∧ ¬ x₆) ∨ (x₁₃ ∧ x₁₄ ∧ x₁₅ ∧ x₂ ∧ x₉ ∧ ¬ x₁₀ ∧ ¬ x₁₆ ∧ ¬ x₃ ∧ ¬ 
+x₆) ∨ (x₁₃ ∧ x₂ ∧ x₃ ∧ x₅ ∧ x₆ ∧ x₈ ∧ ¬ x₁₀ ∧ ¬ x₄ ∧ ¬ x₇) ∨ (x₁₃ ∧ x₇ ∧ x₉ ∧ ¬ x₁₀ ∧
+ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₁₄ ∧ ¬ x₂ ∧ ¬ x₆) ∨ (x₁ ∧ x₁₁ ∧ x₃ ∧ x₅ ∧ x₇ ∧ x₈ ∧ ¬ x₁₀ ∧ ¬ x₁₅
+ ∧ ¬ x₁₆ ∧ ¬ x₂) ∨ (x₁ ∧ x₁₂ ∧ x₁₃ ∧ x₁₆ ∧ x₆ ∧ x₉ ∧ ¬ x₁₀ ∧ ¬ x₁₁ ∧ ¬ x₁₅ ∧ ¬ x₅) ∨ 
+(x₁ ∧ x₁₂ ∧ x₂ ∧ x₄ ∧ ¬ x₁₁ ∧ ¬ x₁₄ ∧ ¬ x₁₆ ∧ ¬ x₅ ∧ ¬ x₆ ∧ ¬ x₉) ∨ (x₁ ∧ x₁₃ ∧ x₃ ∧ 
+x₉ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₁₆ ∧ ¬ x₂ ∧ ¬ x₅ ∧ ¬ x₈) ∨ (x₁₀ ∧ x₁₁ ∧ x₁₃ ∧ x₁₄ ∧ x₃ ∧ x₅ ∧
+ x₇ ∧ ¬ x₁₂ ∧ ¬ x₂ ∧ ¬ x₆) ∨ (x₁₃ ∧ x₂ ∧ x₃ ∧ ¬ x₁₀ ∧ ¬ x₁₄ ∧ ¬ x₁₆ ∧ ¬ x₄ ∧ ¬ x₆ ∧ ¬
+ x₇ ∧ ¬ x₈) ∨ (x₁₄ ∧ x₁₅ ∧ x₄ ∧ x₅ ∧ x₉ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬ x₆ ∧ ¬ x₇) ∨ (x₁₅
+ ∧ x₇ ∧ x₈ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₁₁ ∧ ¬ x₂ ∧ ¬ x₄ ∧ ¬ x₆) ∨ (x₁ ∧ x₁₁ ∧ x₁₂ ∧ x₁₄ 
+∧ x₄ ∧ x₅ ∧ x₆ ∧ x₇ ∧ ¬ x₁₃ ∧ ¬ x₃ ∧ ¬ x₉) ∨ (x₁ ∧ x₁₃ ∧ x₁₄ ∧ x₁₅ ∧ x₉ ∧ ¬ x₁₁ ∧ ¬ x
+₃ ∧ ¬ x₄ ∧ ¬ x₆ ∧ ¬ x₇ ∧ ¬ x₈) ∨ (x₁ ∧ x₁₃ ∧ x₉ ∧ ¬ x₁₄ ∧ ¬ x₁₅ ∧ ¬ x₁₆ ∧ ¬ x₂ ∧ ¬ x₅
+ ∧ ¬ x₆ ∧ ¬ x₇ ∧ ¬ x₈) ∨ (x₁₀ ∧ x₁₁ ∧ x₁₂ ∧ x₅ ∧ ¬ x₁ ∧ ¬ x₁₅ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₇ ∧ 
+¬ x₈ ∧ ¬ x₉) ∨ (x₇ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₁₄ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₄ ∧ ¬ x₆ ∧ ¬ x₈ 
+∧ ¬ x₉) ∨ (x₁₀ ∧ x₁₁ ∧ x₁₂ ∧ x₁₄ ∧ ¬ x₁₃ ∧ ¬ x₁₅ ∧ ¬ x₁₆ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₄ ∧ ¬ x₅ 
+∧ ¬ x₇ ∧ ¬ x₈) ∨ (x₁₄ ∧ x₃ ∧ ¬ x₁ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬ x₁₅ ∧ ¬ x₁₆ ∧ ¬ x₂ ∧ ¬ 
+x₄ ∧ ¬ x₅ ∧ ¬ x₇ ∧ ¬ x₈)
+[2013-06-03 15:15:08] PyMTL           DEBUG  :    - Group 1: (x₁ ∧ ¬ x₁₆ ∧ ¬ x₂) ∨ (x₁ ∧ x₇ ∧ ¬ x₁₅ ∧ ¬ x₅) ∨ (x₁₀ ∧ x₁₄ ∧ x₁₅ ∧ ¬ x₄) ∨ (x₁₁ ∧ x₁
+₆ ∧ x₅ ∧ ¬ x₉) ∨ (x₂ ∧ x₃ ∧ x₅ ∧ ¬ x₈) ∨ (x₁₁ ∧ x₁₃ ∧ x₁₆ ∧ x₃ ∧ ¬ x₁₄) ∨ (x₁₄ ∧ x₄ ∧
+ ¬ x₁₅ ∧ ¬ x₆ ∧ ¬ x₇) ∨ (x₁ ∧ x₁₁ ∧ x₁₃ ∧ x₁₅ ∧ ¬ x₁₄ ∧ ¬ x₁₆) ∨ (x₁ ∧ x₁₁ ∧ x₁₃ ∧ x₁
+₅ ∧ ¬ x₃ ∧ ¬ x₆) ∨ (x₁ ∧ x₁₂ ∧ x₁₃ ∧ x₁₆ ∧ x₃ ∧ x₈) ∨ (x₁ ∧ x₁₂ ∧ x₂ ∧ x₇ ∧ ¬ x₁₃ ∧ ¬
+ x₉) ∨ (x₁ ∧ x₁₆ ∧ x₅ ∧ ¬ x₁₀ ∧ ¬ x₁₃ ∧ ¬ x₃) ∨ (x₁₀ ∧ x₁₃ ∧ x₇ ∧ x₉ ∧ ¬ x₁₄ ∧ ¬ x₆) 
+∨ (x₁₀ ∧ x₁₄ ∧ x₂ ∧ x₄ ∧ x₆ ∧ x₈) ∨ (x₁₀ ∧ ¬ x₁₄ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₄ ∧ ¬ x₅) ∨ (x₁₂ 
+∧ x₁₄ ∧ x₁₅ ∧ x₁₆ ∧ x₆ ∧ ¬ x₁₃) ∨ (x₁ ∧ x₁₂ ∧ x₇ ∧ ¬ x₁₁ ∧ ¬ x₁₅ ∧ ¬ x₄ ∧ ¬ x₅) ∨ (x₁
+ ∧ x₁₃ ∧ x₁₄ ∧ x₅ ∧ ¬ x₃ ∧ ¬ x₇ ∧ ¬ x₈) ∨ (x₁₀ ∧ x₁₃ ∧ x₃ ∧ ¬ x₁₅ ∧ ¬ x₂ ∧ ¬ x₅ ∧ ¬ x
+₉) ∨ (x₁₁ ∧ x₁₃ ∧ x₁₅ ∧ x₃ ∧ x₈ ∧ ¬ x₁₂ ∧ ¬ x₂) ∨ (x₁₁ ∧ x₁₃ ∧ x₁₅ ∧ x₅ ∧ ¬ x₁₂ ∧ ¬ x
+₁₄ ∧ ¬ x₁₆) ∨ (x₁₁ ∧ x₄ ∧ x₅ ∧ ¬ x₁ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬ x₇) ∨ (x₁₂ ∧ x₁₄ ∧ x₆ ∧ x₈ ∧ 
+¬ x₁ ∧ ¬ x₁₁ ∧ ¬ x₁₃) ∨ (x₁₂ ∧ x₁₆ ∧ x₂ ∧ x₆ ∧ x₈ ∧ ¬ x₁₁ ∧ ¬ x₁₅) ∨ (x₁₂ ∧ x₁₆ ∧ x₅ 
+∧ x₇ ∧ x₈ ∧ ¬ x₁₀ ∧ ¬ x₆) ∨ (x₁₃ ∧ x₁₅ ∧ ¬ x₁₁ ∧ ¬ x₁₄ ∧ ¬ x₁₆ ∧ ¬ x₃ ∧ ¬ x₅) ∨ (x₁₃ 
+∧ x₁₆ ∧ x₄ ∧ x₇ ∧ x₈ ∧ ¬ x₅ ∧ ¬ x₉) ∨ (x₁₃ ∧ x₂ ∧ x₆ ∧ x₇ ∧ ¬ x₁₄ ∧ ¬ x₁₆ ∧ ¬ x₅) ∨ (
+x₁₅ ∧ x₁₆ ∧ x₄ ∧ x₈ ∧ ¬ x₁₁ ∧ ¬ x₂ ∧ ¬ x₉) ∨ (x₁₅ ∧ x₅ ∧ ¬ x₁₂ ∧ ¬ x₃ ∧ ¬ x₆ ∧ ¬ x₇ ∧
+ ¬ x₉) ∨ (x₃ ∧ ¬ x₁₂ ∧ ¬ x₁₆ ∧ ¬ x₄ ∧ ¬ x₅ ∧ ¬ x₆ ∧ ¬ x₉) ∨ (x₁ ∧ x₁₁ ∧ x₁₂ ∧ x₁₆ ∧ x
+₃ ∧ x₄ ∧ x₇ ∧ ¬ x₁₅) ∨ (x₁ ∧ x₁₁ ∧ x₁₅ ∧ x₆ ∧ x₇ ∧ x₈ ∧ ¬ x₁₂ ∧ ¬ x₄) ∨ (x₁₀ ∧ x₁₄ ∧ 
+x₇ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬ x₁₅ ∧ ¬ x₃ ∧ ¬ x₅) ∨ (x₁₁ ∧ x₁₄ ∧ x₁₅ ∧ x₁₆ ∧ x₃ ∧ x₆ ∧ ¬ x₂ ∧
+ ¬ x₄) ∨ (x₁₂ ∧ x₁₄ ∧ x₄ ∧ x₇ ∧ x₈ ∧ ¬ x₁ ∧ ¬ x₃ ∧ ¬ x₆) ∨ (x₁₂ ∧ x₁₅ ∧ x₁₆ ∧ x₅ ∧ x₉
+ ∧ ¬ x₁₁ ∧ ¬ x₁₄ ∧ ¬ x₄) ∨ (x₁₅ ∧ x₂ ∧ x₇ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₆) ∨ (x
+₄ ∧ x₅ ∧ x₈ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬ x₂) ∨ (x₁ ∧ x₁₀ ∧ x₁₂ ∧ x₄ ∧ x₆ ∧ x₇ ∧ ¬ 
+x₁₃ ∧ ¬ x₁₄ ∧ ¬ x₂) ∨ (x₁ ∧ x₁₅ ∧ x₁₆ ∧ x₃ ∧ x₄ ∧ x₆ ∧ x₇ ∧ x₉ ∧ ¬ x₈) ∨ (x₁₀ ∧ x₃ ∧ 
+x₉ ∧ ¬ x₁ ∧ ¬ x₁₁ ∧ ¬ x₁₅ ∧ ¬ x₁₆ ∧ ¬ x₂ ∧ ¬ x₇) ∨ (x₁₁ ∧ x₁₂ ∧ x₁₅ ∧ x₁₆ ∧ ¬ x₁ ∧ ¬ 
+x₁₃ ∧ ¬ x₇ ∧ ¬ x₈ ∧ ¬ x₉) ∨ (x₁₁ ∧ x₁₄ ∧ x₁₆ ∧ x₂ ∧ x₆ ∧ ¬ x₁ ∧ ¬ x₁₃ ∧ ¬ x₃ ∧ ¬ x₄) 
+∨ (x₁₁ ∧ x₃ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₁₃ ∧ ¬ x₁₆ ∧ ¬ x₂ ∧ ¬ x₈) ∨ (x₁₂ ∧ x₁₃ ∧ x₄ ∧ x₅
+ ∧ ¬ x₁₅ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₆ ∧ ¬ x₈) ∨ (x₁₂ ∧ x₂ ∧ x₃ ∧ x₄ ∧ ¬ x₁ ∧ ¬ x₁₃ ∧ ¬ x₁₆ ∧ 
+¬ x₈ ∧ ¬ x₉) ∨ (x₁₃ ∧ x₁₄ ∧ x₁₅ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₂ ∧ ¬ x₆ ∧ ¬ x₇) ∨ (x₁₄ ∧
+ x₃ ∧ x₇ ∧ ¬ x₁₀ ∧ ¬ x₁₃ ∧ ¬ x₁₆ ∧ ¬ x₂ ∧ ¬ x₅ ∧ ¬ x₆) ∨ (x₁₄ ∧ x₃ ∧ x₈ ∧ x₉ ∧ ¬ x₁₁ 
+∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬ x₁₅ ∧ ¬ x₁₆) ∨ (x₁₅ ∧ x₃ ∧ ¬ x₁ ∧ ¬ x₁₁ ∧ ¬ x₁₃ ∧ ¬ x₁₄ ∧ ¬ x₁₆ ∧
+ ¬ x₇ ∧ ¬ x₉) ∨ (x₁₅ ∧ x₆ ∧ x₇ ∧ x₈ ∧ ¬ x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬ x₂ ∧ ¬ x₅) ∨ (x₇ ∧ ¬ 
+x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬ x₁₅ ∧ ¬ x₁₆ ∧ ¬ x₄ ∧ ¬ x₅ ∧ ¬ x₈) ∨ (x₁ ∧ x₁₀ ∧ x₁₂ ∧ x₁₃ ∧ x
+₂ ∧ x₇ ∧ x₈ ∧ ¬ x₁₄ ∧ ¬ x₁₆ ∧ ¬ x₅) ∨ (x₁ ∧ x₁₄ ∧ x₈ ∧ x₉ ∧ ¬ x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬
+ x₁₅ ∧ ¬ x₁₆ ∧ ¬ x₇) ∨ (x₁ ∧ x₁₅ ∧ x₃ ∧ x₄ ∧ x₅ ∧ x₇ ∧ x₈ ∧ ¬ x₁₀ ∧ ¬ x₁₁ ∧ ¬ x₉) ∨ (
+x₁₀ ∧ x₁₁ ∧ x₁₂ ∧ x₁₆ ∧ x₂ ∧ x₇ ∧ ¬ x₁ ∧ ¬ x₁₄ ∧ ¬ x₄ ∧ ¬ x₆) ∨ (x₁₀ ∧ x₁₆ ∧ x₄ ∧ x₇ 
+∧ x₈ ∧ ¬ x₁₁ ∧ ¬ x₁₃ ∧ ¬ x₁₅ ∧ ¬ x₂ ∧ ¬ x₅) ∨ (x₁ ∧ x₁₀ ∧ x₁₁ ∧ x₁₂ ∧ x₁₃ ∧ x₇ ∧ x₈ ∧
+ ¬ x₁₄ ∧ ¬ x₁₅ ∧ ¬ x₂ ∧ ¬ x₉) ∨ (x₁ ∧ x₁₀ ∧ x₁₁ ∧ x₃ ∧ x₄ ∧ x₅ ∧ x₉ ∧ ¬ x₁₂ ∧ ¬ x₁₄ ∧
+ ¬ x₁₅ ∧ ¬ x₈) ∨ (x₁ ∧ x₁₁ ∧ x₁₃ ∧ x₃ ∧ x₄ ∧ x₇ ∧ x₈ ∧ x₉ ∧ ¬ x₁₅ ∧ ¬ x₂ ∧ ¬ x₅) ∨ (x
+₁₁ ∧ x₁₅ ∧ x₁₆ ∧ x₃ ∧ x₄ ∧ x₅ ∧ x₉ ∧ ¬ x₁₄ ∧ ¬ x₂ ∧ ¬ x₆ ∧ ¬ x₇) ∨ (x₁₁ ∧ x₄ ∧ ¬ x₁ ∧
+ ¬ x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬ x₁₅ ∧ ¬ x₂ ∧ ¬ x₆ ∧ ¬ x₇ ∧ ¬ x₉) ∨ (x₁ ∧ x₁₀ ∧ x₁₁ ∧ x₁₄ ∧
+ x₁₅ ∧ x₈ ∧ ¬ x₁₂ ∧ ¬ x₁₃ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₄ ∧ ¬ x₅ ∧ ¬ x₆)
+[2013-06-03 15:15:08] PyMTL           DEBUG  :   % of True values in y for each task:
+[2013-06-03 15:15:08] PyMTL           DEBUG  :    - Group 0, task 0: 0.515
+[2013-06-03 15:15:08] PyMTL           DEBUG  :    - Group 0, task 1: 0.495
+[2013-06-03 15:15:08] PyMTL           DEBUG  :    - Group 0, task 2: 0.49
+[2013-06-03 15:15:08] PyMTL           DEBUG  :    - Group 0, task 3: 0.44
+[2013-06-03 15:15:08] PyMTL           DEBUG  :    - Group 0, task 4: 0.47
+[2013-06-03 15:15:08] PyMTL           DEBUG  :    - Group 1, task 0: 0.49
+[2013-06-03 15:15:08] PyMTL           DEBUG  :    - Group 1, task 1: 0.58
+[2013-06-03 15:15:08] PyMTL           DEBUG  :    - Group 1, task 2: 0.53
+[2013-06-03 15:15:08] PyMTL           DEBUG  :    - Group 1, task 3: 0.56
+[2013-06-03 15:15:08] PyMTL           DEBUG  :    - Group 1, task 4: 0.53
+[2013-06-03 15:15:08] PyMTL           DEBUG  :   Average % of True values in y (across all tasks): 0.51
+[2013-06-03 15:15:08] PyMTL           DEBUG  : Finished repetition: 0, base learner: tree, learner: NoMerging in 0.02s
+[2013-06-03 15:15:08] PyMTL           DEBUG  : Merged data has 16 attributes and 1000 examples.
+[2013-06-03 15:15:08] PyMTL           DEBUG  : Finished repetition: 0, base learner: tree, learner: MergeAll in 0.02s
+[2013-06-03 15:15:08] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-06-03 15:15:09] PyMTL           DEBUG  : Processing 16 candidate pairs for merging
+[2013-06-03 15:15:11] PyMTL           DEBUG  : Finished repetition: 0, base learner: tree, learner: ERM in 2.98s
+[2013-06-03 15:15:11] PyMTL           DEBUG  : Finished repetition: 0, base learner: svm_poly, learner: NoMerging in 0.05s
+[2013-06-03 15:15:11] PyMTL           DEBUG  : Merged data has 16 attributes and 1000 examples.
+[2013-06-03 15:15:11] PyMTL           DEBUG  : Finished repetition: 0, base learner: svm_poly, learner: MergeAll in 0.24s
+[2013-06-03 15:15:11] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-06-03 15:15:17] PyMTL           DEBUG  : Processing 19 candidate pairs for merging
+[2013-06-03 15:15:31] PyMTL           DEBUG  : Finished repetition: 0, base learner: svm_poly, learner: ERM in 19.60s
+[2013-06-03 15:15:31] PyMTL           DEBUG  : Finished repetition: 1, base learner: tree, learner: NoMerging in 0.02s
+[2013-06-03 15:15:31] PyMTL           DEBUG  : Merged data has 16 attributes and 1000 examples.
+[2013-06-03 15:15:31] PyMTL           DEBUG  : Finished repetition: 1, base learner: tree, learner: MergeAll in 0.02s
+[2013-06-03 15:15:31] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-06-03 15:15:32] PyMTL           DEBUG  : Processing 18 candidate pairs for merging
+[2013-06-03 15:15:35] PyMTL           DEBUG  : Finished repetition: 1, base learner: tree, learner: ERM in 3.55s
+[2013-06-03 15:15:35] PyMTL           DEBUG  : Finished repetition: 1, base learner: svm_poly, learner: NoMerging in 0.06s
+[2013-06-03 15:15:35] PyMTL           DEBUG  : Merged data has 16 attributes and 1000 examples.
+[2013-06-03 15:15:35] PyMTL           DEBUG  : Finished repetition: 1, base learner: svm_poly, learner: MergeAll in 0.23s
+[2013-06-03 15:15:35] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-06-03 15:15:41] PyMTL           DEBUG  : Processing 19 candidate pairs for merging
+[2013-06-03 15:16:00] PyMTL           DEBUG  : Finished repetition: 1, base learner: svm_poly, learner: ERM in 24.53s
+[2013-06-03 15:16:00] PyMTL           DEBUG  : Finished repetition: 2, base learner: tree, learner: NoMerging in 0.02s
+[2013-06-03 15:16:00] PyMTL           DEBUG  : Merged data has 16 attributes and 1000 examples.
+[2013-06-03 15:16:00] PyMTL           DEBUG  : Finished repetition: 2, base learner: tree, learner: MergeAll in 0.02s
+[2013-06-03 15:16:00] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-06-03 15:16:01] PyMTL           DEBUG  : Processing 14 candidate pairs for merging
+[2013-06-03 15:16:03] PyMTL           DEBUG  : Finished repetition: 2, base learner: tree, learner: ERM in 2.95s
+[2013-06-03 15:16:03] PyMTL           DEBUG  : Finished repetition: 2, base learner: svm_poly, learner: NoMerging in 0.06s
+[2013-06-03 15:16:03] PyMTL           DEBUG  : Merged data has 16 attributes and 1000 examples.
+[2013-06-03 15:16:03] PyMTL           DEBUG  : Finished repetition: 2, base learner: svm_poly, learner: MergeAll in 0.24s
+[2013-06-03 15:16:03] PyMTL           DEBUG  : Computing candidate pairs for merging (45 pairs)
+[2013-06-03 15:16:08] PyMTL           DEBUG  : Processing 11 candidate pairs for merging
+[2013-06-03 15:16:24] PyMTL           DEBUG  : Finished repetition: 2, base learner: svm_poly, learner: ERM in 20.66s
+[2013-06-03 15:16:24] PyMTL           DEBUG  : Successfully pickled the results of base learner: tree to file: /home/tadej/Workspace/PyMTL/results/synthetic_data/boolean_func-a16d8n200g2tg5rs12-seed51-repeats3/bl-tree.pkl
+[2013-06-03 15:16:24] PyMTL           DEBUG  : Successfully pickled the results of base learner: svm_poly to file: /home/tadej/Workspace/PyMTL/results/synthetic_data/boolean_func-a16d8n200g2tg5rs12-seed51-repeats3/bl-svm_poly.pkl
