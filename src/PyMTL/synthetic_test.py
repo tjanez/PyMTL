@@ -56,8 +56,14 @@ if __name__ == "__main__":
                                           error_func=None)
     
     # boolean indicating which testing configuration to use:
-    # 1 -- Boolean function (toy problem)
-    test_config = 1
+    # 1 -- Boolean problem (toy problem with a = 8 and d = 4)
+    # 2 -- Boolean problem (2 groups, 5 tasks per group)
+    # 3 -- Boolean problem (2 groups, 10 tasks per group)
+    # 4 -- Boolean problem (5 groups, 5 tasks per group)
+    # 5 -- Boolean problem (5 groups, 5 tasks per group; comparison of different
+    #                       polynomial SVMs)
+    # 6 -- Boolean problem (10 groups, 10 tasks per group)
+    test_config = 6
     
     # boolean indicating whether to perform the tests on the MTL problem
     test = True
@@ -97,3 +103,167 @@ if __name__ == "__main__":
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
                    test_prop=test_prop, repeats=repeats, cfg_logger=False)
+    
+    if test_config == 2:
+        # parameters of the synthetic Boolean MTL problem
+        attributes = 16
+        disjunct_degree = 8
+        n = 200
+        task_groups = 2
+        tasks_per_group = 5
+        noise = 0.0
+        data_rnd_seed = 12
+        # parameters of the MTL problem tester
+        rnd_seed = 51
+        repeats = 3
+        test_prop=0.5
+        results_path = os.path.join(path_prefix, "results/synthetic_data/"
+                        "boolean_func-a{}d{}n{}g{}tg{}rs{}-seed{}-repeats{}".\
+                        format(attributes, disjunct_degree, n, task_groups,
+                            tasks_per_group, data_rnd_seed, rnd_seed, repeats))
+        if not os.path.exists(results_path):
+            os.makedirs(results_path)
+        log_file = os.path.join(results_path,
+                            "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
+        configure_logger(logger, console_level=logging.INFO, file_name=log_file)
+        tasks_data = synthetic_data.generate_boolean_data(attributes,
+                        disjunct_degree, n, task_groups, tasks_per_group, noise,
+                        random_seed=data_rnd_seed)
+        test_tasks(tasks_data, results_path, base_learners_bool,
+                   measures_clas, learners, "train_test_split",
+                   rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=test_prop, repeats=repeats, cfg_logger=False)
+
+    if test_config == 3:
+        # parameters of the synthetic Boolean MTL problem
+        attributes = 16
+        disjunct_degree = 8
+        n = 200
+        task_groups = 2
+        tasks_per_group = 10
+        noise = 0.0
+        data_rnd_seed = 12
+        # parameters of the MTL problem tester
+        rnd_seed = 51
+        repeats = 3
+        test_prop=0.5
+        results_path = os.path.join(path_prefix, "results/synthetic_data/"
+                        "boolean_func-a{}d{}n{}g{}tg{}rs{}-seed{}-repeats{}".\
+                        format(attributes, disjunct_degree, n, task_groups,
+                            tasks_per_group, data_rnd_seed, rnd_seed, repeats))
+        if not os.path.exists(results_path):
+            os.makedirs(results_path)
+        log_file = os.path.join(results_path,
+                            "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
+        configure_logger(logger, console_level=logging.INFO, file_name=log_file)
+        tasks_data = synthetic_data.generate_boolean_data(attributes,
+                        disjunct_degree, n, task_groups, tasks_per_group, noise,
+                        random_seed=data_rnd_seed)
+        test_tasks(tasks_data, results_path, base_learners_bool,
+                   measures_clas, learners, "train_test_split",
+                   rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=test_prop, repeats=repeats, cfg_logger=False)
+    
+    if test_config == 4:
+        # parameters of the synthetic Boolean MTL problem
+        attributes = 16
+        disjunct_degree = 8
+        n = 200
+        task_groups = 5
+        tasks_per_group = 5
+        noise = 0.0
+        data_rnd_seed = 12
+        # parameters of the MTL problem tester
+        rnd_seed = 51
+        repeats = 3
+        test_prop=0.5
+        results_path = os.path.join(path_prefix, "results/synthetic_data/"
+                        "boolean_func-a{}d{}n{}g{}tg{}rs{}-seed{}-repeats{}".\
+                        format(attributes, disjunct_degree, n, task_groups,
+                            tasks_per_group, data_rnd_seed, rnd_seed, repeats))
+        if not os.path.exists(results_path):
+            os.makedirs(results_path)
+        log_file = os.path.join(results_path,
+                            "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
+        configure_logger(logger, console_level=logging.INFO, file_name=log_file)
+        tasks_data = synthetic_data.generate_boolean_data(attributes,
+                        disjunct_degree, n, task_groups, tasks_per_group, noise,
+                        random_seed=data_rnd_seed)
+        test_tasks(tasks_data, results_path, base_learners_bool,
+                   measures_clas, learners, "train_test_split",
+                   rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=test_prop, repeats=repeats, cfg_logger=False)
+    
+    if test_config == 5:
+        # parameters of the synthetic Boolean MTL problem
+        attributes = 16
+        disjunct_degree = 8
+        n = 200
+        task_groups = 5
+        tasks_per_group = 5
+        noise = 0.0
+        data_rnd_seed = 12
+        # parameters of the MTL problem tester
+        rnd_seed = 51
+        repeats = 3
+        test_prop=0.5
+        # different polynomial SVMs
+        # base learners for Boolean functions
+        base_learners_poly = OrderedDict()
+        from sklearn.svm import SVC
+        for d in [3, 5, 10]:
+            base_learners_poly["svm_poly_deg{}".format(d)] = SVC(kernel="poly",
+                                coef0=1, degree=d, probability=True)
+        results_path = os.path.join(path_prefix, "results/synthetic_data/"
+                        "boolean_func-a{}d{}n{}g{}tg{}rs{}-seed{}-repeats{}"
+                        "-svm_poly_comp".\
+                        format(attributes, disjunct_degree, n, task_groups,
+                            tasks_per_group, data_rnd_seed, rnd_seed, repeats))
+        if not os.path.exists(results_path):
+            os.makedirs(results_path)
+        log_file = os.path.join(results_path,
+                            "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
+        configure_logger(logger, console_level=logging.INFO, file_name=log_file)
+        tasks_data = synthetic_data.generate_boolean_data(attributes,
+                        disjunct_degree, n, task_groups, tasks_per_group, noise,
+                        random_seed=data_rnd_seed)
+        test_tasks(tasks_data, results_path, base_learners_poly,
+                   measures_clas, learners, "train_test_split",
+                   rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=test_prop, repeats=repeats, cfg_logger=False)
+
+    if test_config == 6:
+        # parameters of the synthetic Boolean MTL problem
+        attributes = 16
+        disjunct_degree = 8
+        n = 200
+        task_groups = 10
+        tasks_per_group = 10
+        noise = 0.0
+        data_rnd_seed = 12
+        # parameters of the MTL problem tester
+        rnd_seed = 52
+        repeats = 3
+        test_prop=0.5
+        results_path = os.path.join(path_prefix, "results/synthetic_data/"
+                        "boolean_func-a{}d{}n{}g{}tg{}rs{}-seed{}-repeats{}".\
+                        format(attributes, disjunct_degree, n, task_groups,
+                            tasks_per_group, data_rnd_seed, rnd_seed, repeats))
+        if not os.path.exists(results_path):
+            os.makedirs(results_path)
+        log_file = os.path.join(results_path,
+                            "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
+        configure_logger(logger, console_level=logging.INFO, file_name=log_file)
+        tasks_data = synthetic_data.generate_boolean_data(attributes,
+                        disjunct_degree, n, task_groups, tasks_per_group, noise,
+                        random_seed=data_rnd_seed)
+        test_tasks(tasks_data, results_path, base_learners_bool,
+                   measures_clas, learners, "train_test_split",
+                   rnd_seed=rnd_seed,
+                   test=test, unpickle=unpickle, visualize=visualize,
+                   test_prop=test_prop, repeats=repeats, cfg_logger=False)
+    
