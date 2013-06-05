@@ -152,6 +152,7 @@ def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
     for i in range(g):
         attr, func = generate_boolean_function(a, d,
                                                random_seed=rnd.randint(1, 100))
+        attr_names = [str(a) for a in attr]
         funcs.append(func)
         for j in range(tg):
             X, y = generate_examples(attr, func, n,
@@ -161,6 +162,7 @@ def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
             id = "Group {}, task {}".format(i, j)
             tasks.append(Bunch(data=X,
                                target=y,
+                               feature_names=attr_names,
                                DESCR=descr,
                                ID=id))
     logger.debug("Report about the generated synthetic Boolean MTL problem:")

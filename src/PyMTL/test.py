@@ -67,7 +67,7 @@ class Task:
     
     """
     
-    def __init__(self, id, learn, test):
+    def __init__(self, id, learn, test, feature_names=None):
         """Initialize a Task object. Store the task's id and its learning and
         testing data to private attributes.
         
@@ -80,6 +80,9 @@ class Task:
             X -- numpy.array representing testing examples
             y -- numpy.array representing testing examples' class values
         
+        Keyword arguments:
+        feature_names -- list of strings representing task's feature names
+        
         """
         self.id = id
         self._learn = learn
@@ -90,6 +93,7 @@ class Task:
             self._learn = self._learn[0], np.ravel(self._learn[1])
         if len(self._test[1].shape) == 2:
             self._test = self._test[0], np.ravel(self._test[1])
+        self._feature_names = feature_names
     
     def __str__(self):
         """Return a "pretty" representation of the task by indicating its id."""
@@ -133,6 +137,18 @@ class Task:
         for t in self._test:
             h.update(t)
         return h.hexdigest()
+    
+    def get_feature_names(self):
+        """Return the list of strings representing Task's feature names.
+        Raise a ValueError if the feature_names were not specified when creating
+        this Task object.
+        
+        """
+        if self._feature_names != None:
+            return self._feature_names
+        else:
+            raise ValueError("Feature names were not specified when creating"
+                             "this Task object.")
 
 
 class CVTask(Task):
@@ -409,8 +425,11 @@ class MTLTester:
             X_train, X_test, y_train, y_test = cross_validation.\
                 train_test_split(X, y, test_size=test_prop,
                                  random_state=self._random.randint(0, 100))
+            kwargs = {}
+            if hasattr(td, "feature_names"):
+                kwargs["feature_names"] = td.feature_names
             self._tasks[td.ID] = Task(td.ID, (X_train, y_train),
-                                      (X_test, y_test))
+                                      (X_test, y_test), **kwargs)
     
     def _merge_repetition_scores(self, rpt_scores):
         """Merge the given repetition scores.
@@ -950,6 +969,9 @@ class SubtasksMTLTester(MTLTester):
         self._orig_task_ids = []
         for td in self._tasks_data:
             self._orig_task_ids.append(td.ID)
+            kwargs = {}
+            if hasattr(td, "feature_names"):
+                kwargs["feature_names"] = td.feature_names
             # divide task's data to learn and test sets
             X, y = td.data, td.target
             X_train, X_test, y_train, y_test = cross_validation.\
@@ -965,7 +987,7 @@ class SubtasksMTLTester(MTLTester):
                 tid = "{} (part {})".format(td.ID, i + 1)
                 learn = X_train[test_m], y_train[test_m]
                 test = X_test, y_test
-                self._tasks[tid] = Task(tid, learn, test)
+                self._tasks[tid] = Task(tid, learn, test, **kwargs)
             logger.debug("Splitted task '{}' into {} sub-tasks.".format(td.ID,
                                                                     n_subtasks))
     
