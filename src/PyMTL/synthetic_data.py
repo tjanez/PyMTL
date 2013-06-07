@@ -152,7 +152,7 @@ def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
     for i in range(g):
         attr, func = generate_boolean_function(a, d,
                                                random_seed=rnd.randint(1, 100))
-        attr_names = [str(a) for a in attr]
+        attr_names = [str(a_) for a_ in attr]
         funcs.append(func)
         for j in range(tg):
             X, y = generate_examples(attr, func, n,
