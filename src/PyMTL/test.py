@@ -31,7 +31,7 @@ from sklearn.base import ClassifierMixin, RegressorMixin
 from PyMTL import data, stat
 from PyMTL.learning import prefiltering, learning
 from PyMTL.plotting import BarPlotDesc, LinePlotDesc, plot_multiple, \
-    plot_dendrograms
+    plot_multiple_separate, plot_dendrograms
 from PyMTL.sklearn_utils import absolute_error, squared_error
 from PyMTL.util import logger, configure_logger
 
@@ -751,7 +751,7 @@ class MTLTester:
         return avgs, stds, ci95s
     
     def visualize_results(self, base_learners, learners, measures,
-                              results_path, colors, error_bars):
+                          results_path, colors, error_bars, separate_figs):
         """Visualize the results of the given learning algorithms with the given
         base learning algorithms and the given scoring measures on the MTL
         problem.
@@ -774,6 +774,8 @@ class MTLTester:
             should represent them in the plots
         error_bars -- boolean indicating whether to plot the error bars when
             visualizing the results
+        separate_figs -- boolean indicating whether to plot the results of each
+            base learner as a separate figure or as one combined figure
         
         """
         for m in measures:
@@ -799,27 +801,40 @@ class MTLTester:
                         avgs, stds, l, color=colors[l], ecolor=colors[l]))
                     plot_desc_ci95[bl].append(LinePlotDesc(x_points,
                         avgs, ci95s, l, color=colors[l], ecolor=colors[l]))
-            plot_multiple(plot_desc_sd,
-                os.path.join(results_path, "{}-avg-SD.pdf".format(m)),
-                title="Avg. results for tasks (error bars show std. dev.)",
-                subplot_title_fmt="Learner: {}",
-                xlabel="Task name",
-                ylabel=m,
-                x_tick_points=x_points,
-                x_tick_labels=x_labels,
-                ylim_bottom=ylim_bottom, ylim_top=ylim_top,
-                error_bars=error_bars)
-            plot_multiple(plot_desc_ci95,
-                os.path.join(results_path, "{}-avg-CI.pdf".format(m)),
-                title="Avg. results for tasks (error bars show 95% conf. "
-                    "intervals)",
-                subplot_title_fmt="Learner: {}",
-                xlabel="Task name",
-                ylabel=m,
-                x_tick_points=x_points,
-                x_tick_labels=x_labels,
-                ylim_bottom=ylim_bottom, ylim_top=ylim_top,
-                error_bars=error_bars)
+            if separate_figs:
+                plot_multiple_separate(plot_desc_sd,
+                    os.path.join(results_path, "{}-{{}}-avg-SD.pdf".format(m)),
+                    title="Avg. results for tasks (error bars show std. dev.)",
+                    xlabel="Task name", ylabel=m,
+                    x_tick_points=x_points, x_tick_labels=x_labels,
+                    ylim_bottom=ylim_bottom, ylim_top=ylim_top,
+                    error_bars=error_bars)
+                plot_multiple_separate(plot_desc_ci95,
+                    os.path.join(results_path, "{}-{{}}-avg-CI.pdf".format(m)),
+                    title="Avg. results for tasks (error bars show 95% conf. "
+                        "intervals)",
+                    xlabel="Task name", ylabel=m,
+                    x_tick_points=x_points, x_tick_labels=x_labels,
+                    ylim_bottom=ylim_bottom, ylim_top=ylim_top,
+                    error_bars=error_bars)
+            else:
+                plot_multiple(plot_desc_sd,
+                    os.path.join(results_path, "{}-avg-SD.pdf".format(m)),
+                    title="Avg. results for tasks (error bars show std. dev.)",
+                    subplot_title_fmt="Learner: {}",
+                    xlabel="Task name", ylabel=m,
+                    x_tick_points=x_points, x_tick_labels=x_labels,
+                    ylim_bottom=ylim_bottom, ylim_top=ylim_top,
+                    error_bars=error_bars)
+                plot_multiple(plot_desc_ci95,
+                    os.path.join(results_path, "{}-avg-CI.pdf".format(m)),
+                    title="Avg. results for tasks (error bars show 95% conf. "
+                        "intervals)",
+                    subplot_title_fmt="Learner: {}",
+                    xlabel="Task name", ylabel=m,
+                    x_tick_points=x_points, x_tick_labels=x_labels,
+                    ylim_bottom=ylim_bottom, ylim_top=ylim_top,
+                    error_bars=error_bars)
     
     def visualize_dendrograms(self, base_learners, results_path):
         """Visualize the dendrograms showing merging history of the ERM MTL
@@ -1409,7 +1424,7 @@ def test_tasks(tasks_data, results_path, base_learners,
                test=True, unpickle=False, visualize=True,
                test_prop=0.3, subtasks_split=(3, 5), cv_folds=5,
                repeats=1, keep=0, weighting="all_equal", error_margin="std",
-               error_bars=True, cfg_logger=True):
+               error_bars=True, separate_figs=False, cfg_logger=True):
     """Test the given tasks' data corresponding to a MTL problem according to
     the given parameters and save the results where indicated.
     
@@ -1451,6 +1466,8 @@ def test_tasks(tasks_data, results_path, base_learners,
         when computing the overall results
     error_bars -- boolean indicating whether to plot the error bars when
         visualizing the results
+    separate_figs -- boolean indicating whether to plot the results of each base
+        learner as a separate figure or as one combined figure
     cfg_logger -- boolean indicating whether to re-configure the global logger
         object
     
@@ -1501,7 +1518,7 @@ def test_tasks(tasks_data, results_path, base_learners,
         ms = mtlt.get_measures()
         mtlt.visualize_results(bls, ls, ms, results_path,
             {"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
-            error_bars)
+            error_bars, separate_figs)
         mtlt.visualize_dendrograms(bls, results_path)
         mtlt.compute_overall_results(bls, ls, ms, results_path,
                 weighting=weighting, error_margin=error_margin)

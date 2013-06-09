@@ -29,6 +29,10 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
+# common figure sizes in inches (width, height)
+A4 = (8.3, 11.7)
+A4_LANDSCAPE = (11.7, 8.3)
+
 class BarPlotDesc:
     
     """A class containing a bar plot description."""
@@ -176,24 +180,21 @@ def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
         visualizing the results
      
     """
-    # figure sizes in inches (width, height)
-    a4 = (8.3, 11.7)
-    a4_landscape = (11.7, 8.3)
     # create the appropriate number of subplots and set the appropriate figure
     # size
     nplots = len(plot_descs_mult)
     if nplots == 1:
         nrows, ncols = 1, 1
-        figsize = a4_landscape
+        figsize = A4_LANDSCAPE
     elif nplots in (2, 3):
         nrows, ncols = nplots, 1
-        figsize = a4
+        figsize = A4
     elif nplots == 4:
         nrows, ncols = 2, 2
-        figsize = a4_landscape
+        figsize = A4_LANDSCAPE
     elif nplots in (5, 6, 7, 8):
         nrows, ncols = ceil(1.*nplots / 2), 2
-        figsize = a4
+        figsize = A4
     else:
         raise ValueError("Too many subplots to draw!")
     fig = plt.figure(figsize=figsize)
@@ -215,6 +216,51 @@ def plot_multiple(plot_descs_mult, file_name, title="", subplot_title_fmt="{}",
     fig.subplots_adjust(top=0.93, bottom=0.10, left=0.10, right=0.95,
                         wspace=0.2, hspace=0.25)
     fig.savefig(file_name)
+
+
+def plot_multiple_separate(plot_descs_mult, file_name_fmt,
+                           title="", xlabel="", ylabel="",
+                           x_tick_points=None, x_tick_labels=None,
+                           ylim_bottom=None, ylim_top=None,
+                           error_bars=True):
+    """Plot multiple plots at once. Plot each plot on a separate figure and save
+    it as a separate file.
+    
+    Arguments:
+    plot_descs_mult -- ordered dictionary with items of the form (name,
+        plot_descs), where name is a string representing the base learner's name
+        and plot_descs is a list of BarPlotDesc or LinePlotDesc objects, one for
+        each learner
+    file_name_fmt -- string representing a template for the path where to save
+        the drawn figure; it must contain exactly one pair of braces ({}), where
+        the base learner's name will be put
+    
+    Keyword arguments:
+    title -- string representing the title of each plot
+    xlabel -- string representing each plot's x-axis label
+    ylabel -- string representing each plot's y-axis label
+    x_tick_points -- list of floats (or integers) representing each plot's
+        x-axis tick positions
+    x_tick_labels -- list of strings representing each plot's x-axis tick labels
+    ylim_bottom -- float representing y-axis's bottom limit
+    ylim_top -- float representing y-axis's top limit
+    error_bars -- boolean indicating whether to plot the error bars when
+        visualizing the results
+     
+    """
+    # draw each plot on its own figure
+    for i, (bl, plot_descs) in enumerate(plot_descs_mult.iteritems()):
+        fig = plt.figure(figsize=A4_LANDSCAPE)
+        ax = fig.add_subplot(1, 1, 1)
+        _draw_subplot(ax, plot_descs, xlabel=xlabel, ylabel=ylabel,
+            x_tick_points=x_tick_points, x_tick_labels=x_tick_labels,
+            ylim_bottom=ylim_bottom, ylim_top=ylim_top, error_bars=error_bars)
+        fig.suptitle(title)
+        # adjust figure parameters to make it look nicer
+        fig.subplots_adjust(top=0.93, bottom=0.10, left=0.10, right=0.95,
+                            wspace=0.2, hspace=0.25)
+        fig.savefig(file_name_fmt.format(bl))
+
 
 from scipy.cluster.hierarchy import dendrogram
 

@@ -102,7 +102,8 @@ if __name__ == "__main__":
                    measures_clas, learners, "train_test_split",
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
-                   test_prop=test_prop, repeats=repeats, cfg_logger=False)
+                   test_prop=test_prop, repeats=repeats, cfg_logger=False,
+                   separate_figs=True)
     
     if test_config == 2:
         # parameters of the synthetic Boolean MTL problem
@@ -133,7 +134,8 @@ if __name__ == "__main__":
                    measures_clas, learners, "train_test_split",
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
-                   test_prop=test_prop, repeats=repeats, cfg_logger=False)
+                   test_prop=test_prop, repeats=repeats, cfg_logger=False,
+                   separate_figs=True)
 
     if test_config == 3:
         # parameters of the synthetic Boolean MTL problem
@@ -164,7 +166,8 @@ if __name__ == "__main__":
                    measures_clas, learners, "train_test_split",
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
-                   test_prop=test_prop, repeats=repeats, cfg_logger=False)
+                   test_prop=test_prop, repeats=repeats, cfg_logger=False,
+                   separate_figs=True)
     
     if test_config == 4:
         # parameters of the synthetic Boolean MTL problem
@@ -195,7 +198,8 @@ if __name__ == "__main__":
                    measures_clas, learners, "train_test_split",
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
-                   test_prop=test_prop, repeats=repeats, cfg_logger=False)
+                   test_prop=test_prop, repeats=repeats, cfg_logger=False,
+                   separate_figs=True)
     
     if test_config == 5:
         # parameters of the synthetic Boolean MTL problem
@@ -234,7 +238,8 @@ if __name__ == "__main__":
                    measures_clas, learners, "train_test_split",
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
-                   test_prop=test_prop, repeats=repeats, cfg_logger=False)
+                   test_prop=test_prop, repeats=repeats, cfg_logger=False,
+                   separate_figs=True)
 
     if test_config == 6:
         # parameters of the synthetic Boolean MTL problem
@@ -265,5 +270,6 @@ if __name__ == "__main__":
                    measures_clas, learners, "train_test_split",
                    rnd_seed=rnd_seed,
                    test=test, unpickle=unpickle, visualize=visualize,
-                   test_prop=test_prop, repeats=repeats, cfg_logger=False)
+                   test_prop=test_prop, repeats=repeats, cfg_logger=False,
+                   separate_figs=True)
     
