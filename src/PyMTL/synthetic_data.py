@@ -101,13 +101,11 @@ def generate_examples(attributes, function, n=100, random_state=None):
         # distribution
         X_i = list(random_state.random_integers(0, 1, a))
         # substitute the attributes in the function with their values
-        y_i = function.subs(zip(attributes, X_i))
+        # NOTE: The 'simultaneous=True' keyword argument delays the expression
+        # evaluation until all substitutions have been made.
+        y_i = function.subs(zip(attributes, X_i), simultaneous=True)
         X[i] = X_i
-        # NOTE: Sometimes, the call to subs() function returns a boolean value
-        # and sometimes it returns a SymPy's Zero (or One) object. If it returns
-        # the latter, the following statement without int() fails with:
-        # TypeError: long() argument must be a string or a number, not 'Zero'
-        y[i] = int(y_i)
+        y[i] = y_i
     return X, y
 
 
