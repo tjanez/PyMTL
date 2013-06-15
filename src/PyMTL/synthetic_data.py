@@ -101,9 +101,7 @@ def generate_examples(attributes, function, n=100, random_state=None):
         # distribution
         X_i = list(random_state.random_integers(0, 1, a))
         # substitute the attributes in the function with their values
-        # NOTE: The 'simultaneous=True' keyword argument delays the expression
-        # evaluation until all substitutions have been made.
-        y_i = function.subs(zip(attributes, X_i), simultaneous=True)
+        y_i = function.subs(zip(attributes, X_i))
         X[i] = X_i
         y[i] = y_i
     return X, y
