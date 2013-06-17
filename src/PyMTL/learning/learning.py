@@ -28,7 +28,7 @@ from PyMTL.sklearn_utils import change_dummy_classes
 from PyMTL.util import logger
 
 
-class MergeAllLearner:
+class MergeAllLearner(object):
     
     """Learning strategy that merges all tasks, regardless of whether they
     belong to the same behavior class or not.
@@ -67,7 +67,7 @@ class MergeAllLearner:
         R["task_models"] = task_models
         return R
 
-class NoMergingLearner:
+class NoMergingLearner(object):
     
     """Learning strategy that doesn't merge any tasks. The base learning
     algorithm only uses the data of each task to build its particular model.
@@ -248,7 +248,7 @@ def convert_merg_history_to_scipy_linkage(merg_history):
         cur_h += inc
     return Z, labels
 
-class MergedTask:
+class MergedTask(object):
     
     """Contains data pertaining to a particular (merged) task and methods for
     extracting this data.
@@ -326,7 +326,7 @@ def sorted_pair((t1, t2)):
     """
     return (t1, t2) if t1 <= t2 else (t2, t1)
 
-class CandidatePair():
+class CandidatePair(object):
     
     """Contains data pertaining to a pair of tasks that is a candidate for
     merging.
@@ -376,7 +376,7 @@ def update_progress(progress, width=20, invert=False):
                                      progress * 100))
     sys.stdout.flush()
 
-class ERMLearner:
+class ERMLearner(object):
     
     """Learning method that intelligently merges data for different tasks that
     exhibit the same or similar behavior. By increasing the number of learning

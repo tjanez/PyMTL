@@ -19,7 +19,7 @@
 # Author(s): Tadej Janez <tadej.janez@fri.uni-lj.si>
 #
 
-class NoFilter:
+class NoFilter(object):
     
     """Pre-filtering method that doesn't filter out any pair of tasks. """
     
@@ -27,7 +27,7 @@ class NoFilter:
         """Return True for any pair of tasks. """
         return True
 
-class MinCommonFilter:
+class MinCommonFilter(object):
     
     """Pre-filtering method that filters out pairs of tasks that have less
     than a predefined value of common examples.

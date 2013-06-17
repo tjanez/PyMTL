@@ -291,7 +291,7 @@ def _generalized_cross_validation_clas(learner, data1, data2, cv_folds1):
     return pred_errs1, pred_errs2, pred_errsm
 
 
-class _RegressionGeneralizedCVWrapper:
+class _RegressionGeneralizedCVWrapper(object):
     
     """Class that wraps the call to the _generalized_cross_validation_regr()
     function.

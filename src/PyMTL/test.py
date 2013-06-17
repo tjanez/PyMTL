@@ -60,7 +60,7 @@ def unpickle_obj(file_path):
     with open(file_path, "rb") as pkl_file:
         return pickle.load(pkl_file)
 
-class Task:
+class Task(object):
     
     """Contains data pertaining to a particular MTL task and methods for
     extracting and manipulating this data.
@@ -289,7 +289,7 @@ def _compute_avg_scores(fold_scores):
     return avg_scores
 
 
-class TestingResults:
+class TestingResults(object):
 
     """Contains data of testing a particular base learning method on a
     multi-task learning (MTL) problem.
@@ -324,7 +324,7 @@ class TestingResults:
         self.dend_info = dend_info
 
 
-class MTLTester:
+class MTLTester(object):
     
     """Contains methods for testing various learning algorithms on the given
     multi-task learning (MTL) problem.

@@ -33,7 +33,7 @@ from matplotlib.font_manager import FontProperties
 A4 = (8.3, 11.7)
 A4_LANDSCAPE = (11.7, 8.3)
 
-class BarPlotDesc:
+class BarPlotDesc(object):
     
     """A class containing a bar plot description."""
     
@@ -63,7 +63,7 @@ class BarPlotDesc:
         self.label = label
     
         
-class LinePlotDesc:
+class LinePlotDesc(object):
     
     """A class containing a line plot description."""
     
