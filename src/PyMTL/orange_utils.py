@@ -39,6 +39,8 @@ class ForcedFirstSplitTreeLearner(octree.TreeLearner):
             Orange.classification.tree.TreeLearner
         
         """
+        if first_split_attr == None:
+            raise ValueError("Please, specify the 'first_split_attr'.")
         self.first_split_attr = first_split_attr
         super(ForcedFirstSplitTreeLearner, self).__init__(**kwargs)
     
@@ -140,5 +142,5 @@ if __name__ == "__main__":
     print
     
     ffst = ForcedFirstSplitTreeLearner(data, first_split_attr="age")
-    print "ForcedFirstSplitTreeLearner:"
+    print "ForcedFirstSplitTreeLearner (with the first split forced to 'age'):"
     print ffst # should have 'age' attribute as the first split
