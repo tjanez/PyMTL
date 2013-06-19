@@ -191,6 +191,12 @@ class OrangeClassifierWrapper(BaseEstimator, ClassifierMixin):
     `orange_data_` : Orange.data.Table 
         The Orange data table with the converted Numpy array learning data.
     
+    `classes_` : array of shape = [n_classes]
+        The classes' labels.
+
+    `n_classes_` : int
+        The number of classes.
+    
     """
     
     def __init__(self, orange_learner):
@@ -227,7 +233,8 @@ class OrangeClassifierWrapper(BaseEstimator, ClassifierMixin):
             else:
                 feat = Orange.data.variable.Continuous(name=feat_names[k])
             orange_feat.append(feat)
-        self.n_classes_ = len(np.unique(y))
+        self.classes_ = np.unique(y)
+        self.n_classes_ = len(self.classes_)
         if self.n_classes_ != 2:
             raise ValueError("Only binary classification problems are "
                              "supported!")
