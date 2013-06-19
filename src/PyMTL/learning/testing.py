@@ -430,6 +430,9 @@ def generalized_cross_validation(learner, data1, data2, folds, rand_seed1,
             raise ValueError("Parameter 'error_func' must be specified for "
                              "regression problems.")
         generalized_cv = _RegressionGeneralizedCVWrapper(error_func=error_func)
+    else:
+        raise ValueError("Unsupported type of learner: {}".\
+                         format(type(learner)))
     # unpack the data1 and data2 tuples
     _, y1 = data1
     _, y2 = data2
