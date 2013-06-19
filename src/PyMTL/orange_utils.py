@@ -134,6 +134,181 @@ class ForcedFirstSplitTreeLearner(octree.TreeLearner):
         
         return octree.TreeClassifier(base_classifier=tree)
 
+
+def convert_numpy_data_to_orange(orange_domain, X, y=None):
+        """Convert the given X and y numpy arrays to an Orange data table
+        with the given domain.
+        If y is None (default), the class values of the Orange data table are
+        set to '?'.
+        
+        Parameters
+        ----------
+        orange_domain : Orange.data.domain
+            The domain of the newly created Orange data table. It should have
+            the same number of features as the X numpy array.
+        X : array-like, shape = [n_samples, n_features]
+            The training input samples.
+        y : array-like, shape = [n_samples]
+            The target values (integers that correspond to classes). 
+        
+        Returns
+        -------
+        orange_data : Orange.data.Table
+            The data converted to an Orange data table.
+        """
+        if y == None:
+            new_y = np.zeros((len(X), 1))
+        else:
+            new_y = np.atleast_2d(y).T
+        X_y = np.hstack((X, new_y))
+        orange_data = Orange.data.Table(orange_domain, X_y)
+        # convert all class values from 0 to '?'
+        if y == None:
+            for ex in orange_data:
+                ex.set_class('?')
+        return orange_data
+
+
+import numpy as np
+
+from sklearn.base import BaseEstimator, ClassifierMixin
+
+class OrangeClassifierWrapper(BaseEstimator, ClassifierMixin):
+    
+    """A wrapper that wraps an Orange classification learner as a scikit-learn
+    estimator.
+    
+    Parameters
+    ----------
+    orange_learner : a descendant of Orange.core.Leaner
+        The Orange learner to be wrapped as a scikit-learn estimator.
+    
+    Attributes
+    ----------
+    `orange_classifier_` : a descendant of Orange.core.Classifier
+        The underlying Orange classifier.
+    
+    `orange_data_` : Orange.data.Table 
+        The Orange data table with the converted Numpy array learning data.
+    
+    """
+    
+    def __init__(self, orange_learner):
+        if not isinstance(orange_learner, Orange.core.Learner):
+            raise ValueError("The given orange_learner is not an Orange "
+                             "learner.")
+        self.orange_learner = orange_learner
+        
+        self.orange_classifier_ = None
+    
+    def fit(self, X, y):
+        """Build a classifier for the training set (X, y).
+        
+        Parameters
+        ----------
+        X : array-like, shape = [n_samples, n_features]
+            The training input samples.
+        y : array-like, shape = [n_samples]
+            The target values (integers that correspond to classes). 
+        
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+        # convert numpy data to Orange
+        self.n_features_ = X.shape[1]
+        feat_names = ["a{}".format(k) for k in range(self.n_features_)]
+        orange_feat = []
+        for k in range(self.n_features_):
+            if len(np.unique(X[:, k])) <= 2:
+                feat = Orange.data.variable.Discrete(name=feat_names[k],
+                                                     values=["0", "1"])
+            else:
+                feat = Orange.data.variable.Continuous(name=feat_names[k])
+            orange_feat.append(feat)
+        self.n_classes_ = len(np.unique(y))
+        if self.n_classes_ != 2:
+            raise ValueError("Only binary classification problems are "
+                             "supported!")
+        orange_class = Orange.data.variable.Discrete(name="cls",
+                                                     values=["0", "1"])
+        self.orange_domain_ = Orange.data.Domain(orange_feat, orange_class)
+        self.orange_data_ = convert_numpy_data_to_orange(self.orange_domain_,
+                                                         X, y)
+        
+        # build a classifier
+        self.orange_classifier_ = self.orange_learner(self.orange_data_)
+        
+        return self
+
+    def predict(self, X):
+        """Predict class value for X.
+
+        The predicted class for each sample in X is returned.
+
+        Parameters
+        ----------
+        X : array-like of shape = [n_samples, n_features]
+            The input samples.
+
+        Returns
+        -------
+        y : array of shape = [n_samples]
+            The predicted classes.
+        """
+        # perform sanity checks
+        n_samples, n_features = X.shape
+        if self.orange_classifier_ is None:
+            raise Exception("OrangeClassifierWrapper not initialized. Call the"
+                            " a fit() function first.")
+        if self.n_features_ != n_features:
+            raise ValueError("Number of features of the model must match the "
+                             "input. Model n_features is {} and input "
+                             "n_features is {}".format(self.n_features_,
+                                                       n_features))
+        # convert numpy data to Orange
+        orange_test_data = convert_numpy_data_to_orange(self.orange_domain_, X)
+        # classify all examples with the previously built classifier
+        y = np.empty(n_samples)
+        for i, ex in enumerate(orange_test_data):
+            y[i] = self.orange_classifier_(ex, Orange.core.GetValue)
+        return y
+        
+    def predict_proba(self, X):
+        """Predict class probabilities of the input samples X.
+
+        Parameters
+        ----------
+        X : array-like of shape = [n_samples, n_features]
+            The input samples.
+
+        Returns
+        -------
+        p : array of shape = [n_samples, n_classes]
+            The class probabilities of the input samples. Classes are ordered
+            by arithmetical order.
+        """
+        # perform sanity checks
+        n_samples, n_features = X.shape
+        if self.orange_classifier_ is None:
+            raise Exception("OrangeClassifierWrapper not initialized. Call the"
+                            " a fit() function first.")
+        if self.n_features_ != n_features:
+            raise ValueError("Number of features of the model must match the "
+                             "input. Model n_features is {} and input "
+                             "n_features is {}".format(self.n_features_,
+                                                       n_features))
+        # convert numpy data to Orange
+        orange_test_data = convert_numpy_data_to_orange(self.orange_domain_, X)
+        # classify all examples with the previously built classifier
+        p = np.empty((n_samples, self.n_classes_))
+        for i, ex in enumerate(orange_test_data):
+            p[i, :] = list(self.orange_classifier_(ex,
+                                    Orange.core.GetProbabilities))
+        return p
+
+
 if __name__ == "__main__":
     data = Orange.data.Table("titanic")
     nt = octree.TreeLearner(data)
@@ -144,3 +319,20 @@ if __name__ == "__main__":
     ffst = ForcedFirstSplitTreeLearner(data, first_split_attr="age")
     print "ForcedFirstSplitTreeLearner (with the first split forced to 'age'):"
     print ffst # should have 'age' attribute as the first split
+    print
+
+    import PyMTL.synthetic_data as sd
+    a, d = 8, 4
+    attr, func = sd.generate_boolean_function(a, d, random_seed=2)
+    print "Boolean function (a={}, d={}): {}".format(a, d, func)
+    X, y = sd.generate_examples(attr, func, n=100, random_state=10)
+    print "% of True values in y: {:.2f}".format(100 * sum(y == True) / len(y))
+    
+    orange_learner = octree.TreeLearner()
+    sklearn_wrapper = OrangeClassifierWrapper(orange_learner=orange_learner)
+    
+    from sklearn.cross_validation import cross_val_score
+    print "Cross-validation CAs: ", cross_val_score(sklearn_wrapper, X, y=y)
+    print "Cross-validation AUCs: ", cross_val_score(sklearn_wrapper, X, y=y,
+                                                    scoring="roc_auc")
+    
