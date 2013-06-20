@@ -20,7 +20,6 @@
 # Author(s): Tadej Janez <tadej.janez@fri.uni-lj.si>
 #
 
-
 import logging, os.path, time
 from collections import OrderedDict
 
