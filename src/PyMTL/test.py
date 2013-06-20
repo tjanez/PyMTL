@@ -482,7 +482,7 @@ class MTLTester(object):
         Arguments:
         models -- dictionary mapping from tasks' ids to their models
         measures -- list of strings representing measure's names (currently,
-            only CA and AUC are supported)
+            AUC, CA, MAE, MSE, RMSE and Explained variance are supported)
         
         """
         scores = dict()
@@ -586,8 +586,8 @@ class MTLTester(object):
         base learners -- ordered dictionary with items of the form (name,
             learner), where name is a string representing the base learner's
             name and learner is a scikit-learn estimator object
-        measures -- list of strings representing measure's names (currently,
-            only CA and AUC are supported)
+        measures -- list of strings representing measure's names (e.g. CA, AUC,
+            RMSE, ...)
         results_path -- string representing the path where to save any extra
             information about the running of this test (currently, only used
             for pickling the results when there is an error in calling the
