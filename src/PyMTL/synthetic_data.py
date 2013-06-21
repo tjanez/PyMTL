@@ -34,25 +34,27 @@ from PyMTL.util import logger
 def generate_boolean_function(a, d=8, random_seed=0):
     """Generate a Boolean function in disjunctive normal form according to the
     given parameters.
-    Return a tuple (attributes, function), where:
-        attributes -- list of sympy's Symbol objects representing the attributes
-            of the generated function
-        function -- Boolean function comprised of Boolean operators from
-            sympy.logic
     
-    Note: This function implements the Boolean function generation algorithm as
+    NOTE: This function implements the Boolean function generation algorithm as
     given in "(2001) Sadohara - Learning of Boolean Functions using Support
     Vector Machines - ALT".
     
-    Arguments:
-    a -- integer representing the number of attributes/variables of the
-        generated function
+    Parameters
+    ----------
+    a : int
+        The number of attributes/variables of the generated function.
+    d : int
+        The expected number of attributes/variables in a disjunct.
+    random_seed : int
+        The random seed with which to initialize a private Random object.
     
-    Keyword arguments:
-    d -- integer representing the expected number of attributes/variables in a
-        disjunct
-    random_seed -- integer representing the random seed with which to initialize
-        a private Random object
+    Returns
+    -------
+    attributes : list
+        The sympy's Symbol objects representing the attributes of the Boolean
+        function.
+    function : Boolean function comprised of Boolean operators from sympy.logic
+        The Boolean function.
     
     """
     rand_obj = random.Random(random_seed)
@@ -74,22 +76,27 @@ def generate_boolean_function(a, d=8, random_seed=0):
 def generate_examples(attributes, function, n=100, random_state=None):
     """Generate examples for the given Boolean function. The values of
     attributes are chosen according to a random uniform distribution. 
-    Return a tuple (X, y), where:
-        X -- numpy.ndarray of shape (n, len(attributes)) representing the values
-            of attributes
-        y -- numpy.ndarray of shape (n,) representing the values of the Boolean
-            function for each example in X
     
-    Arguments:
-    attributes -- list of sympy's Symbol objects representing the attributes
-        of the Boolean function
-    function -- Boolean function comprised of Boolean operators from sympy.logic
+    Parameters
+    ----------
+    attributes : list
+        The sympy's Symbol objects representing the attributes of the Boolean
+        function.
+    function : Boolean function comprised of Boolean operators from sympy.logic
+        The Boolean function.
+    n : int
+        The number of example to generate.
+    random_state : int or RandomState
+        The random seed or random state to use for pseudo-random number
+        generator.
+        NOTE: This value is passed to sklearn's check_random_state function 
     
-    Keyword arguments:
-    n -- integer representing the number of examples to generate
-    random_state -- integer or RandomState representing the state used for
-        pseudo-random number generator; this value is passed to sklearn's
-        check_random_state function
+    Returns
+    -------
+    X : numpy.ndarray of shape (n, len(attributes))
+        The attribute values of the Boolean function.
+    y : numpy.ndarray of shape (n,)
+        The values of the Boolean function for each example in X.
     
     """
     random_state = validation.check_random_state(random_state)
@@ -107,39 +114,40 @@ def generate_examples(attributes, function, n=100, random_state=None):
     return X, y
 
 
-def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
+def _generate_boolean_data(a, d, n, g, tg, noise, random_seed):
     """Generate a synthetic MTL problem of learning Boolean functions according
     to the given parameters.
-    Log the report about the generated MTL problem, which includes:
-    - the Boolean function of each group,
-    - the % of True values in y for each task,
-    - the average % of True values in y (across all tasks).
     
     Parameters
     ----------
-    a -- int
+    a : int
         Number of attributes/variables of the generated Boolean functions.
-    d -- int
+    d : int
         The expected number of attributes/variables in a disjunct.
-    n -- int
+    n : int
         The number of examples for each task to generate.
-    g -- int
+    g : int
         The number of task groups to generate. Each task group shares the
         same Boolean functions.
-    tg -- int
+    tg : int
         The number of tasks (with their corresponding data) to generate for
         each task group.
-    noise -- float
+    noise : float
         The proportion of examples of each task that have their class values
         determined randomly.
-    random_seed -- int
+    random_seed : int
         The random seed with which to initialize a private Random object.
     
     Returns
     -------
-    tasks -- list
-        A list of Bunch objects that correspond to regression tasks, each task
-        corresponding to one subject.
+    tasks : list
+        A list of Bunch objects corresponding to Boolean function learning
+        tasks.
+    funcs : list
+        A list of Boolean functions comprised of Boolean operators from
+        sympy.logic, one function for each task group.
+    attr : list of sympy's Symbol objects representing the attributes of the
+        generated functions
     
     """
     rnd = random.Random(random_seed)
@@ -158,14 +166,29 @@ def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
             descr = (u"Synthetic boolean data for task {} of group {} "
                      "(function: {})".format(j, i, pretty(func)))
             id = "Group {}, task {}".format(i, j)
-            tasks.append(Bunch(data=X,
-                               target=y,
-                               feature_names=attr_names,
-                               DESCR=descr,
-                               ID=id))
+            tasks.append(Bunch(data=X, target=y, feature_names=attr_names,
+                               DESCR=descr, ID=id))
+    return tasks, funcs, attr
+
+
+def _report_about_generated_boolean_mtl_problem(functions, tasks):
+    """Log a report about the generated synthetic Boolean MTL problem
+    represented by the given functions and tasks.
+    Note: The logger object must be a valid Logger.
+    
+    Parameters
+    ----------
+    functions : list
+        A list of Boolean functions comprised of Boolean operators from
+        sympy.logic, one function for each task group.
+    tasks : list
+        A list of Bunch objects corresponding to Boolean function learning
+        tasks.
+    
+    """
     logger.debug("Report about the generated synthetic Boolean MTL problem:")
     logger.debug("  Boolean function of each group:")
-    for i, func in enumerate(funcs):
+    for i, func in enumerate(functions):
         # NOTE: sympy's pretty() function returns a unicode string, so the
         # string literal must also be a unicode string
         logger.debug(u"   - Group {}: {}".format(i, pretty(func)))
@@ -180,7 +203,137 @@ def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
         logger.debug("   - {}: {}".format(t.ID, cur_true / cur_len))
     logger.debug("  Average % of True values in y (across all tasks): {}".\
                  format(sum_true / sum_total))
+
+
+def generate_boolean_data(a, d, n, g, tg, noise, random_seed=1):
+    """Generate a synthetic MTL problem of learning Boolean functions according
+    to the given parameters.
+    Log the report about the generated MTL problem, which includes:
+    - the Boolean function of each group,
+    - the % of True values in y for each task,
+    - the average % of True values in y (across all tasks).
+    
+    Parameters
+    ----------
+    a : int
+        Number of attributes/variables of the generated Boolean functions.
+    d : int
+        The expected number of attributes/variables in a disjunct.
+    n : int
+        The number of examples for each task to generate.
+    g : int
+        The number of task groups to generate. Each task group shares the
+        same Boolean functions.
+    tg : int
+        The number of tasks (with their corresponding data) to generate for
+        each task group.
+    noise : float
+        The proportion of examples of each task that have their class values
+        determined randomly.
+    random_seed : int
+        The random seed with which to initialize a private Random object.
+    
+    Returns
+    -------
+    tasks : list
+        A list of Bunch objects corresponding to Boolean function learning
+        tasks.
+    
+    """
+    tasks, funcs, _ = _generate_boolean_data(a, d, n, g, tg, noise, random_seed)
+    _report_about_generated_boolean_mtl_problem(funcs, tasks)
     return tasks
+
+
+from itertools import product
+
+def _generate_complete_test_set(attributes, function):
+    """Generate the complete testing set for the given Boolean function by
+    generating all 2**len(attributes) possible attribute values of the Boolean
+    function.
+    
+    Parameters
+    ----------
+    attributes : list
+        The sympy's Symbol objects representing the attributes of the Boolean
+        function.
+    function : Boolean function comprised of Boolean operators from sympy.logic
+        The Boolean function.
+    
+    Returns
+    -------
+    X : numpy.ndarray of shape (2**len(attributes), len(attributes))
+        All possible attribute values of the Boolean function.
+    y : numpy.ndarray of shape (2**len(attributes),)
+        The values of the Boolean function for each example in X.
+    
+    """
+    a = len(attributes)
+    X = np.zeros((2**a, a), dtype="int")
+    y = np.zeros(2**a, dtype="int")
+    # generate all 2**a possible combinations of values of a Boolean attributes 
+    for i, X_i in enumerate(product((0, 1), repeat=a)):
+        X[i] = X_i
+        # substitute the attributes in the function with their values
+        y_i = function.subs(zip(attributes, X_i))
+        y[i] = y_i
+    return X, y
+
+
+def generate_boolean_data_with_complete_test_sets(a, d, n, g, tg, noise,
+                                                  random_seed=1):
+    """Generate a synthetic MTL problem of learning Boolean functions according
+    to the given parameters. In addition, create test sets that cover the
+    complete attribute space (2**a distinct examples).
+    Log the report about the generated MTL problem, which includes:
+    - the Boolean function of each group,
+    - the % of True values in y for each task,
+    - the average % of True values in y (across all tasks).
+    
+    Parameters
+    ----------
+    a : int
+        Number of attributes/variables of the generated Boolean functions.
+    d : int
+        The expected number of attributes/variables in a disjunct.
+    n : int
+        The number of examples for each task to generate.
+    g : int
+        The number of task groups to generate. Each task group shares the
+        same Boolean functions.
+    tg : int
+        The number of tasks (with their corresponding data) to generate for
+        each task group.
+    noise : float
+        The proportion of examples of each task that have their class values
+        determined randomly.
+    random_seed : int
+        The random seed with which to initialize a private Random object.
+    
+    Returns
+    -------
+    tasks : list
+        A list of Bunch objects corresponding to Boolean function learning
+        tasks.
+    tasks_complete_test_sets : list
+        A list of (X, y) tuples corresponding to complete testing test for each
+        task.
+    
+    """
+    tasks, funcs, attr = _generate_boolean_data(a, d, n, g, tg, noise,
+                                                random_seed)
+    
+    tasks_complete_test_sets = []
+    # generate a complete testing set for each Boolean function
+    for func in funcs:
+        complete_test_set = _generate_complete_test_set(attr, func)
+        # duplicate the generated complete testing set for each task from the
+        # current task group 
+        for i in range(tg):
+            tasks_complete_test_sets.append(complete_test_set)
+    
+    _report_about_generated_boolean_mtl_problem(funcs, tasks)
+    return tasks, tasks_complete_test_sets
 
 
 if __name__ == "__main__":
@@ -225,3 +378,9 @@ if __name__ == "__main__":
 #    tasks = generate_boolean_data(16, 8, 200, 20, 5, 0.0, random_seed=1)
 #    print "Generated a synthetic Boolean MTL problem with {} tasks.".\
 #        format(len(tasks))
+
+    tasks, tasks_complete_test_sets = \
+        generate_boolean_data_with_complete_test_sets(8, 4, 100, 2, 3, 0.0,
+                                                      random_seed=1)
+    print "Generated a synthetic Boolean MTL problem with {} tasks.".\
+        format(len(tasks))
