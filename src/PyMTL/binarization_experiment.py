@@ -28,10 +28,11 @@ import sklearn
 import Orange
 
 from PyMTL import data, synthetic_data, test
-from PyMTL.util import logger, configure_logger
+from PyMTL.util import logger, configure_logger, convert_svgs_to_pdfs
 from PyMTL.learning import prefiltering, learning, bin_exp
 from PyMTL.orange_utils import convert_numpy_data_to_orange, \
     OrangeClassifierWrapper
+from PyMTL.orange_visualizations import save_treegraph_image
 
 
 def _add_id_and_merge_learn_data_orange(tasks):
@@ -279,10 +280,24 @@ class BinarizationExperimentMTLTester(test.MTLTester):
                     # store dendrogram info if the results contain it 
                     if "dend_info" in R:
                         dend_info[bl][i] = R["dend_info"]
+                    # visualize the decision tree if the learner is a (sub)class
+                    # of TreeMarkedAndMergedLearner
+                    if isinstance(learners[l],
+                                  bin_exp.TreeMarkedAndMergedLearner):
+                        tree = R["task_models"].values()[0]
+                        save_path = os.path.join(results_path, "{}-repeat{}"
+                                                 ".svg".format(l, i))
+                        save_treegraph_image(tree, save_path)
         self._process_repetition_scores(rpt_scores, dend_info)
 
 
 if __name__ == "__main__":
+    # initialize Qt application
+    # NOTE: Needed by the save_treegraph_image() function.
+    import sys
+    from OWWidget import QApplication
+    a = QApplication(sys.argv)
+    
     # find out the current file's location so it can be used to compute the
     # location of other files/directories
     cur_dir = os.path.dirname(os.path.abspath(__file__))
@@ -389,3 +404,4 @@ if __name__ == "__main__":
     mtlt.visualize_dendrograms(bls, results_path)
     mtlt.compute_overall_results(bls, ls, ms, results_path,
             weighting="all_equal", error_margin="std")
+    convert_svgs_to_pdfs(results_path)

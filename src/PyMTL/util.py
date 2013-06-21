@@ -20,6 +20,7 @@
 
 import logging
 
+
 def configure_logger(logger, level=logging.DEBUG, console_level=logging.DEBUG,
                      file_name=None, file_level=logging.DEBUG):
     """Configure the given Logger instance.
@@ -63,6 +64,32 @@ def _remove_handlers(logger):
     for handler in list(logger.handlers):
         logger.removeHandler(handler)
 
+
 logger_name = "PyMTL"
 logger = logging.getLogger(logger_name)
 configure_logger(logger)
+
+
+import os, subprocess
+
+
+def convert_svgs_to_pdfs(path):
+    """Find the SVG files in the given path, convert them to PDF, crop them and
+    finally, remove them.
+    
+    Note: This function requires 'rsvg-convert' and 'pdfcrop' commands to be
+    installed somewhere in $PATH.
+    
+    Arguments:
+    path -- string representing the path to the directory where to convert the
+        SVG files to PDF
+    
+    """
+    for file in sorted(os.listdir(path)):
+        base, ext = os.path.splitext(file)
+        if ext.lower() == ".svg":
+            svg_file = os.path.join(path, file)
+            pdf_file = os.path.join(path, base + ".pdf")
+            subprocess.call(["-c", "rsvg-convert -f pdf {} | pdfcrop - {}".\
+                             format(svg_file, pdf_file)], shell=True)
+            os.remove(svg_file)
