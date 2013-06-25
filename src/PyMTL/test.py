@@ -1057,6 +1057,39 @@ class SubtasksMTLTester(MTLTester):
         return mrg_scores
 
 
+class PrepreparedTestSetsMTLTester(MTLTester):
+    
+    """Sub-class of the MTLTester which implements support for taks with
+    pre-prepared testing sets.
+    
+    """
+    
+    def _prepare_tasks_data(self, preprepared_test_sets=None):
+        """Iterate through the tasks' data stored in self._tasks_data and the
+        given pre-prepared testing sets. Create a new Task object for each task
+        with appropriate training and testing data.
+        Create a dictionary mapping from tasks' ids to their Task objects and
+        store it in the self._tasks variable.
+        
+        Keyword arguments:
+        preprepared_test_sets -- list of (X, y) tuples corresponding to
+            pre-prepared testing sets for each task
+        
+        """
+        if preprepared_test_sets == None:
+            raise ValueError("The pre-prepared testing sets of tasks were not "
+                             "given.")
+        self._tasks = OrderedDict()
+        for td, preprepared_test_set in zip(self._tasks_data,
+                                         preprepared_test_sets):
+            training_data = td.data, td.target
+            kwargs = {}
+            if hasattr(td, "feature_names"):
+                kwargs["feature_names"] = td.feature_names
+            self._tasks[td.ID] = Task(td.ID, training_data,
+                                      preprepared_test_set, **kwargs)
+
+
 class CVMTLTester(MTLTester):
     
     """Contains methods for testing various learning algorithms on the given
@@ -1423,6 +1456,7 @@ def test_tasks(tasks_data, results_path, base_learners,
                measures, learners, tester_type, rnd_seed=50,
                test=True, unpickle=False, visualize=True,
                test_prop=0.3, subtasks_split=(3, 5), cv_folds=5,
+               preprepared_test_sets=None,
                repeats=1, keep=0, weighting="all_equal", error_margin="std",
                error_bars=True, separate_figs=False, cfg_logger=True):
     """Test the given tasks' data corresponding to a MTL problem according to
@@ -1456,6 +1490,8 @@ def test_tasks(tasks_data, results_path, base_learners,
     test_prop -- parameter for MTLTester and SubtasksMTLTester
     subtasks_split -- parameter for the SubtasksMTLTester
     cv_folds -- integer indicating how many folds to use with the CVMTLTester
+    preprepared_test_sets -- list of (X, y) tuples corresponding to pre-prepared
+        testing sets for each task
     repeats -- integer indicating how many times the MTLTester should repeat the
         experiment
     keep -- integer indicating the number of random tasks of the MTL problem to
@@ -1488,6 +1524,9 @@ def test_tasks(tasks_data, results_path, base_learners,
                                  subtasks_split=subtasks_split, repeats=repeats)
     elif tester_type == "cv":
         mtlt = CVMTLTester(tasks_data, rnd_seed, cv_folds=cv_folds)
+    elif tester_type == "pre-prepared_test":
+        mtlt = PrepreparedTestSetsMTLTester(tasks_data, rnd_seed, repeats=1,
+                    preprepared_test_sets=preprepared_test_sets)
     else:
         raise ValueError("Unknown MTL tester type: '{}'".format(tester_type))
     # select a random subset of tasks if keep > 0
