@@ -316,7 +316,7 @@ def generate_boolean_data_with_complete_test_sets(a, d, n, g, tg, noise,
         A list of Bunch objects corresponding to Boolean function learning
         tasks.
     tasks_complete_test_sets : list
-        A list of (X, y) tuples corresponding to complete testing test for each
+        A list of (X, y) tuples corresponding to complete testing sets for each
         task.
     
     """
