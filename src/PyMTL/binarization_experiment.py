@@ -103,13 +103,14 @@ def _add_id_and_merge_learn_data_orange(tasks):
     return learn_data_merged, test_data_with_id
 
 
-class BinarizationExperimentMTLTester(test.MTLTester):
+class BinarizationExperimentMTLTester(test.PrepreparedTestSetsMTLTester):
     
-    """A subclass of the PyMTL.test.MTLTester class containing special versions
-    of some of the methods to enable comparison between the standard ERM
-    multi-task learning (MTL) method and other methods that add the id attribute
-    to the input data, merge data of all tasks together and then use a decision
-    tree learning method with attribute binarization on the merged data.
+    """A subclass of the PyMTL.test.PrepreparedTestSetsMTLTester class
+    containing special versions of some of the methods to enable comparison
+    between the standard ERM multi-task learning (MTL) method and other methods
+    that add the id attribute to the input data, merge data of all tasks
+    together and then use a decision tree learning method with attribute
+    binarization on the merged data.
     
     """
     
@@ -124,6 +125,28 @@ class BinarizationExperimentMTLTester(test.MTLTester):
         # and converted to Orange format
         self._merged_learn_data_orange, self._test_data_orange = \
             _add_id_and_merge_learn_data_orange(self._tasks)
+    
+    def _save_orange_data(self, repetition, results_path):
+        """Save the Orange data table stored at self._merged_learn_data_orange
+        and Orange data tables stored at self._test_data_orange to the given
+        results path.
+        
+        Arguments:
+        repetition -- integer representing the repetition number of the
+            binarization experiment
+        results_path -- string representing the path where to save the Orange
+            data tables
+        
+        """
+        # save learn data
+        learn_data_path = os.path.join(results_path, "orange_merged_learn-"
+                                       "repetition{}.tab".format(repetition))
+        self._merged_learn_data_orange.save(learn_data_path)
+        # save test data
+        for tid, test_data in self._test_data_orange.items():
+            test_data_path = os.path.join(results_path, "orange_test-{}-"
+                                "repetition{}.tab".format(tid, repetition))
+            test_data.save(test_data_path)
     
     def _test_tasks_orange(self, models, measures):
         """Test the given tasks' models on their testing data sets. Compute
@@ -203,7 +226,8 @@ class BinarizationExperimentMTLTester(test.MTLTester):
         else:
             raise ValueError("Unsupported model type: {}".format(type(model0)))
     
-    def test_tasks(self, learners, base_learners, measures, results_path):
+    def test_tasks(self, learners, base_learners, measures, results_path,
+                   save_orange_data=False):
         """Repeat the following experiment self._repeats times:
         Prepare tasks' data with the _prepare_tasks_data() function.
         Test the performance of the given learning algorithms with the given
@@ -227,12 +251,16 @@ class BinarizationExperimentMTLTester(test.MTLTester):
             information about the running of this test (currently, only used
             for pickling the results when there is an error in calling the
             learner)
+        save_orange_data -- boolean indicating whether to save the Orange data
+            tables created with the call to self._prepare_tasks_data() function
         
         """
         rpt_scores = OrderedDict()
         dend_info = {bl : OrderedDict() for bl in base_learners.iterkeys()}
         for i in range(self._repeats):
             self._prepare_tasks_data(**self._tasks_data_params)
+            if save_orange_data:
+                self._save_orange_data(i, results_path)
             rpt_scores[i] = {bl : dict() for bl in base_learners.iterkeys()}
             for bl in base_learners:
                 for l in learners:
@@ -320,73 +348,98 @@ if __name__ == "__main__":
     learners = OrderedDict()
     learners["Tree"] = bin_exp.TreeMarkedAndMergedLearner()
     learners["ForcedTree"] = bin_exp.ForcedFirstSplitMTLLearner(
-                                        first_split_attr="x1")
+                                        first_split_attr="id")
     no_filter = prefiltering.NoFilter()
     learners["ERM"] = learning.ERMLearner(folds=5, seed=33, prefilter=no_filter,
                                           error_func=None)
     
-    test_config = 2
+    test_config = 1
     
     if test_config == 1:
         # parameters of the synthetic Boolean MTL problem
         attributes = 8
         disjunct_degree = 4
-        n = 200
-        task_groups = 2
-        tasks_per_group = 5
-        noise = 0.0
-        data_rnd_seed = 14
-        # parameters for the MTL problem tester
-        rnd_seed = 63
-        repeats = 3
-        test_prop=0.50
-        results_path = os.path.join(path_prefix, "results/binarization_"
-            "experiment/bool_func-a{}d{}n{}g{}tg{}rs{}-seed{}-repeats{}".\
-            format(attributes, disjunct_degree, n, task_groups, tasks_per_group,
-                   data_rnd_seed, rnd_seed, repeats))
-        if not os.path.exists(results_path):
-            os.makedirs(results_path)
-        log_file = os.path.join(results_path,
-                        "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
-        configure_logger(logger, console_level=logging.INFO,
-                         file_name=log_file)
-        tasks_data = synthetic_data.generate_boolean_data(attributes,
-                        disjunct_degree, n, task_groups, tasks_per_group, noise,
-                        random_seed=data_rnd_seed)
-    
-    if test_config == 2:
-        # parameters of the synthetic Boolean MTL problem
-        attributes = 8
-        disjunct_degree = 4
-        n = 200
+        n = 100
         task_groups = 2
         tasks_per_group = 5
         noise = 0.0
         data_rnd_seed = 15
         # parameters for the MTL problem tester
         rnd_seed = 63
-        repeats = 3
-        test_prop=0.50
         results_path = os.path.join(path_prefix, "results/binarization_"
-            "experiment/bool_func-a{}d{}n{}g{}tg{}rs{}-seed{}-repeats{}".\
+            "experiment/bool_func-a{}d{}n{}g{}tg{}rs{}-seed{}-complete_test".\
             format(attributes, disjunct_degree, n, task_groups, tasks_per_group,
-                   data_rnd_seed, rnd_seed, repeats))
+                   data_rnd_seed, rnd_seed))
         if not os.path.exists(results_path):
             os.makedirs(results_path)
         log_file = os.path.join(results_path,
                         "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
         configure_logger(logger, console_level=logging.INFO,
                          file_name=log_file)
-        tasks_data = synthetic_data.generate_boolean_data(attributes,
-                        disjunct_degree, n, task_groups, tasks_per_group, noise,
-                        random_seed=data_rnd_seed)
+        tasks_data, tasks_complete_test_sets = \
+            synthetic_data.generate_boolean_data_with_complete_test_sets(
+                attributes, disjunct_degree, n, task_groups, tasks_per_group,
+                noise, random_seed=data_rnd_seed)
+    
+    if test_config == 2:
+        # parameters of the synthetic Boolean MTL problem
+        attributes = 8
+        disjunct_degree = 4
+        n = 100
+        task_groups = 2
+        tasks_per_group = 5
+        noise = 0.0
+        data_rnd_seed = 14
+        # parameters for the MTL problem tester
+        rnd_seed = 63
+        results_path = os.path.join(path_prefix, "results/binarization_"
+            "experiment/bool_func-a{}d{}n{}g{}tg{}rs{}-seed{}-complete_test".\
+            format(attributes, disjunct_degree, n, task_groups, tasks_per_group,
+                   data_rnd_seed, rnd_seed))
+        if not os.path.exists(results_path):
+            os.makedirs(results_path)
+        log_file = os.path.join(results_path,
+                        "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
+        configure_logger(logger, console_level=logging.INFO,
+                         file_name=log_file)
+        tasks_data, tasks_complete_test_sets = \
+            synthetic_data.generate_boolean_data_with_complete_test_sets(
+                attributes, disjunct_degree, n, task_groups, tasks_per_group,
+                noise, random_seed=data_rnd_seed)
+    
+    if test_config == 3:
+        # parameters of the synthetic Boolean MTL problem
+        attributes = 16
+        disjunct_degree = 8
+        n = 100
+        task_groups = 2
+        tasks_per_group = 5
+        noise = 0.0
+        data_rnd_seed = 16
+        # parameters for the MTL problem tester
+        rnd_seed = 63
+        results_path = os.path.join(path_prefix, "results/binarization_"
+            "experiment/bool_func-a{}d{}n{}g{}tg{}rs{}-seed{}-complete_test".\
+            format(attributes, disjunct_degree, n, task_groups, tasks_per_group,
+                   data_rnd_seed, rnd_seed))
+        if not os.path.exists(results_path):
+            os.makedirs(results_path)
+        log_file = os.path.join(results_path,
+                        "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
+        configure_logger(logger, console_level=logging.INFO,
+                         file_name=log_file)
+        tasks_data, tasks_complete_test_sets = \
+            synthetic_data.generate_boolean_data_with_complete_test_sets(
+                attributes, disjunct_degree, n, task_groups, tasks_per_group,
+                noise, random_seed=data_rnd_seed)
     
     if not os.path.exists(results_path):
         os.makedirs(results_path)
     # create a MTL tester with tasks' data
-    mtlt = BinarizationExperimentMTLTester(tasks_data, rnd_seed,
-                                           test_prop=test_prop, repeats=repeats) 
-    mtlt.test_tasks(learners, base_learners_bool, measures_clas, results_path)
+    mtlt = BinarizationExperimentMTLTester(tasks_data, rnd_seed, repeats=1,
+            preprepared_test_sets=tasks_complete_test_sets)
+    mtlt.test_tasks(learners, base_learners_bool, measures_clas, results_path,
+                    save_orange_data=True)
     pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
     mtlt.pickle_test_results(pickle_path_fmt)
     # visualize the results of the current tasks for each combination of base
