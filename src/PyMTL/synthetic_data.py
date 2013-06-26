@@ -73,7 +73,7 @@ def generate_boolean_function(a, d=8, random_seed=0):
     return attributes, Or(*function)
 
 
-def generate_examples(attributes, function, n=100, random_state=None):
+def generate_examples(attributes, function, n=100, noise=0, random_state=None):
     """Generate examples for the given Boolean function. The values of
     attributes are chosen according to a random uniform distribution. 
     
@@ -86,10 +86,13 @@ def generate_examples(attributes, function, n=100, random_state=None):
         The Boolean function.
     n : int
         The number of example to generate.
+    noise: float (in range 0.0 -- 1.0)
+        The fraction of examples with the value of the Boolean function chosen
+        uniformly at random.
     random_state : int or RandomState
         The random seed or random state to use for pseudo-random number
         generator.
-        NOTE: This value is passed to sklearn's check_random_state function 
+        NOTE: This value is passed to sklearn's check_random_state function
     
     Returns
     -------
@@ -103,12 +106,21 @@ def generate_examples(attributes, function, n=100, random_state=None):
     a = len(attributes)
     X = np.zeros((n, a), dtype="int")
     y = np.zeros(n, dtype="int")
+    # create a noise mask with indices indicating whether the corresponding
+    # example should have its Boolean function value chosen randomly or not
+    noise_mask = np.zeros(n, dtype="bool")
+    noise_mask[:int(noise * n)] = True
+    random_state.shuffle(noise_mask)
     for i in range(n):
         # choose the values of all attributes according to a random uniform
         # distribution
         X_i = list(random_state.random_integers(0, 1, a))
-        # substitute the attributes in the function with their values
-        y_i = function.subs(zip(attributes, X_i))
+        if noise_mask[i]:
+            # choose the value of y at random
+            y_i = random_state.random_integers(0, 1)
+        else:
+            # substitute the attributes in the function with their values
+            y_i = function.subs(zip(attributes, X_i))
         X[i] = X_i
         y[i] = y_i
     return X, y
@@ -159,7 +171,7 @@ def _generate_boolean_data(a, d, n, g, tg, noise, random_seed):
         attr_names = [str(a_) for a_ in attr]
         funcs.append(func)
         for j in range(tg):
-            X, y = generate_examples(attr, func, n,
+            X, y = generate_examples(attr, func, n, noise=noise,
                                      random_state=rnd.randint(1, 100))
             # NOTE: sympy's pretty() function returns a unicode string, so the
             # string literal must also be a unicode string
@@ -346,6 +358,8 @@ if __name__ == "__main__":
     print u"Boolean function (a={}, d={}): {}".format(a, d, pretty(func))
     X, y = generate_examples(attr, func, n=1000, random_state=10)
     print "% of True values in y: {:.2f}".format(100 * sum(y == True) / len(y))
+    X_noise, y_noise = generate_examples(attr, func, n=1000, noise=0.3,
+                                         random_state=10)
     
     # try different learning algorithms in scikit-learn and report their
     # cross-validation scores
@@ -380,7 +394,8 @@ if __name__ == "__main__":
 #        format(len(tasks))
 
     tasks, tasks_complete_test_sets = \
-        generate_boolean_data_with_complete_test_sets(8, 4, 100, 2, 3, 0.0,
+        generate_boolean_data_with_complete_test_sets(8, 4, 100, 2, 3, 0.2,
                                                       random_seed=1)
     print "Generated a synthetic Boolean MTL problem with {} tasks.".\
         format(len(tasks))
+    
