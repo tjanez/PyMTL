@@ -258,6 +258,7 @@ class BinarizationExperimentMTLTester(test.PrepreparedTestSetsMTLTester):
         rpt_scores = OrderedDict()
         dend_info = {bl : OrderedDict() for bl in base_learners.iterkeys()}
         for i in range(self._repeats):
+            self._repetition_number = i
             self._prepare_tasks_data(**self._tasks_data_params)
             if save_orange_data:
                 self._save_orange_data(i, results_path)
@@ -367,12 +368,14 @@ if __name__ == "__main__":
         tasks_per_group = 5
         noise = 0.0
         data_rnd_seed = 15
+        n_learning_sets = 3
         # parameters for the MTL problem tester
         rnd_seed = 63
         results_path = os.path.join(path_prefix, "results/binarization_"
-            "experiment/bool_func-a{}d{}n{}g{}tg{}rs{}-seed{}-complete_test".\
+            "experiment/bool_func-a{}d{}n{}g{}tg{}nse{}rs{}nls{}-seed{}-"
+            "complete_test".\
             format(attributes, disjunct_degree, n, task_groups, tasks_per_group,
-                   data_rnd_seed, rnd_seed))
+                   noise, data_rnd_seed, n_learning_sets, rnd_seed))
         if not os.path.exists(results_path):
             os.makedirs(results_path)
         log_file = os.path.join(results_path,
@@ -382,7 +385,8 @@ if __name__ == "__main__":
         tasks_data, tasks_complete_test_sets = \
             synthetic_data.generate_boolean_data_with_complete_test_sets(
                 attributes, disjunct_degree, n, task_groups, tasks_per_group,
-                noise, random_seed=data_rnd_seed)
+                noise, random_seed=data_rnd_seed,
+                n_learning_sets=n_learning_sets)
     
     if test_config == 2:
         # parameters of the synthetic Boolean MTL problem
@@ -393,12 +397,14 @@ if __name__ == "__main__":
         tasks_per_group = 5
         noise = 0.0
         data_rnd_seed = 14
+        n_learning_sets = 3
         # parameters for the MTL problem tester
         rnd_seed = 63
         results_path = os.path.join(path_prefix, "results/binarization_"
-            "experiment/bool_func-a{}d{}n{}g{}tg{}rs{}-seed{}-complete_test".\
+            "experiment/bool_func-a{}d{}n{}g{}tg{}nse{}rs{}nls{}-seed{}-"
+            "complete_test".\
             format(attributes, disjunct_degree, n, task_groups, tasks_per_group,
-                   data_rnd_seed, rnd_seed))
+                   noise, data_rnd_seed, n_learning_sets, rnd_seed))
         if not os.path.exists(results_path):
             os.makedirs(results_path)
         log_file = os.path.join(results_path,
@@ -408,7 +414,8 @@ if __name__ == "__main__":
         tasks_data, tasks_complete_test_sets = \
             synthetic_data.generate_boolean_data_with_complete_test_sets(
                 attributes, disjunct_degree, n, task_groups, tasks_per_group,
-                noise, random_seed=data_rnd_seed)
+                noise, random_seed=data_rnd_seed,
+                n_learning_sets=n_learning_sets)
     
     if test_config == 3:
         # parameters of the synthetic Boolean MTL problem
@@ -419,12 +426,14 @@ if __name__ == "__main__":
         tasks_per_group = 5
         noise = 0.0
         data_rnd_seed = 16
+        n_learning_sets = 3
         # parameters for the MTL problem tester
         rnd_seed = 63
         results_path = os.path.join(path_prefix, "results/binarization_"
-            "experiment/bool_func-a{}d{}n{}g{}tg{}rs{}-seed{}-complete_test".\
+            "experiment/bool_func-a{}d{}n{}g{}tg{}nse{}rs{}nls{}-seed{}-"
+            "complete_test".\
             format(attributes, disjunct_degree, n, task_groups, tasks_per_group,
-                   data_rnd_seed, rnd_seed))
+                   noise, data_rnd_seed, n_learning_sets, rnd_seed))
         if not os.path.exists(results_path):
             os.makedirs(results_path)
         log_file = os.path.join(results_path,
@@ -434,7 +443,8 @@ if __name__ == "__main__":
         tasks_data, tasks_complete_test_sets = \
             synthetic_data.generate_boolean_data_with_complete_test_sets(
                 attributes, disjunct_degree, n, task_groups, tasks_per_group,
-                noise, random_seed=data_rnd_seed)
+                noise, random_seed=data_rnd_seed,
+                n_learning_sets=n_learning_sets)
     
     if test_config == 4:
         # parameters of the synthetic Boolean MTL problem
@@ -448,9 +458,10 @@ if __name__ == "__main__":
         # parameters for the MTL problem tester
         rnd_seed = 63
         results_path = os.path.join(path_prefix, "results/binarization_"
-            "experiment/bool_func-a{}d{}n{}g{}tg{}rs{}-seed{}-complete_test_unprunned".\
+            "experiment/bool_func-a{}d{}n{}g{}tg{}nse{}rs{}nls{}-seed{}-"
+            "complete_test".\
             format(attributes, disjunct_degree, n, task_groups, tasks_per_group,
-                   data_rnd_seed, rnd_seed))
+                   noise, data_rnd_seed, n_learning_sets, rnd_seed))
         if not os.path.exists(results_path):
             os.makedirs(results_path)
         log_file = os.path.join(results_path,
@@ -460,7 +471,8 @@ if __name__ == "__main__":
         tasks_data, tasks_complete_test_sets = \
             synthetic_data.generate_boolean_data_with_complete_test_sets(
                 attributes, disjunct_degree, n, task_groups, tasks_per_group,
-                noise, random_seed=data_rnd_seed)
+                noise, random_seed=data_rnd_seed,
+                n_learning_sets=n_learning_sets)
     
     if not os.path.exists(results_path):
         os.makedirs(results_path)
