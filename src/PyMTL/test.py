@@ -27,6 +27,7 @@ import numpy as np
 from sklearn import metrics
 from sklearn import cross_validation
 from sklearn.base import ClassifierMixin, RegressorMixin
+from sklearn.datasets.base import Bunch
 
 from PyMTL import data, stat
 from PyMTL.learning import prefiltering, learning
@@ -597,6 +598,7 @@ class MTLTester(object):
         rpt_scores = OrderedDict()
         dend_info = {bl : OrderedDict() for bl in base_learners.iterkeys()}
         for i in range(self._repeats):
+            self._repetition_number = i
             self._prepare_tasks_data(**self._tasks_data_params)
             rpt_scores[i] = {bl : dict() for bl in base_learners.iterkeys()}
             for bl in base_learners:
@@ -1064,6 +1066,35 @@ class PrepreparedTestSetsMTLTester(MTLTester):
     
     """
     
+    def __init__(self, tasks_data, seed, repeats, **kwargs):
+        """In addition to calling the super class' __init__() function, check
+        whether the given tasks_data is a list of Bunch objects or a list of
+        lists of Bunch objects and set the self._repeats attribute
+        appropriately.
+        
+        Arguments:
+        tasks_data -- either a list of Bunch objects, where each Bunch object
+            holds data corresponding to a task of the MTL problem,
+            or a list of lists of Bunch objects, where each list corresponds
+            to a set of different learning sets for each task of the MTL problem
+        seed -- integer to be used as a seed for the private Random object
+        repeats -- integer representing how many times the testing experiment
+            should be repeated
+        
+        """
+        super(PrepreparedTestSetsMTLTester, self).__init__(tasks_data, seed,
+                                                           repeats, **kwargs)
+        if (isinstance(tasks_data[0], list) and
+            isinstance(tasks_data[0][0], Bunch)):
+            # we have more than one learning set for each task
+            self._repeats = len(tasks_data[0])
+        elif isinstance(tasks_data[0], Bunch):
+            # we have one learning set for each task
+            self._repeats = 1
+        else:
+            raise ValueError("The given tasks_data should be a list of Bunch"
+                             "objects or a list of lists of Bunch objects.")
+    
     def _prepare_tasks_data(self, preprepared_test_sets=None):
         """Iterate through the tasks' data stored in self._tasks_data and the
         given pre-prepared testing sets. Create a new Task object for each task
@@ -1080,13 +1111,18 @@ class PrepreparedTestSetsMTLTester(MTLTester):
             raise ValueError("The pre-prepared testing sets of tasks were not "
                              "given.")
         self._tasks = OrderedDict()
-        for td, preprepared_test_set in zip(self._tasks_data,
-                                         preprepared_test_sets):
-            training_data = td.data, td.target
+        if self._repeats > 1:
+            i = self._repetition_number
+            cur_training_data = [td[i] for td in self._tasks_data]
+        else:
+            cur_training_data = self._tasks_data
+        for td, preprepared_test_set in zip(cur_training_data,
+                                            preprepared_test_sets):
+            training_set = td.data, td.target
             kwargs = {}
             if hasattr(td, "feature_names"):
                 kwargs["feature_names"] = td.feature_names
-            self._tasks[td.ID] = Task(td.ID, training_data,
+            self._tasks[td.ID] = Task(td.ID, training_set,
                                       preprepared_test_set, **kwargs)
 
 
