@@ -313,8 +313,8 @@ class BinarizationExperimentMTLTester(test.PrepreparedTestSetsMTLTester):
                     if isinstance(learners[l],
                                   bin_exp.TreeMarkedAndMergedLearner):
                         tree = R["task_models"].values()[0]
-                        save_path = os.path.join(results_path, "{}-repeat{}"
-                                                 ".svg".format(l, i))
+                        save_path = os.path.join(results_path, "{}-{}-repeat{}"
+                                                 ".svg".format(bl, l, i))
                         save_treegraph_image(tree, save_path)
         self._process_repetition_scores(rpt_scores, dend_info)
 
@@ -336,9 +336,12 @@ if __name__ == "__main__":
     import Orange.classification.tree as octree
     import Orange.feature.scoring as fscoring
     split_const = octree.SplitConstructor_ExhaustiveBinary(measure=
-                                                           fscoring.InfoGain())   
+                                                           fscoring.InfoGain())
     base_learners_bool["orange_tree"] = octree.TreeLearner(split=split_const,
-                                                           store_instances=True)
+        store_instances=True)
+    base_learners_bool["orange_tree_pruned"] = octree.TreeLearner(
+        split=split_const, min_instances=10, same_majority_pruning=True,
+        store_instances=True)
     
     # scoring measures for classification problems
     measures_clas = []
@@ -420,6 +423,32 @@ if __name__ == "__main__":
         rnd_seed = 63
         results_path = os.path.join(path_prefix, "results/binarization_"
             "experiment/bool_func-a{}d{}n{}g{}tg{}rs{}-seed{}-complete_test".\
+            format(attributes, disjunct_degree, n, task_groups, tasks_per_group,
+                   data_rnd_seed, rnd_seed))
+        if not os.path.exists(results_path):
+            os.makedirs(results_path)
+        log_file = os.path.join(results_path,
+                        "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
+        configure_logger(logger, console_level=logging.INFO,
+                         file_name=log_file)
+        tasks_data, tasks_complete_test_sets = \
+            synthetic_data.generate_boolean_data_with_complete_test_sets(
+                attributes, disjunct_degree, n, task_groups, tasks_per_group,
+                noise, random_seed=data_rnd_seed)
+    
+    if test_config == 4:
+        # parameters of the synthetic Boolean MTL problem
+        attributes = 12
+        disjunct_degree = 6
+        n = 200
+        task_groups = 2
+        tasks_per_group = 5
+        noise = 0.0
+        data_rnd_seed = 16
+        # parameters for the MTL problem tester
+        rnd_seed = 63
+        results_path = os.path.join(path_prefix, "results/binarization_"
+            "experiment/bool_func-a{}d{}n{}g{}tg{}rs{}-seed{}-complete_test_unprunned".\
             format(attributes, disjunct_degree, n, task_groups, tasks_per_group,
                    data_rnd_seed, rnd_seed))
         if not os.path.exists(results_path):
