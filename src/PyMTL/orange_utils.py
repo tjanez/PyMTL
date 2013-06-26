@@ -128,9 +128,9 @@ class ForcedFirstSplitTreeLearner(octree.TreeLearner):
         
         # perform post pruning
         if getattr(self, "same_majority_pruning", 0):
-            tree = Pruner_SameMajority(tree)
+            tree = octree.Pruner_SameMajority(tree)
         if getattr(self, "m_pruning", 0):
-            tree = Pruner_m(tree, m=self.m_pruning)
+            tree = octree.Pruner_m(tree, m=self.m_pruning)
         
         return octree.TreeClassifier(base_classifier=tree)
 
