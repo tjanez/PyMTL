@@ -20,7 +20,6 @@
 
 import logging
 
-
 def configure_logger(logger, level=logging.DEBUG, console_level=logging.DEBUG,
                      file_name=None, file_level=logging.DEBUG):
     """Configure the given Logger instance.
@@ -72,7 +71,6 @@ configure_logger(logger)
 
 import os, subprocess
 
-
 def convert_svgs_to_pdfs(path):
     """Find the SVG files in the given path, convert them to PDF, crop them and
     finally, remove them.
@@ -93,3 +91,20 @@ def convert_svgs_to_pdfs(path):
             subprocess.call(["-c", "rsvg-convert -f pdf {} | pdfcrop - {}".\
                              format(svg_file, pdf_file)], shell=True)
             os.remove(svg_file)
+
+
+import warnings
+
+def ignore_deprecation_warnings(func):
+    """This is a decorator which can be used to ignore deprecation warnings
+    occurring in a function.
+    
+    """
+    def new_func(*args, **kwargs):
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return func(*args, **kwargs)
+    new_func.__name__ = func.__name__
+    new_func.__doc__ = func.__doc__
+    new_func.__dict__.update(func.__dict__)
+    return new_func

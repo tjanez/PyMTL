@@ -28,10 +28,11 @@ import sklearn
 import Orange
 
 from PyMTL import data, synthetic_data, test
-from PyMTL.util import logger, configure_logger, convert_svgs_to_pdfs
+from PyMTL.util import (logger, configure_logger, convert_svgs_to_pdfs,
+                        ignore_deprecation_warnings)
 from PyMTL.learning import prefiltering, learning, bin_exp
-from PyMTL.orange_utils import convert_numpy_data_to_orange, \
-    OrangeClassifierWrapper
+from PyMTL.orange_utils import (convert_numpy_data_to_orange,
+                                OrangeClassifierWrapper)
 from PyMTL.orange_visualizations import save_treegraph_image
 
 
@@ -148,6 +149,7 @@ class BinarizationExperimentMTLTester(test.PrepreparedTestSetsMTLTester):
                                 "repetition{}.tab".format(tid, repetition))
             test_data.save(test_data_path)
     
+    @ignore_deprecation_warnings
     def _test_tasks_orange(self, models, measures):
         """Test the given tasks' models on their testing data sets. Compute
         the given scoring measures of the testing results.
