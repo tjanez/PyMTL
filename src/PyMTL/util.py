@@ -88,9 +88,12 @@ def convert_svgs_to_pdfs(path):
         if ext.lower() == ".svg":
             svg_file = os.path.join(path, file)
             pdf_file = os.path.join(path, base + ".pdf")
-            subprocess.call(["-c", "rsvg-convert -f pdf {} | pdfcrop - {}".\
-                             format(svg_file, pdf_file)], shell=True)
-            os.remove(svg_file)
+            retcode = subprocess.call(["-c", "rsvg-convert --format pdf "
+                        "--width 10000 --keep-aspect-ratio {} | pdfcrop - {}".\
+                        format(svg_file, pdf_file)], shell=True)
+            # remove the original file only if the conversion was successful
+            if retcode == 0:
+                os.remove(svg_file)
 
 
 import warnings
