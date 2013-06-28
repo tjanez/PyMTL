@@ -168,22 +168,28 @@ def _generate_boolean_data(a, d, n, g, tg, noise, random_seed,
     
     """
     rnd = random.Random(random_seed)
-    tasks = [[] for i in range(g * tg)]
+    # generate Boolean functions
+    attrs = []
     funcs = []
     for i in range(g):
         attr, func = generate_boolean_function(a, d,
                                                random_seed=rnd.randint(1, 100))
-        attr_names = [str(a_) for a_ in attr]
+        attrs.append(attr)
         funcs.append(func)
+    # generate examples for all tasks 
+    tasks = [[] for i in range(g * tg)]
+    for i in range(g):
+        attr, func = attrs[i], funcs[i]
+        attr_names = [str(a_) for a_ in attr]
         for j in range(tg):
+            # NOTE: sympy's pretty() function returns a unicode string, so
+            # the string literal must also be a unicode string
+            descr = (u"Synthetic boolean data for task {} of group {} "
+                     "(function: {})".format(j, i, pretty(func)))
+            id = "Group {}, task {}".format(i, j)
             for k in range(n_learning_sets):
                 X, y = generate_examples(attr, func, n, noise=noise,
                                          random_state=rnd.randint(1, 100))
-                # NOTE: sympy's pretty() function returns a unicode string, so
-                # the string literal must also be a unicode string
-                descr = (u"Synthetic boolean data for task {} of group {} "
-                         "(function: {})".format(j, i, pretty(func)))
-                id = "Group {}, task {}".format(i, j)
                 tasks[i * tg + j].append(Bunch(data=X, target=y,
                                                feature_names=attr_names,
                                                DESCR=descr, ID=id))
