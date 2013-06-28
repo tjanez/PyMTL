@@ -185,7 +185,8 @@ def _generate_boolean_data(a, d, n, g, tg, noise, random_seed,
             # NOTE: sympy's pretty() function returns a unicode string, so
             # the string literal must also be a unicode string
             descr = (u"Synthetic boolean data for task {} of group {} "
-                     "(function: {})".format(j, i, pretty(func)))
+                     "(function: {})".format(j, i, pretty(func,
+                                                          wrap_line=False)))
             id = "Group {}, task {}".format(i, j)
             for k in range(n_learning_sets):
                 X, y = generate_examples(attr, func, n, noise=noise,
@@ -220,7 +221,8 @@ def _report_about_generated_boolean_mtl_problem(functions, tasks):
     for i, func in enumerate(functions):
         # NOTE: sympy's pretty() function returns a unicode string, so the
         # string literal must also be a unicode string
-        logger.debug(u"   - Group {}: {}".format(i, pretty(func)))
+        logger.debug(u"   - Group {}: {}".format(i, pretty(func,
+                                                           wrap_line=False)))
     logger.debug("  % of True values in y for each task:")
     sum_true = 0
     sum_total = 0
@@ -386,7 +388,8 @@ if __name__ == "__main__":
     attr, func = generate_boolean_function(a, d, random_seed=2)
     # NOTE: sympy's pretty() function returns a unicode string, so the string
     # literal must also be a unicode string
-    print u"Boolean function (a={}, d={}): {}".format(a, d, pretty(func))
+    print u"Boolean function (a={}, d={}): {}".format(a, d,
+                                                pretty(func, wrap_line=False))
     X, y = generate_examples(attr, func, n=1000, random_state=10)
     print "% of True values in y: {:.2f}".format(100 * sum(y == True) / len(y))
     X_noise, y_noise = generate_examples(attr, func, n=1000, noise=0.3,
