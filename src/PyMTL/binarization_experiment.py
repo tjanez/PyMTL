@@ -340,7 +340,7 @@ def run_experiment(attributes, disjunct_degree, n, task_groups, tasks_per_group,
         The number of examples for each task to generate.
     task_groups : int
         The number of task groups to generate. Each task group shares the
-        same Boolean functions.
+        same Boolean function.
     tasks_per_group : int
         The number of tasks (with their corresponding data) to generate for
         each task group.
@@ -398,11 +398,12 @@ def run_experiment(attributes, disjunct_degree, n, task_groups, tasks_per_group,
                             "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
         configure_logger(logger, console_level=logging.INFO, file_name=log_file)
     # generate boolean data with complete test sets
+    funcs_pickle_path = os.path.join(results_path, "boolean_funcs.pkl")
     tasks_data, tasks_complete_test_sets = \
         synthetic_data.generate_boolean_data_with_complete_test_sets(
             attributes, disjunct_degree, n, task_groups, tasks_per_group,
-            noise, random_seed=data_rnd_seed,
-            n_learning_sets=n_learning_sets)
+            noise, random_seed=data_rnd_seed, n_learning_sets=n_learning_sets,
+            funcs_pickle_path=funcs_pickle_path)
     # create a MTL tester with tasks' data
     mtlt = BinarizationExperimentMTLTester(tasks_data, rnd_seed, repeats=1,
             preprepared_test_sets=tasks_complete_test_sets)

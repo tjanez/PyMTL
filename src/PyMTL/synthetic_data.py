@@ -29,7 +29,7 @@ from sympy.printing import pretty
 from sklearn.utils import validation
 from sklearn.datasets.base import Bunch
 
-from PyMTL.util import logger
+from PyMTL.util import logger, pickle_obj
 
 def generate_boolean_function(a, d=8, random_seed=0):
     """Generate a Boolean function in disjunctive normal form according to the
@@ -322,7 +322,7 @@ def _generate_complete_test_set(attributes, function):
 
 
 def generate_boolean_data_with_complete_test_sets(a, d, n, g, tg, noise,
-        random_seed=1, n_learning_sets=1):
+        random_seed=1, n_learning_sets=1, funcs_pickle_path=None):
     """Generate a synthetic MTL problem of learning Boolean functions according
     to the given parameters. In addition, create test sets that cover the
     complete attribute space (2**a distinct examples).
@@ -348,10 +348,12 @@ def generate_boolean_data_with_complete_test_sets(a, d, n, g, tg, noise,
     noise : float
         The proportion of examples of each task that have their class values
         determined randomly.
-    random_seed : int
+    random_seed : int (optional)
         The random seed with which to initialize a private Random object.
-    n_learning_sets : int
+    n_learning_sets : int (optional)
         The number of different learning sets to create for each task.
+    funcs_pickle_path : str (optional)
+        Path where to pickle the list of generated Boolean functions. 
     
     Returns
     -------
@@ -367,6 +369,8 @@ def generate_boolean_data_with_complete_test_sets(a, d, n, g, tg, noise,
     """
     tasks, funcs, attr = _generate_boolean_data(a, d, n, g, tg, noise,
                             random_seed, n_learning_sets=n_learning_sets)
+    if funcs_pickle_path:
+        pickle_obj(funcs, funcs_pickle_path)
     
     tasks_complete_test_sets = []
     # generate a complete testing set for each Boolean function
