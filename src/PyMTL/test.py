@@ -20,7 +20,6 @@
 #
 
 import bisect, hashlib, logging, os, random, re, time
-import cPickle as pickle
 from collections import OrderedDict
 
 import numpy as np
@@ -34,32 +33,8 @@ from PyMTL.learning import prefiltering, learning
 from PyMTL.plotting import BarPlotDesc, LinePlotDesc, plot_multiple, \
     plot_multiple_separate, plot_dendrograms
 from PyMTL.sklearn_utils import absolute_error, squared_error
-from PyMTL.util import logger, configure_logger
+from PyMTL.util import logger, configure_logger, pickle_obj, unpickle_obj
 
-
-def pickle_obj(obj, file_path):
-    """Pickle the given object to the given file_path.
-    
-    Keyword arguments:
-    file_path -- string representing the path to the file where to pickle
-        the object
-    
-    """
-    with open(file_path, "wb") as pkl_file:
-        pickle.dump(obj, pkl_file, pickle.HIGHEST_PROTOCOL)
-
-
-def unpickle_obj(file_path):
-    """Unpickle an object from the given file_path.
-    Return the reference to the unpickled object.
-    
-    Keyword arguments:
-    file_path -- string representing the path to the file where the object is
-        pickled
-    
-    """
-    with open(file_path, "rb") as pkl_file:
-        return pickle.load(pkl_file)
 
 class Task(object):
     
@@ -934,6 +909,7 @@ class MTLTester(object):
             - ci95 -- margin of error is 95% conf. interval of the mean
         
         """
+        over_res = OrderedDict()
         offset = "  "
         with open(os.path.join(results_path, "overall_results.txt"), 'w') as r:
             for m in measures:
@@ -941,8 +917,10 @@ class MTLTester(object):
                     "measure: {})".format(m, weighting, error_margin)
                 r.write(s + "\n")
                 r.write("-"*len(s) + "\n")
+                over_res[s] = OrderedDict()
                 for bl in base_learners:
                     r.write(offset + "- Base learner: {}".format(bl) + "\n")
+                    over_res[s][bl] = OrderedDict()
                     for l in learners:
                         avg, std, ci95 = self._compute_overall_stats(bl, l, m,
                                                 weighting=weighting)
@@ -955,7 +933,10 @@ class MTLTester(object):
                                              "{}".format(error_margin))
                         r.write(3*offset + "* {:<20}{:.2f} +/- {:.2f}".\
                                 format(l, avg, em) + "\n")
+                        over_res[s][bl][l] = (avg, em)
                 r.write("\n")
+        pickle_obj(over_res, os.path.join(results_path, "overall_results.pkl"))
+
 
 class SubtasksMTLTester(MTLTester):
     

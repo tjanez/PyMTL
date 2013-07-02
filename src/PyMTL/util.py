@@ -69,6 +69,33 @@ logger = logging.getLogger(logger_name)
 configure_logger(logger)
 
 
+import cPickle as pickle
+
+def pickle_obj(obj, file_path):
+    """Pickle the given object to the given file_path.
+    
+    Keyword arguments:
+    file_path -- string representing the path to the file where to pickle
+        the object
+    
+    """
+    with open(file_path, "wb") as pkl_file:
+        pickle.dump(obj, pkl_file, pickle.HIGHEST_PROTOCOL)
+
+
+def unpickle_obj(file_path):
+    """Unpickle an object from the given file_path.
+    Return the reference to the unpickled object.
+    
+    Keyword arguments:
+    file_path -- string representing the path to the file where the object is
+        pickled
+    
+    """
+    with open(file_path, "rb") as pkl_file:
+        return pickle.load(pkl_file)
+
+
 import os, subprocess
 
 def convert_svgs_to_pdfs(path):
