@@ -25,6 +25,12 @@ from Orange.classification.tree import TreeClassifier
 
 # indentation
 IND = "  "
+# TikZ tree style
+TIKZ_TREE_STYLE = r"""
+\begin{tikzpicture}[every internal node/.style={draw,circle},
+  level distance=1.25cm,sibling distance=1cm,
+  edge from parent path={(\tikzparentnode) -- (\tikzchildnode)}]
+"""
 
 
 def _convert_attr_name(name):
@@ -202,10 +208,34 @@ def draw_tikz_tree(tree):
     res = _draw_tikz_subtree(node, initial_ind_level, only_draw="id")
     # insert the '\Tree' command at the beginning of the string
     res = "\\Tree " + res[6:]
-    # indicate that the following is a TikZ picture
-    res = "\\begin{tikzpicture}\n" + res
-    res += "\\end{tikzpicture}\n"
     return res
+
+
+def draw_and_save_tikz_tree_document(tree, save_path):
+    """Draw a tikz-qtree-formatted tree from the given Orange TreeClassifier,
+    put it in a stand-alone TeX document and save it to the given path.
+    
+    Parameters
+    ----------
+    tree : Orange's TreeClassifier
+        The decision tree for which to draw a tikz-qtree-formatted tree.
+    save_path : string
+        The path where to store a stand-alone TeX document containing the
+        tikz-qtree-formatted tree.
+    
+    """
+    with open(save_path, "w") as out:
+        out.write("\\documentclass[12pt,a4paper]{article}\n\n"
+                  "\\usepackage[margin=0cm, landscape]{geometry}\n"
+                  "\\usepackage{tikz}\n"
+                  "\\usepackage{tikz-qtree}\n"
+                  "\\usepackage{xspace}\n\n"
+                  "\\newcommand{\\id}{\\textit{id}\\xspace}\n\n"
+                  "\\begin{document}\n")
+        out.write(TIKZ_TREE_STYLE)
+        out.write(draw_tikz_tree(tree))
+        out.write("\\end{tikzpicture}\n"
+                  "\\end{document}\n")
 
 
 if __name__ == "__main__":
@@ -245,7 +275,14 @@ if __name__ == "__main__":
                               "nls10-seed63-complete_test/orange_merged_learn-"
                               "repetition0.tab"))
     tree = tree_learner(data)
-    print draw_tikz_tree(tree)
+    tex_file = os.path.join(results_path, "test-tree.tex")
+    pdf_file = os.path.join(results_path, "test-tree.pdf")
+    draw_and_save_tikz_tree_document(tree, tex_file)
+    import subprocess
+    subprocess.call(["-c", "pdflatex -interaction=batchmode {0} && "
+                     "rm {1}.{{aux,log}} && pdfcrop --margins 10 {1}.pdf {2}".
+                     format(tex_file, tex_file[:-4], pdf_file)],
+                     shell=True, cwd=results_path)
     
     # initialize Qt application
     import sys
