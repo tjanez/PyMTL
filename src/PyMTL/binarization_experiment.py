@@ -28,12 +28,14 @@ import sklearn
 import Orange
 
 from PyMTL import data, synthetic_data, test
-from PyMTL.util import (logger, configure_logger, convert_svgs_to_pdfs,
-                        ignore_deprecation_warnings)
+from PyMTL.util import (logger, configure_logger, pickle_obj,
+                        ignore_deprecation_warnings,
+                        convert_svgs_to_pdfs, build_and_crop_tex_files)
 from PyMTL.learning import prefiltering, learning, bin_exp
 from PyMTL.orange_utils import (convert_numpy_data_to_orange,
                                 OrangeClassifierWrapper)
 from PyMTL.orange_visualizations import save_treegraph_image
+from PyMTL.tikz_visualizations import draw_and_save_tikz_tree_document
 
 
 def _add_id_and_merge_learn_data_orange(tasks):
@@ -311,15 +313,22 @@ class BinarizationExperimentMTLTester(test.PrepreparedTestSetsMTLTester):
                     # store dendrogram info if the results contain it 
                     if "dend_info" in R:
                         dend_info[bl][i] = R["dend_info"]
-                    # visualize the decision tree if the learner is a (sub)class
-                    # of TreeMarkedAndMergedLearner
+                    # pickle and visualize the decision tree if the learner is a
+                    # (sub)class of TreeMarkedAndMergedLearner
                     if isinstance(learners[l],
                                   bin_exp.TreeMarkedAndMergedLearner):
                         tree = R["task_models"].values()[0]
-                        save_path = os.path.join(results_path, "{}-{}-repeat{}"
-                                                 ".svg".format(bl, l, i))
-                        save_treegraph_image(tree, save_path)
+                        pickle_path = os.path.join(results_path, "{}-{}-"
+                                        "repeat{}.pkl".format(bl, l, i))
+                        svg_path = os.path.join(results_path, "{}-{}-repeat{}"
+                                                ".svg".format(bl, l, i))
+                        tikz_path = os.path.join(results_path, "{}-{}-repeat{}"
+                                                 "-tikz.tex".format(bl, l, i))
+                        pickle_obj(tree, pickle_path)
+                        save_treegraph_image(tree, svg_path)
+                        draw_and_save_tikz_tree_document(tree, tikz_path)
         self._process_repetition_scores(rpt_scores, dend_info)
+
 
 def run_experiment(attributes, disjunct_degree, n, task_groups, tasks_per_group,
                    noise, data_rnd_seed, n_learning_sets, rnd_seed,
@@ -427,6 +436,7 @@ def run_experiment(attributes, disjunct_degree, n, task_groups, tasks_per_group,
     mtlt.compute_overall_results(bls, ls, ms, results_path,
             weighting=weighting, error_margin=error_margin)
     convert_svgs_to_pdfs(results_path)
+    build_and_crop_tex_files(results_path)
 
 
 if __name__ == "__main__":

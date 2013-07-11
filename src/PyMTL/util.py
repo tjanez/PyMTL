@@ -123,6 +123,30 @@ def convert_svgs_to_pdfs(path):
                 os.remove(svg_file)
 
 
+def build_and_crop_tex_files(path):
+    """Find all TeX files in the given path, build them and crop the resulting
+    PDFs.
+    
+    Note: This function requires 'pdflatex' and 'pdfcrop' commands to be
+    installed somewhere in $PATH.
+    
+    Arguments:
+    path -- string representing the path to the directory where to build and
+        crop the source TeX files
+    
+    """
+    for file in sorted(os.listdir(path)):
+        base, ext = os.path.splitext(file)
+        if ext.lower() == ".tex":
+            tex_file = file
+            pdf_file = os.path.join(path, base + ".pdf")
+            subprocess.call(["-c", "pdflatex -interaction=batchmode {0} && "
+                             "rm {1}.{{aux,log}} && "
+                             "pdfcrop --margins 10 {1}.pdf {1}.pdf".
+                             format(file, base)],
+                            shell=True, cwd=path)
+
+
 import warnings
 
 def ignore_deprecation_warnings(func):
