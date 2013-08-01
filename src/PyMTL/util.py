@@ -123,27 +123,37 @@ def convert_svgs_to_pdfs(path):
                 os.remove(svg_file)
 
 
-def build_and_crop_tex_files(path):
-    """Find all TeX files in the given path, build them and crop the resulting
-    PDFs.
+import re
+
+def build_and_crop_tex_files(path, pattern, crop=True):
+    """Find all TeX files in the given path matching the given pattern, build
+    them and crop the resulting PDFs.
     
     Note: This function requires 'pdflatex' and 'pdfcrop' commands to be
     installed somewhere in $PATH.
     
     Arguments:
-    path -- string representing the path to the directory where to build and
-        crop the source TeX files
+    path -- string representing the path to the directory where to find, build
+        and crop the source TeX files
+    pattern -- string representing the regular expression pattern to use when
+        matching the TeX files that should be built and cropped
+    
+    Keyword arguments:
+    crop -- boolean indicating whether the resulting PDF files should be
+        cropped (with 'pdfcrop') or not
     
     """
+    command_pattern = ("pdflatex -interaction=batchmode {0}"
+                       " && rm {1}.{{aux,log}}")
+    if crop:
+        command_pattern += " && pdfcrop --margins 10 {1}.pdf {1}.pdf"
     for file in sorted(os.listdir(path)):
-        base, ext = os.path.splitext(file)
-        if ext.lower() == ".tex":
-            tex_file = file
+        match = re.search(pattern, file)
+        if match:
+            base, ext = os.path.splitext(file)
             pdf_file = os.path.join(path, base + ".pdf")
-            subprocess.call(["-c", "pdflatex -interaction=batchmode {0} && "
-                             "rm {1}.{{aux,log}} && "
-                             "pdfcrop --margins 10 {1}.pdf {1}.pdf".
-                             format(file, base)],
+            
+            subprocess.call(["-c", command_pattern.format(file, base)],
                             shell=True, cwd=path)
 
 

@@ -20,7 +20,7 @@
 # Author(s): Tadej Janez <tadej.janez@fri.uni-lj.si>
 #
 
-import logging, os.path, time
+import logging, os.path, re, time
 from collections import OrderedDict
 
 import numpy as np
@@ -330,6 +330,81 @@ class BinarizationExperimentMTLTester(test.PrepreparedTestSetsMTLTester):
         self._process_repetition_scores(rpt_scores, dend_info)
 
 
+def combine_dendrograms_and_trees(base_learners, path):
+    """Find the PDF files of ERM's dendrograms and ForcedTree's trees for the
+    given base learners in the given path, and
+    create a TeX file with dendrograms and trees as side-by-side figures (one
+    figure for each repetition).
+    
+    Parameters
+    ----------
+    base_learners : list 
+        A list of strings representing the names of base learners.
+    path : string
+        The path where to search for PDF files of ERM's dendrograms and
+        ForcedTree's trees.
+    
+    """
+    for bl in base_learners:
+        # find the PDFs of ERM's dendrograms and ForcedTree's trees
+        dends = OrderedDict()
+        trees = OrderedDict()
+        for e in sorted(os.listdir(path)):
+            match_dend = re.search(r"^dend-" + bl + r"-repeat(\d+).pdf$", e)
+            if match_dend:
+                # extract the values of the parenthesized subgroup
+                repeat = match_dend.group(1)
+                dends[repeat] = os.path.join(path, e)
+        for e in sorted(os.listdir(path)):
+            match_tree = re.search(r"^" + bl + r"-ForcedTree-repeat(\d+)-"
+                                   r"tikz.pdf$", e)
+            if match_tree:
+                # extract the values of the parenthesized subgroup
+                repeat = match_tree.group(1)
+                trees[repeat] = os.path.join(path, e)
+        # create a TeX file with dendrograms and trees as side-by-side figures
+        # (one figure for each repetition) 
+        tex_file = os.path.join(path, "comparison-{}-ForcedTree_vs_dend.tex".
+                                format(bl))
+        with open(tex_file, "w") as out:
+            out.write(r"\documentclass[12pt,a4paper]{article}"
+                      "\n\n"
+                      r"\usepackage[margin=0cm, landscape]{geometry}"
+                      "\n"
+                      r"\usepackage{graphicx}"
+                      "\n\n"
+                      r"\begin{document}"
+                      "\n\n")
+            for repeat in trees:
+                out.write(r"\begin{figure}"
+                          "\n"
+                          r"\centering"
+                          "\n"
+                          r"\begin{minipage}{0.45\textwidth}"
+                          "\n"
+                          r"\centering"
+                          "\n"
+                          r"\includegraphics[width=\textwidth]{")
+                out.write(dends[repeat])
+                out.write("}\n"
+                          r"\end{minipage}"
+                          "\n"                        
+                          r"\begin{minipage}{0.45\textwidth}"
+                          "\n"
+                          r"\centering"
+                          "\n"
+                          r"\includegraphics[width=\textwidth]{")
+                out.write(trees[repeat])
+                out.write("}\n"
+                          r"\end{minipage}"
+                          "\n"
+                          r"\caption{Dendrogram of ERM vs. ForcedTree, ")
+                out.write("repetition: {}}}\n".format(repeat))
+                out.write(r"\end{figure}"
+                          "\n\n")
+            out.write(r"\end{document}")
+
+
 def run_experiment(attributes, disjunct_degree, n, task_groups, tasks_per_group,
                    noise, data_rnd_seed, n_learning_sets, rnd_seed,
                    results_path, base_learners, measures, learners,
@@ -406,6 +481,7 @@ def run_experiment(attributes, disjunct_degree, n, task_groups, tasks_per_group,
         log_file = os.path.join(results_path,
                             "run-{}.log".format(time.strftime("%Y%m%d_%H%M%S")))
         configure_logger(logger, console_level=logging.INFO, file_name=log_file)
+    pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
     # generate boolean data with complete test sets
     funcs_pickle_path = os.path.join(results_path, "boolean_funcs.pkl")
     tasks_data, tasks_complete_test_sets = \
@@ -416,27 +492,41 @@ def run_experiment(attributes, disjunct_degree, n, task_groups, tasks_per_group,
     # create a MTL tester with tasks' data
     mtlt = BinarizationExperimentMTLTester(tasks_data, rnd_seed, repeats=1,
             preprepared_test_sets=tasks_complete_test_sets)
-    mtlt.test_tasks(learners, base_learners, measures, results_path,
-                    save_orange_data=True)
-    pickle_path_fmt = os.path.join(results_path, "bl-{}.pkl")
-    mtlt.pickle_test_results(pickle_path_fmt)
+    # test all combinations of learners and base learners (compute the testing
+    # results with the defined measures) and save the results if test == True
+    if test:
+        mtlt.test_tasks(learners, base_learners, measures, results_path,
+                        save_orange_data=True)
+        mtlt.pickle_test_results(pickle_path_fmt)
+    # find previously computed testing results and check if they were computed
+    # using the same data tables and cross-validation indices if
+    # unpickle == True
+    if unpickle:
+        mtlt.find_pickled_test_results(pickle_path_fmt)
+        if not mtlt.check_test_results_compatible():
+            raise ValueError("Test results for different base learners are not "
+                             "compatible.")
     # visualize the results of the current tasks for each combination of base
     # learners, learners and measures that are in the MTL problem; in addition,
     # visualize the dendrograms showing merging history of ERM
-    if not mtlt.contains_test_results():
-        raise ValueError("The MTLTester object doesn't contain any testing"
-                         " results.")
-    bls = mtlt.get_base_learners()
-    ls = mtlt.get_learners()
-    ms = mtlt.get_measures()
-    mtlt.visualize_results(bls, ls, ms, results_path,
-        {"ForcedTree": "blue", "Tree": "green", "ERM": "red"},
-        error_bars=error_bars, separate_figs=separate_figs)
-    mtlt.visualize_dendrograms(bls, results_path)
-    mtlt.compute_overall_results(bls, ls, ms, results_path,
-            weighting=weighting, error_margin=error_margin)
-    convert_svgs_to_pdfs(results_path)
-    build_and_crop_tex_files(results_path)
+    if visualize:
+        if not mtlt.contains_test_results():
+            raise ValueError("The MTLTester object doesn't contain any testing"
+                             " results.")
+        bls = mtlt.get_base_learners()
+        ls = mtlt.get_learners()
+        ms = mtlt.get_measures()
+        mtlt.visualize_results(bls, ls, ms, results_path,
+            {"ForcedTree": "blue", "Tree": "green", "ERM": "red"},
+            error_bars=error_bars, separate_figs=separate_figs)
+        mtlt.visualize_dendrograms(bls, results_path)
+        mtlt.compute_overall_results(bls, ls, ms, results_path,
+                weighting=weighting, error_margin=error_margin)
+        convert_svgs_to_pdfs(results_path)
+        build_and_crop_tex_files(results_path, r"-tikz.tex$")
+        combine_dendrograms_and_trees(bls, results_path)
+        build_and_crop_tex_files(results_path, r"^comparison.*.tex$",
+                                 crop=False)
 
 
 if __name__ == "__main__":
