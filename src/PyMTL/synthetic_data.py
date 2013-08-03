@@ -20,7 +20,7 @@
 
 from __future__ import division
 
-import random
+import random, re
 
 import numpy as np
 from sympy import symbols
@@ -216,13 +216,28 @@ def _report_about_generated_boolean_mtl_problem(functions, tasks):
         to a set of different learning sets for each task.
     
     """
+    # extract group names from tasks' ids
+    group_names = []
+    for tl in tasks:
+        if isinstance(tl, list):
+            t = tl[0]
+        else:
+            t = tl
+        match = re.search(r"(Group \d+)", t.ID)
+        group_name = match.group(1)
+        if group_name not in group_names:
+            group_names.append(group_name)
+    if len(group_names) != len(functions):
+        raise ValueError("The number of task groups doesn't correspond to the "
+                         "number of Boolean functions.")
+    
     logger.debug("Report about the generated synthetic Boolean MTL problem:")
     logger.debug("  Boolean function of each group:")
-    for i, func in enumerate(functions):
+    for group_name, func in zip(group_names, functions):
         # NOTE: sympy's pretty() function returns a unicode string, so the
         # string literal must also be a unicode string
-        logger.debug(u"   - Group {}: {}".format(i, pretty(func,
-                                                           wrap_line=False)))
+        logger.debug(u"   - {}: {}".format(group_name, pretty(func,
+                                                              wrap_line=False)))
     logger.debug("  % of True values in y for each task:")
     sum_true = 0
     sum_total = 0
