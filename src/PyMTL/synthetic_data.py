@@ -185,9 +185,9 @@ def _generate_boolean_data(a, d, n, g, tg, noise, random_seed,
             # NOTE: sympy's pretty() function returns a unicode string, so
             # the string literal must also be a unicode string
             descr = (u"Synthetic boolean data for task {} of group {} "
-                     "(function: {})".format(j, i, pretty(func,
-                                                          wrap_line=False)))
-            id = "Group {}, task {}".format(i, j)
+                     "(function: {})".format(j + 1, i + 1, pretty(func,
+                                                            wrap_line=False)))
+            id = "Group {}, task {}".format(i + 1, j + 1)
             for k in range(n_learning_sets):
                 X, y = generate_examples(attr, func, n, noise=noise,
                                          random_state=rnd.randint(1, 100))
