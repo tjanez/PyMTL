@@ -21,6 +21,7 @@ Dependencies
 PyMTL is tested to work under Python 2.7 (currently, there are no plans to support Python 3).
 
 It has the following dependencies:
+
  - NumPy >= 1.3
  - SciPy >= 0.7
  - scikit-learn >= 0.14
