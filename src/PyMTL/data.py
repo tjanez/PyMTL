@@ -257,6 +257,10 @@ if __name__ == "__main__":
     
     tasks = load_school_data()
     print "Loaded the School MTL problem with {} tasks.".format(len(tasks))
+    print ("Maximum number of examples in a task: ",
+           max([len(t.target) for t in tasks]))
+    print ("Manimum number of examples in a task: ",
+           min([len(t.target) for t in tasks]))
     print
     
     tasks = load_computer_survey_data()
