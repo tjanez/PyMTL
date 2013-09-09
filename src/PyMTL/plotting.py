@@ -127,18 +127,19 @@ def _draw_subplot(axes, plot_descs, title="", xlabel="", ylabel="",
     axes.set_title(title, size="small")
     axes.set_xlabel(xlabel, size="small")
     axes.set_ylabel(ylabel, size="small")
-    # set x-axis' left limit a bit to the left and x-axis' right limit a bit to
-    # the right so that the resulting plot looks nicer
-    margin = (x_tick_points[1] - x_tick_points[0]) / 2.0
-    axes.set_xlim(left=x_tick_points[0] - margin,
-                  right=x_tick_points[-1] + margin)
-    if x_tick_points != None and x_tick_labels != None:
+    if x_tick_points != None:
+        # set x-axis' left limit a bit to the left and x-axis' right limit a bit
+        # to the right so that the resulting plot looks nicer
+        margin = (x_tick_points[1] - x_tick_points[0]) / 2.0
+        axes.set_xlim(left=x_tick_points[0] - margin,
+                      right=x_tick_points[-1] + margin)
         axes.set_xticks(x_tick_points)
-        if len(x_tick_points) > 20:
-            axes.set_xticklabels(x_tick_labels, rotation="vertical",
-                                 size="small")
-        else:
-            axes.set_xticklabels(x_tick_labels, size="small")
+        if x_tick_labels != None:
+            if len(x_tick_points) > 20:
+                axes.set_xticklabels(x_tick_labels, rotation="vertical",
+                                     size="small")
+            else:
+                axes.set_xticklabels(x_tick_labels, size="small")
     if ylim_bottom != None:
         axes.set_ylim(bottom=ylim_bottom)
     if ylim_top != None:
