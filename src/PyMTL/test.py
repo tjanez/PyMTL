@@ -35,6 +35,9 @@ from PyMTL.plotting import BarPlotDesc, LinePlotDesc, plot_multiple, \
 from PyMTL.sklearn_utils import absolute_error, squared_error
 from PyMTL.util import logger, configure_logger, pickle_obj, unpickle_obj
 
+# dictionary mapping from MTL learning algorithms to their colors (for use in
+# plots, etc.)
+LEARNERS_TO_COLORS = {"NoMerging": "blue", "MergeAll": "green", "ERM": "red"}
 
 class Task(object):
     
@@ -1572,8 +1575,7 @@ def test_tasks(tasks_data, results_path, base_learners,
         bls = mtlt.get_base_learners()
         ls = mtlt.get_learners()
         ms = mtlt.get_measures()
-        mtlt.visualize_results(bls, ls, ms, results_path,
-            {"NoMerging": "blue", "MergeAll": "green", "ERM": "red"},
+        mtlt.visualize_results(bls, ls, ms, results_path, LEARNERS_TO_COLORS,
             error_bars, separate_figs)
         mtlt.visualize_dendrograms(bls, results_path)
         mtlt.compute_overall_results(bls, ls, ms, results_path,
