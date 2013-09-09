@@ -172,3 +172,26 @@ def ignore_deprecation_warnings(func):
     new_func.__doc__ = func.__doc__
     new_func.__dict__.update(func.__dict__)
     return new_func
+
+
+import sys
+
+def update_progress(progress, width=20, invert=False):
+    """Write a textual progress bar to the console along with the progress' 
+    numerical value in percent.
+    
+    Arguments:
+    progress -- float in range [0, 1] indicating the progress
+    
+    Keyword arguments:
+    width -- integer representing the width (in characters) of the textual
+        progress bar
+    invert -- boolean indicating whether the progress' value should be inverted
+    
+    """
+    template = "\r[{:<" + str(width) + "}] {:.1f}%"
+    if invert:
+        progress = 1 - progress
+    sys.stdout.write(template.format('#' * (int(progress * width)),
+                                     progress * 100))
+    sys.stdout.flush()

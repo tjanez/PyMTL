@@ -67,6 +67,7 @@ class MergeAllLearner(object):
         R["task_models"] = task_models
         return R
 
+
 class NoMergingLearner(object):
     
     """Learning strategy that doesn't merge any tasks. The base learning
@@ -111,13 +112,16 @@ class NoMergingLearner(object):
         R["task_models"] = task_models
         return R
 
-import random, sys
+
+import random
 from collections import Iterable, OrderedDict
 from itertools import combinations
 
 from scipy import stats
 
 from PyMTL.learning import testing
+from PyMTL.util import update_progress
+
 
 def error_reduction(avg_error1, avg_error2, avg_errorM, size1, size2):
     """Compute the error reduction of merging two tasks by comparing the
@@ -137,6 +141,7 @@ def error_reduction(avg_error1, avg_error2, avg_errorM, size1, size2):
     
     """
     return ((size1*avg_error1+size2*avg_error2) / (size1 + size2)) - avg_errorM
+
 
 def compute_significance(errors1, errors2):
     """Perform a pair-wise one-sided t-test for testing the hypothesis:
@@ -163,6 +168,7 @@ def compute_significance(errors1, errors2):
         p_value = p_value/2
     return p_value
 
+
 def _convert_id_to_string(m_id):
     """Convert the (merged) task's id to a string by recursively traversing the
     given hierarchical id object.
@@ -179,6 +185,7 @@ def _convert_id_to_string(m_id):
     else:
         return str(m_id)
 
+
 def flatten(l):
     """Return a flattened list of the given (arbitrarily) nested iterable of
     iterables (e.g. list of lists).
@@ -194,6 +201,7 @@ def flatten(l):
         else:
             flat_l.append(el)
     return flat_l
+
 
 def convert_merg_history_to_scipy_linkage(merg_history):
     """Convert the given merging history to same format as returned by the
@@ -247,6 +255,7 @@ def convert_merg_history_to_scipy_linkage(merg_history):
         Z[i, 2] = cur_h
         cur_h += inc
     return Z, labels
+
 
 class MergedTask(object):
     
@@ -316,6 +325,7 @@ class MergedTask(object):
             # the task has not been merged, return its id in a list
             return [self.id]
 
+
 def sorted_pair((t1, t2)):
     """Return a lexicographically sorted tuple of the given pair of tasks' ids.
     
@@ -325,6 +335,7 @@ def sorted_pair((t1, t2)):
     
     """
     return (t1, t2) if t1 <= t2 else (t2, t1)
+
 
 class CandidatePair(object):
     
@@ -356,25 +367,6 @@ class CandidatePair(object):
         return max(self.p_values["dataM vs data1; dataM"],
                    self.p_values["dataM vs data2; dataM"])       
 
-def update_progress(progress, width=20, invert=False):
-    """Write a textual progress bar to the console along with the progress' 
-    numerical value in percent.
-    
-    Arguments:
-    progress -- float in range [0, 1] indicating the progress
-    
-    Keyword arguments:
-    width -- integer representing the width (in characters) of the textual
-        progress bar
-    invert -- boolean indicating whether the progress' value should be inverted
-    
-    """
-    template = "\r[{:<" + str(width) + "}] {:.1f}%"
-    if invert:
-        progress = 1 - progress
-    sys.stdout.write(template.format('#' * (int(progress * width)),
-                                     progress * 100))
-    sys.stdout.flush()
 
 class ERMLearner(object):
     
@@ -572,6 +564,7 @@ class ERMLearner(object):
         p_values["dataM vs data2; dataM"] = compute_significance(
             pred_errs["dataM"]["dataM"], pred_errs["data2"]["dataM"])
         return avg_pred_errs, p_values
+
 
 if __name__ == "__main__":
     print "TESTING compute_significance()"
