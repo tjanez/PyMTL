@@ -113,6 +113,75 @@ class NoMergingLearner(object):
         return R
 
 
+import re
+
+class OracleLearner(object):
+    
+    """A special learning method that imitates an 'oracle' who knows which
+    tasks should be merged into the same cluster.
+    This is done by providing a regular expression that matches the predefined
+    cluster ids from the given tasks' ids.
+    
+    """
+    
+    def __init__(self, regex):
+        """Initialize the ERMLearner object. Copy the given argument to a
+        private attribute.
+        
+        Arguments:
+        regex -- string representing a regular expression that matches the
+            predefined cluster ids; it should contain exactly one pair of
+            parenthesis which matches the cluster id
+        
+        """
+        self.regex = regex
+    
+    def __call__(self, tasks, base_learner):
+        """Run the merging algorithm for the given tasks.
+        Split the tasks into clusters according to the given regular
+        expression, learn a model for each cluster and assign it to all tasks
+        in the cluster.
+        Return a dictionary of data structures computed within this learner.
+        It has the following keys:
+            task_models -- dictionary mapping from tasks' ids to the learned
+                models
+        
+        Arguments:
+        tasks -- dictionary mapping from tasks' ids to their Task objects
+        base_learner -- scikit-learn estimator
+        
+        """
+        # split the tasks into clusters according to the regular expression
+        # indicating the tasks' cluster affiliation
+        clusters = dict()
+        for tid, task in tasks.iteritems():
+            match = re.search(self.regex, tid)
+            if match:
+                cid = match.group(1)
+                if cid not in clusters:
+                    clusters[cid] = dict()
+                clusters[cid][tid] = task
+        # build a model for each cluster and assign it to all the tasks in the
+        # cluster
+        task_models = dict()
+        for cid, cluster in clusters.iteritems():
+            # merge learning data of all tasks tasks in the cluster
+            Xs_ys = [t.get_learn_data() for t in cluster.itervalues()]
+            Xs, ys = zip(*Xs_ys)
+            merged_data = np.concatenate(Xs, axis=0), np.concatenate(ys, axis=0)
+            # NOTE: The scikit-learn estimator must be cloned to prevent different
+            # tasks from having the same classifiers
+            model = clone(base_learner)
+            model.fit(*merged_data)
+            # assign the fitted model to all tasks in the cluster
+            for tid in cluster:
+                task_models[tid] = model
+        # create and fill the return dictionary
+        R = dict()
+        R["task_models"] = task_models
+        return R
+
+
 import random
 from collections import Iterable, OrderedDict
 from itertools import combinations

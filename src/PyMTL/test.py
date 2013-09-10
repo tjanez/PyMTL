@@ -37,7 +37,8 @@ from PyMTL.util import logger, configure_logger, pickle_obj, unpickle_obj
 
 # dictionary mapping from MTL learning algorithms to their colors (for use in
 # plots, etc.)
-LEARNERS_TO_COLORS = {"NoMerging": "blue", "MergeAll": "green", "ERM": "red"}
+LEARNERS_TO_COLORS = {"NoMerging": "blue", "MergeAll": "green", "ERM": "red",
+                      "Oracle" : "0.5"}
 
 class Task(object):
     
