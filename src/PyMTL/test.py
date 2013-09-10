@@ -429,9 +429,9 @@ class MTLTester(object):
             value corresponding to the scoring measure's value.
         
         """
-        mrg_scores = dict()
+        mrg_scores = OrderedDict()
         for bl in rpt_scores[0]:
-            mrg_scores[bl] = dict()
+            mrg_scores[bl] = OrderedDict()
             for l in rpt_scores[0][bl]:
                 # prepare an OrderedDict with tasks' ids
                 # NOTE: OrderedDict is used to keep the order the tasks so that
@@ -574,11 +574,11 @@ class MTLTester(object):
         
         """
         rpt_scores = OrderedDict()
-        dend_info = {bl : OrderedDict() for bl in base_learners.iterkeys()}
+        dend_info = {bl : OrderedDict() for bl in base_learners}
         for i in range(self._repeats):
             self._repetition_number = i
             self._prepare_tasks_data(**self._tasks_data_params)
-            rpt_scores[i] = {bl : dict() for bl in base_learners.iterkeys()}
+            rpt_scores[i] = {bl : OrderedDict() for bl in base_learners}
             for bl in base_learners:
                 for l in learners:
                     start = time.clock()
