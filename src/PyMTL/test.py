@@ -34,6 +34,7 @@ from PyMTL.plotting import BarPlotDesc, LinePlotDesc, plot_multiple, \
     plot_multiple_separate, plot_dendrograms
 from PyMTL.sklearn_utils import absolute_error, squared_error
 from PyMTL.util import logger, configure_logger, pickle_obj, unpickle_obj
+from PyMTL.orange_utils import OrangeClassifierWrapper
 
 # dictionary mapping from MTL learning algorithms to their colors (for use in
 # plots, etc.)
@@ -1472,6 +1473,37 @@ class CVMTLTester(MTLTester):
                 subplot_title_fmt="Learner: {}",
                 xlabel="Number of instances",
                 ylabel=m)
+
+
+def log_base_learner_info(logger, base_learners):
+    """Log a report about the given base learners (i.e. their class names and
+    attribute values) to the given logger.
+    
+    Parameters
+    ----------
+    logger : logging.Logger
+        Logger object where to log the report about the given base learners.
+    base_learners : dict
+        Dictionary with base learners' names (keys) and corresponding objects
+        (values).
+    
+    """
+    logger.debug("Base learners used for testing this MTL problem:")
+    for bl_name, bl in base_learners.iteritems():
+        if isinstance(bl, OrangeClassifierWrapper):
+            orange_attrs = []
+            for k, v in bl.orange_learner.__dict__.iteritems():
+                if not(v == None or k.startswith("_")):
+                    orange_attrs.append("{}={}".format(k, v))
+            bl_str = ("OrangeClassifierWrapper(orange_learner={}({}))".format(
+                        bl.orange_learner.__class__.__name__,
+                        ", ".join(orange_attrs)))
+        else:
+            # replace all new lines and subsequent indentation with a single
+            # space
+            bl_str = re.sub(r'\n\s+', ' ', str(bl))
+        logger.debug("  - {}: {}".format(bl_name, bl_str))
+
 
 def test_tasks(tasks_data, results_path, base_learners,
                measures, learners, tester_type, rnd_seed=50,
