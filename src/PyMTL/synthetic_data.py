@@ -29,7 +29,7 @@ from sympy.printing import pretty
 from sklearn.utils import validation
 from sklearn.datasets.base import Bunch
 
-from PyMTL.util import logger, pickle_obj
+from PyMTL.util import logger, pickle_obj, update_progress
 
 def generate_boolean_function(a, d=8, random_seed=0):
     """Generate a Boolean function in disjunctive normal form according to the
@@ -389,12 +389,17 @@ def generate_boolean_data_with_complete_test_sets(a, d, n, g, tg, noise,
     
     tasks_complete_test_sets = []
     # generate a complete testing set for each Boolean function
-    for func in funcs:
+    n_funcs = len(funcs)
+    print ("Generating the complete test sets for {} Boolean functions".
+           format(n_funcs))
+    for i, func in enumerate(funcs):
         complete_test_set = _generate_complete_test_set(attr, func)
         # duplicate the generated complete testing set for each task from the
         # current task group 
-        for i in range(tg):
+        for _ in range(tg):
             tasks_complete_test_sets.append(complete_test_set)
+        update_progress(1.* (i + 1) / n_funcs)
+    print
     
     _report_about_generated_boolean_mtl_problem(funcs, tasks)
     return tasks, tasks_complete_test_sets
