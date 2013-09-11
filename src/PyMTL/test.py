@@ -34,7 +34,12 @@ from PyMTL.plotting import BarPlotDesc, LinePlotDesc, plot_multiple, \
     plot_multiple_separate, plot_dendrograms
 from PyMTL.sklearn_utils import absolute_error, squared_error
 from PyMTL.util import logger, configure_logger, pickle_obj, unpickle_obj
-from PyMTL.orange_utils import OrangeClassifierWrapper
+# the import of orange_utils is conditional so that PyMTL doesn't have a hard
+# dependency on Orange
+try:
+    from PyMTL import orange_utils
+except:
+    orange_utils = None
 
 # dictionary mapping from MTL learning algorithms to their colors (for use in
 # plots, etc.)
@@ -1490,7 +1495,9 @@ def log_base_learner_info(logger, base_learners):
     """
     logger.debug("Base learners used for testing this MTL problem:")
     for bl_name, bl in base_learners.iteritems():
-        if isinstance(bl, OrangeClassifierWrapper):
+        # the first check makes sure that the orange_utils module is loaded
+        if orange_utils != None and isinstance(bl,
+                                        orange_utils.OrangeClassifierWrapper):
             orange_attrs = []
             for k, v in bl.orange_learner.__dict__.iteritems():
                 if not(v == None or k.startswith("_")):
