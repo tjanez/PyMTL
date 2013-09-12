@@ -1,0 +1,16 @@
+Results for CA (weighting method: all_equal, error margin measure: std)
+-----------------------------------------------------------------------
+  - Base learner: svm_poly3
+      * ERM                 0.66 +/- 0.02
+      * NoMerging           0.67 +/- 0.01
+      * MergeAll            0.64 +/- 0.01
+      * Oracle              0.75 +/- 0.01
+
+Results for AUC (weighting method: all_equal, error margin measure: std)
+------------------------------------------------------------------------
+  - Base learner: svm_poly3
+      * ERM                 0.56 +/- 0.02
+      * NoMerging           0.52 +/- 0.02
+      * MergeAll            0.56 +/- 0.05
+      * Oracle              0.70 +/- 0.07
+
