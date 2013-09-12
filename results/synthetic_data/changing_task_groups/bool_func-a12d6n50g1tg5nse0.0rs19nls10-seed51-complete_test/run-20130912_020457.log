@@ -1,0 +1,128 @@
+[2013-09-12 02:04:57] PyMTL           DEBUG  : Base learners used for testing this MTL problem:
+[2013-09-12 02:04:57] PyMTL           DEBUG  :   - svm_poly3: SVC(C=1.0, cache_size=200, class_weight=None, coef0=1, degree=3, gamma=0.0, kernel=poly, max_iter=-1, probability=True, shrinking=True, tol=0.001, verbose=False)
+[2013-09-12 02:04:59] PyMTL           DEBUG  : Report about the generated synthetic Boolean MTL problem:
+[2013-09-12 02:04:59] PyMTL           DEBUG  :   Boolean function of each group:
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1: (x₁ ∧ x₃ ∧ ¬ x₂ ∧ ¬ x₅) ∨ (x₁₁ ∧ x₃ ∧ x₉ ∧ ¬ x₇) ∨ (x₁₂ ∧ x₂ ∧ x₇ ∧ ¬ x₁₀) ∨ (x₁₀ ∧ x₃ ∧ x₇ ∧ ¬ x₁₂ ∧ ¬ x₂) ∨ (x₆ ∧ ¬ x₁₂ ∧ ¬ x₅ ∧ ¬ x₈ ∧ ¬ x₉) ∨ (x₁₀ ∧ x₁₁ ∧ x₅ ∧ ¬ x₁ ∧ ¬ x₄ ∧ ¬ x₈) ∨ (x₁₀ ∧ x₁₂ ∧ x₆ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₃) ∨ (x₁₂ ∧ x₄ ∧ x₅ ∧ x₈ ∧ ¬ x₁₀ ∧ ¬ x₉) ∨ (x₃ ∧ x₄ ∧ x₆ ∧ ¬ x₁₀ ∧ ¬ x₂ ∧ ¬ x₈) ∨ (x₃ ∧ x₄ ∧ x₉ ∧ ¬ x₁₂ ∧ ¬ x₆ ∧ ¬ x₇) ∨ (x₆ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₅) ∨ (x₆ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₄ ∧ ¬ x₇ ∧ ¬ x₉) ∨ (x₁ ∧ x₄ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₇ ∧ ¬ x₈ ∧ ¬ x₉) ∨ (x₁₀ ∧ x₁₂ ∧ x₂ ∧ x₃ ∧ ¬ x₁ ∧ ¬ x₁₁ ∧ ¬ x₆ ∧ ¬ x₇) ∨ (x₅ ∧ x₆ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₈ ∧ ¬ x₉) ∨ (x₁₁ ∧ x₄ ∧ x₈ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₃ ∧ ¬ x₅ ∧ ¬ x₆ ∧ ¬ x₇)
+[2013-09-12 02:04:59] PyMTL           DEBUG  :   % of True values in y for each task:
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #0): 0.26
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #1): 0.32
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #2): 0.36
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #3): 0.3
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #4): 0.28
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #5): 0.3
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #6): 0.3
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #7): 0.2
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #8): 0.2
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #9): 0.34
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #0): 0.2
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #1): 0.34
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #2): 0.34
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #3): 0.36
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #4): 0.36
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #5): 0.34
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #6): 0.26
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #7): 0.34
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #8): 0.3
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #9): 0.38
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #0): 0.3
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #1): 0.2
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #2): 0.26
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #3): 0.26
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #4): 0.34
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #5): 0.22
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #6): 0.3
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #7): 0.38
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #8): 0.26
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #9): 0.34
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #0): 0.42
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #1): 0.38
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #2): 0.24
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #3): 0.44
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #4): 0.3
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #5): 0.3
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #6): 0.2
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #7): 0.3
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #8): 0.38
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #9): 0.34
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #0): 0.34
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #1): 0.26
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #2): 0.28
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #3): 0.32
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #4): 0.34
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #5): 0.24
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #6): 0.24
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #7): 0.4
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #8): 0.24
+[2013-09-12 02:04:59] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #9): 0.24
+[2013-09-12 02:04:59] PyMTL           DEBUG  :   Average % of True values in y (across all tasks): 0.3028
+[2013-09-12 02:04:59] PyMTL           DEBUG  : Computing candidate pairs for merging (10 pairs)
+[2013-09-12 02:04:59] PyMTL           DEBUG  : Processing 4 candidate pairs for merging
+[2013-09-12 02:05:00] PyMTL           DEBUG  : Finished repetition: 0, base learner: svm_poly3, learner: ERM in 1.13s
+[2013-09-12 02:05:01] PyMTL           DEBUG  : Finished repetition: 0, base learner: svm_poly3, learner: NoMerging in 0.52s
+[2013-09-12 02:05:01] PyMTL           DEBUG  : Merged data has 12 attributes and 250 examples.
+[2013-09-12 02:05:01] PyMTL           DEBUG  : Finished repetition: 0, base learner: svm_poly3, learner: MergeAll in 0.51s
+[2013-09-12 02:05:01] PyMTL           DEBUG  : Finished repetition: 0, base learner: svm_poly3, learner: Oracle in 0.44s
+[2013-09-12 02:05:01] PyMTL           DEBUG  : Computing candidate pairs for merging (10 pairs)
+[2013-09-12 02:05:02] PyMTL           DEBUG  : Processing 5 candidate pairs for merging
+[2013-09-12 02:05:03] PyMTL           DEBUG  : Finished repetition: 1, base learner: svm_poly3, learner: ERM in 1.18s
+[2013-09-12 02:05:03] PyMTL           DEBUG  : Finished repetition: 1, base learner: svm_poly3, learner: NoMerging in 0.34s
+[2013-09-12 02:05:03] PyMTL           DEBUG  : Merged data has 12 attributes and 250 examples.
+[2013-09-12 02:05:03] PyMTL           DEBUG  : Finished repetition: 1, base learner: svm_poly3, learner: MergeAll in 0.45s
+[2013-09-12 02:05:04] PyMTL           DEBUG  : Finished repetition: 1, base learner: svm_poly3, learner: Oracle in 0.44s
+[2013-09-12 02:05:04] PyMTL           DEBUG  : Computing candidate pairs for merging (10 pairs)
+[2013-09-12 02:05:04] PyMTL           DEBUG  : Processing 4 candidate pairs for merging
+[2013-09-12 02:05:05] PyMTL           DEBUG  : Finished repetition: 2, base learner: svm_poly3, learner: ERM in 1.18s
+[2013-09-12 02:05:05] PyMTL           DEBUG  : Finished repetition: 2, base learner: svm_poly3, learner: NoMerging in 0.33s
+[2013-09-12 02:05:05] PyMTL           DEBUG  : Merged data has 12 attributes and 250 examples.
+[2013-09-12 02:05:06] PyMTL           DEBUG  : Finished repetition: 2, base learner: svm_poly3, learner: MergeAll in 0.45s
+[2013-09-12 02:05:06] PyMTL           DEBUG  : Finished repetition: 2, base learner: svm_poly3, learner: Oracle in 0.44s
+[2013-09-12 02:05:06] PyMTL           DEBUG  : Computing candidate pairs for merging (10 pairs)
+[2013-09-12 02:05:07] PyMTL           DEBUG  : Processing 5 candidate pairs for merging
+[2013-09-12 02:05:07] PyMTL           DEBUG  : Finished repetition: 3, base learner: svm_poly3, learner: ERM in 1.13s
+[2013-09-12 02:05:08] PyMTL           DEBUG  : Finished repetition: 3, base learner: svm_poly3, learner: NoMerging in 0.34s
+[2013-09-12 02:05:08] PyMTL           DEBUG  : Merged data has 12 attributes and 250 examples.
+[2013-09-12 02:05:08] PyMTL           DEBUG  : Finished repetition: 3, base learner: svm_poly3, learner: MergeAll in 0.43s
+[2013-09-12 02:05:09] PyMTL           DEBUG  : Finished repetition: 3, base learner: svm_poly3, learner: Oracle in 0.44s
+[2013-09-12 02:05:09] PyMTL           DEBUG  : Computing candidate pairs for merging (10 pairs)
+[2013-09-12 02:05:09] PyMTL           DEBUG  : Processing 10 candidate pairs for merging
+[2013-09-12 02:05:10] PyMTL           DEBUG  : Finished repetition: 4, base learner: svm_poly3, learner: ERM in 1.18s
+[2013-09-12 02:05:10] PyMTL           DEBUG  : Finished repetition: 4, base learner: svm_poly3, learner: NoMerging in 0.33s
+[2013-09-12 02:05:10] PyMTL           DEBUG  : Merged data has 12 attributes and 250 examples.
+[2013-09-12 02:05:11] PyMTL           DEBUG  : Finished repetition: 4, base learner: svm_poly3, learner: MergeAll in 0.44s
+[2013-09-12 02:05:11] PyMTL           DEBUG  : Finished repetition: 4, base learner: svm_poly3, learner: Oracle in 0.44s
+[2013-09-12 02:05:11] PyMTL           DEBUG  : Computing candidate pairs for merging (10 pairs)
+[2013-09-12 02:05:11] PyMTL           DEBUG  : Processing 2 candidate pairs for merging
+[2013-09-12 02:05:12] PyMTL           DEBUG  : Finished repetition: 5, base learner: svm_poly3, learner: ERM in 1.01s
+[2013-09-12 02:05:12] PyMTL           DEBUG  : Finished repetition: 5, base learner: svm_poly3, learner: NoMerging in 0.33s
+[2013-09-12 02:05:12] PyMTL           DEBUG  : Merged data has 12 attributes and 250 examples.
+[2013-09-12 02:05:13] PyMTL           DEBUG  : Finished repetition: 5, base learner: svm_poly3, learner: MergeAll in 0.43s
+[2013-09-12 02:05:13] PyMTL           DEBUG  : Finished repetition: 5, base learner: svm_poly3, learner: Oracle in 0.44s
+[2013-09-12 02:05:13] PyMTL           DEBUG  : Computing candidate pairs for merging (10 pairs)
+[2013-09-12 02:05:14] PyMTL           DEBUG  : Processing 3 candidate pairs for merging
+[2013-09-12 02:05:14] PyMTL           DEBUG  : Finished repetition: 6, base learner: svm_poly3, learner: ERM in 0.92s
+[2013-09-12 02:05:15] PyMTL           DEBUG  : Finished repetition: 6, base learner: svm_poly3, learner: NoMerging in 0.34s
+[2013-09-12 02:05:15] PyMTL           DEBUG  : Merged data has 12 attributes and 250 examples.
+[2013-09-12 02:05:15] PyMTL           DEBUG  : Finished repetition: 6, base learner: svm_poly3, learner: MergeAll in 0.42s
+[2013-09-12 02:05:15] PyMTL           DEBUG  : Finished repetition: 6, base learner: svm_poly3, learner: Oracle in 0.42s
+[2013-09-12 02:05:15] PyMTL           DEBUG  : Computing candidate pairs for merging (10 pairs)
+[2013-09-12 02:05:16] PyMTL           DEBUG  : Processing 3 candidate pairs for merging
+[2013-09-12 02:05:17] PyMTL           DEBUG  : Finished repetition: 7, base learner: svm_poly3, learner: ERM in 1.20s
+[2013-09-12 02:05:17] PyMTL           DEBUG  : Finished repetition: 7, base learner: svm_poly3, learner: NoMerging in 0.35s
+[2013-09-12 02:05:17] PyMTL           DEBUG  : Merged data has 12 attributes and 250 examples.
+[2013-09-12 02:05:17] PyMTL           DEBUG  : Finished repetition: 7, base learner: svm_poly3, learner: MergeAll in 0.47s
+[2013-09-12 02:05:18] PyMTL           DEBUG  : Finished repetition: 7, base learner: svm_poly3, learner: Oracle in 0.46s
+[2013-09-12 02:05:18] PyMTL           DEBUG  : Computing candidate pairs for merging (10 pairs)
+[2013-09-12 02:05:18] PyMTL           DEBUG  : Processing 7 candidate pairs for merging
+[2013-09-12 02:05:19] PyMTL           DEBUG  : Finished repetition: 8, base learner: svm_poly3, learner: ERM in 1.16s
+[2013-09-12 02:05:19] PyMTL           DEBUG  : Finished repetition: 8, base learner: svm_poly3, learner: NoMerging in 0.35s
+[2013-09-12 02:05:19] PyMTL           DEBUG  : Merged data has 12 attributes and 250 examples.
+[2013-09-12 02:05:20] PyMTL           DEBUG  : Finished repetition: 8, base learner: svm_poly3, learner: MergeAll in 0.41s
+[2013-09-12 02:05:20] PyMTL           DEBUG  : Finished repetition: 8, base learner: svm_poly3, learner: Oracle in 0.40s
+[2013-09-12 02:05:20] PyMTL           DEBUG  : Computing candidate pairs for merging (10 pairs)
+[2013-09-12 02:05:21] PyMTL           DEBUG  : Processing 3 candidate pairs for merging
+[2013-09-12 02:05:21] PyMTL           DEBUG  : Finished repetition: 9, base learner: svm_poly3, learner: ERM in 1.14s
+[2013-09-12 02:05:22] PyMTL           DEBUG  : Finished repetition: 9, base learner: svm_poly3, learner: NoMerging in 0.33s
+[2013-09-12 02:05:22] PyMTL           DEBUG  : Merged data has 12 attributes and 250 examples.
+[2013-09-12 02:05:22] PyMTL           DEBUG  : Finished repetition: 9, base learner: svm_poly3, learner: MergeAll in 0.46s
+[2013-09-12 02:05:23] PyMTL           DEBUG  : Finished repetition: 9, base learner: svm_poly3, learner: Oracle in 0.46s
+[2013-09-12 02:05:23] PyMTL           DEBUG  : Successfully pickled the results of base learner: svm_poly3 to file: /home/tadej/Workspace/PyMTL/results/synthetic_data/changing_task_groups/bool_func-a12d6n50g1tg5nse0.0rs19nls10-seed51-complete_test/bl-svm_poly3.pkl

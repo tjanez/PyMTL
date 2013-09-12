@@ -1,0 +1,12 @@
+Ä]q(csympy.logic.boolalg
+Or
+q(csympy.logic.boolalg
+And
+qcsympy.core.symbol
+Symbol
+qUx1qÖRq}qU_assumptionsqcsympy.core.assumptions
+StdFactKB
+q	)Åq
+Ucommutativeqàs}qbsbhUx10qÖRq}qhh	)Åqhàs}qbsbhUx5qÖRq}qhh	)Åqhàs}qbsbáqRq}bh(hhUx4qÖRq}qhh	)Åqhàs}qbsbhUx6qÖRq}q hh	)Åq!hàs}q"bsbcsympy.logic.boolalg
+Not
+q#hÖq$Rq%}btq&Rq'}bh(hhUx2q(ÖRq)}q*hh	)Åq+hàs}q,bsbhUx3q-ÖRq.}q/hh	)Åq0hàs}q1bsbhhUx7q2ÖRq3}q4hh	)Åq5hàs}q6bsbtq7Rq8}bh(hUx11q9ÖRq:}q;hh	)Åq<hàs}q=bsbhUx8q>ÖRq?}q@hh	)ÅqAhàs}qBbsbh%h#hÖqCRqD}btqERqF}bh(hhh)h.hh#h?ÖqGRqH}btqIRqJ}bh(h3hUx9qKÖRqL}qMhh	)ÅqNhàs}qObsbh#hÖqPRqQ}bhDhHtqRRqS}bh(hhh:h3h#hUx12qTÖRqU}qVhh	)ÅqWhàs}qXbsbÖqYRqZ}bh#hLÖq[Rq\}btq]Rq^}bh(hUhQh#hÖq_Rq`}bh#h)ÖqaRqb}bhHtqcRqd}bh(h.hQh#h:ÖqeRqf}bhDh#h3ÖqgRqh}btqiRqj}bh(hhhhh?hZh#h.ÖqkRql}bh#hÖqmRqn}btqoRqp}bh(h:hUh)hhhnhhhHtqqRqr}bh(h:hh3h?hLh`hZh%tqsRqt}bh(hUh)h3hLhQh`hlh%tquRqv}bh(hh:h)h.h?hLh`hZhDtqwRqx}bh(hhh?h`hnhDhhh\tqyRqz}bh(hUh)hhhQh`hfh%hHtq{Rq|}btq}Rq~}bh(hhh`h%áqRqÄ}bh(hhhLhhtqÅRqÇ}bh(h)h?h`hZtqÉRqÑ}bh(hh)h.hLhZtqÖRqÜ}bh(hUhfhnhhtqáRqà}bh(hUh3hLhbhDtqâRqä}bh(hhhQhfhhtqãRqå}bh(hhZhlh%hhtqçRqé}bh(hh3hLh`hfhltqèRqê}bh(h3h?hLhQhlhntqëRqí}bh(h)hLhQhDhhhHtqìRqî}bh(hhhhfhlhDhhtqïRqñ}bh(hhhQhfhnhhhHtqóRqò}bh(hh?hZhlhDhhh\tqôRqö}bh(hhhh3hZhnhHh\tqõRqú}bh(hh3h?hLhQh`hfhlhntqùRqû}btqüRq†}be.

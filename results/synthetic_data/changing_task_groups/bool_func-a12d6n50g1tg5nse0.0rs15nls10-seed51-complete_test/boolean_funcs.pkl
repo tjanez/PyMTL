@@ -1,0 +1,12 @@
+Ä]qcsympy.logic.boolalg
+Or
+q(csympy.logic.boolalg
+And
+qcsympy.core.symbol
+Symbol
+qUx5qÖRq}qU_assumptionsqcsympy.core.assumptions
+StdFactKB
+q	)Åq
+Ucommutativeqàs}qbsbcsympy.logic.boolalg
+Not
+qhUx9qÖRq}qhh	)Åqhàs}qbsbÖqRq}bÜqRq}bh(hhUx7qÖRq}qhh	)Åqhàs}qbsbhhUx11qÖRq}qhh	)Åqhàs}q bsbÖq!Rq"}bhhUx2q#ÖRq$}q%hh	)Åq&hàs}q'bsbÖq(Rq)}btq*Rq+}bh(hUx6q,ÖRq-}q.hh	)Åq/hàs}q0bsbhhhUx1q1ÖRq2}q3hh	)Åq4hàs}q5bsbÖq6Rq7}bhhUx10q8ÖRq9}q:hh	)Åq;hàs}q<bsbÖq=Rq>}btq?Rq@}bh(hh)hh-ÖqARqB}bhhÖqCRqD}btqERqF}bh(h"hhUx12qGÖRqH}qIhh	)ÅqJhàs}qKbsbÖqLRqM}bhhUx3qNÖRqO}qPhh	)ÅqQhàs}qRbsbÖqSRqT}bhtqURqV}bh(h2hh$hUx4qWÖRqX}qYhh	)ÅqZhàs}q[bsbhDhhUx8q\ÖRq]}q^hh	)Åq_hàs}q`bsbÖqaRqb}btqcRqd}bh(hHh>h)hBhDtqeRqf}bh(h2hOh-hMhbhtqgRqh}bh(h$hh-hMhThDtqiRqj}bh(hOhh]hMh)htqkRql}bh(h9hXh7h)hThtqmRqn}bh(hhHh]h7h)hBhtqoRqp}bh(h9hXhh]hh"hMh)tqqRqr}bh(hh$hOh-hh]h>hhÖqsRqt}bhtquRqv}bh(hHhh7h)hThthDhbtqwRqx}bh(hhHhOhXhh7h>h)hDhbtqyRqz}btq{Rq|}ba.
