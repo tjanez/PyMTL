@@ -2,7 +2,7 @@
 # stat.py
 # Contains auxiliary methods for computing various statistical quantities.
 #
-# Copyright (C) 2010, 2011, 2012 Tadej Janez
+# Copyright (C) 2010, 2011, 2012, 2013 Tadej Janez
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 import numpy
 from scipy import stats
 
+
 def mean(matrix):
     """Compute the means of columns of the given matrix.
     If the matrix is a column (i.e. only has one dimension), compute its mean.
@@ -33,6 +34,7 @@ def mean(matrix):
     
     """
     return numpy.mean(matrix, axis=0)
+
 
 def unbiased_std(matrix):
     """Compute the unbiased std. deviations of columns of the given matrix.
@@ -51,6 +53,7 @@ def unbiased_std(matrix):
     # divisor "N - ddof" is used
     return numpy.std(matrix, axis=0, ddof=1)
 
+
 def _std_err(matrix):
     """Compute the std. errors of the means of columns of the given matrix.
     If the matrix is a column (i.e. only has one dimension), compute the std.
@@ -65,6 +68,7 @@ def _std_err(matrix):
     """
     # using "ddof=1" gives the unbiased estimator of std. dev. 
     return stats.sem(matrix, axis=0, ddof=1)
+
 
 def ci95(matrix):
     """Compute the 95% confidence intervals of the means of columns of the given
@@ -82,6 +86,21 @@ def ci95(matrix):
     """
     return 1.96 * _std_err(matrix)
 
+
+def convert_std_to_ci95(std, size):
+    """Convert the given std. deviations to 95% confidence intervals.
+    
+    Parameters
+    ----------
+    std : float or numpy.array
+        Std. deviation or an array of std. deviations.
+    size : int
+        Size of the sample that was used to compute the std. deviation(s).
+    
+    """
+    return 1.96 * (std / numpy.sqrt(size))
+
+
 if __name__ == "__main__":
     print mean([1, 2, 3, 4, 5, 6])
     print mean([[1, 2, 4], [4, 5, 6]])
@@ -94,3 +113,7 @@ if __name__ == "__main__":
     print ci95(([[1, 2, 4], [4, 5, 6]]))
     print ci95([])
     
+    data = [0.113967640255, 0.223095775796, 0.283134228235, 0.416793887842]
+    print "95% conf. interval from std:", (convert_std_to_ci95(
+                                            unbiased_std(data), len(data)))
+    print "95% conf. interval:", ci95(data)
