@@ -1,0 +1,332 @@
+[2013-09-11 17:48:08] PyMTL           DEBUG  : Base learners used for testing this MTL problem:
+[2013-09-11 17:48:08] PyMTL           DEBUG  :   - svm_poly3: SVC(C=1.0, cache_size=200, class_weight=None, coef0=1, degree=3, gamma=0.0, kernel=poly, max_iter=-1, probability=True, shrinking=True, tol=0.001, verbose=False)
+[2013-09-11 17:48:41] PyMTL           DEBUG  : Report about the generated synthetic Boolean MTL problem:
+[2013-09-11 17:48:41] PyMTL           DEBUG  :   Boolean function of each group:
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1: (x₅ ∧ ¬ x₉) ∨ (x₅ ∧ x₇ ∧ ¬ x₁₁ ∧ ¬ x₂) ∨ (x₆ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₁₀) ∨ (x₉ ∧ ¬ x₂ ∧ ¬ x₆ ∧ ¬ x₇) ∨ (¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₃ ∧ ¬ x₉) ∨ (x₁₂ ∧ ¬ x₁₀ ∧ ¬ x₂ ∧ ¬ x₆ ∧ ¬ x₇) ∨ (x₁ ∧ x₁₁ ∧ x₂ ∧ x₄ ∧ ¬ x₇ ∧ ¬ x₈) ∨ (x₁ ∧ x₃ ∧ x₆ ∧ ¬ x₁₂ ∧ ¬ x₈ ∧ ¬ x₉) ∨ (x₁₀ ∧ x₄ ∧ ¬ x₁ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₉) ∨ (x₂ ∧ x₅ ∧ x₆ ∧ ¬ x₁₂ ∧ ¬ x₃ ∧ ¬ x₇) ∨ (x₃ ∧ x₇ ∧ x₈ ∧ ¬ x₁₂ ∧ ¬ x₂ ∧ ¬ x₉) ∨ (x₁₁ ∧ x₁₂ ∧ x₈ ∧ ¬ x₁ ∧ ¬ x₂ ∧ ¬ x₆ ∧ ¬ x₉) ∨ (x₁₀ ∧ x₄ ∧ x₅ ∧ x₈ ∧ x₉ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₂) ∨ (x₁₂ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₅ ∧ ¬ x₇ ∧ ¬ x₈) ∨ (x₁₁ ∧ x₂ ∧ x₃ ∧ x₆ ∧ x₇ ∧ x₈ ∧ ¬ x₁₀ ∧ ¬ x₅ ∧ ¬ x₉) ∨ (x₁₁ ∧ x₁₂ ∧ x₃ ∧ x₄ ∧ x₅ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₂ ∧ ¬ x₇ ∧ ¬ x₈)
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2: (x₇ ∧ ¬ x₁ ∧ ¬ x₁₁) ∨ (x₁₀ ∧ x₃ ∧ ¬ x₁₁ ∧ ¬ x₇) ∨ (¬ x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₂ ∧ ¬ x₈) ∨ (x₁ ∧ x₁₀ ∧ x₈ ∧ ¬ x₁₁ ∧ ¬ x₁₂) ∨ (x₁₂ ∧ x₅ ∧ x₇ ∧ x₈ ∧ ¬ x₁) ∨ (x₁₀ ∧ x₃ ∧ x₄ ∧ x₅ ∧ x₉ ∧ ¬ x₆) ∨ (x₁₁ ∧ x₂ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₄ ∧ ¬ x₇) ∨ (x₁ ∧ x₁₁ ∧ x₁₂ ∧ x₆ ∧ x₈ ∧ x₉ ∧ ¬ x₂) ∨ (x₁ ∧ x₅ ∧ x₇ ∧ x₈ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₄) ∨ (x₁₀ ∧ x₁₁ ∧ x₅ ∧ x₇ ∧ ¬ x₁ ∧ ¬ x₁₂ ∧ ¬ x₄) ∨ (x₁₁ ∧ x₁₂ ∧ x₄ ∧ ¬ x₁ ∧ ¬ x₅ ∧ ¬ x₆ ∧ ¬ x₇) ∨ (x₄ ∧ x₆ ∧ x₇ ∧ ¬ x₁ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₈) ∨ (x₉ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₄ ∧ ¬ x₆) ∨ (¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₁₁ ∧ ¬ x₃ ∧ ¬ x₄ ∧ ¬ x₇ ∧ ¬ x₉) ∨ (x₁₁ ∧ x₄ ∧ x₈ ∧ ¬ x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₆) ∨ (x₁₂ ∧ x₃ ∧ x₅ ∧ x₇ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₂)
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3: (¬ x₇ ∧ ¬ x₈) ∨ (x₁ ∧ x₁₀ ∧ ¬ x₄) ∨ (x₆ ∧ ¬ x₁₁ ∧ ¬ x₁₂) ∨ (x₄ ∧ x₇ ∧ ¬ x₁₁ ∧ ¬ x₅) ∨ (x₁₀ ∧ x₃ ∧ x₇ ∧ x₉ ∧ ¬ x₂) ∨ (x₁₀ ∧ x₈ ∧ ¬ x₁₂ ∧ ¬ x₃ ∧ ¬ x₄) ∨ (x₁₂ ∧ x₆ ∧ ¬ x₂ ∧ ¬ x₅ ∧ ¬ x₉) ∨ (x₁ ∧ x₂ ∧ x₈ ∧ ¬ x₁₀ ∧ ¬ x₃ ∧ ¬ x₉) ∨ (x₁ ∧ x₄ ∧ x₇ ∧ x₈ ∧ ¬ x₂ ∧ ¬ x₆) ∨ (x₁₀ ∧ x₂ ∧ x₆ ∧ ¬ x₁ ∧ ¬ x₈ ∧ ¬ x₉) ∨ (x₇ ∧ ¬ x₁₁ ∧ ¬ x₃ ∧ ¬ x₄ ∧ ¬ x₈ ∧ ¬ x₉) ∨ (x₁₁ ∧ x₄ ∧ x₆ ∧ x₉ ∧ ¬ x₁₀ ∧ ¬ x₃ ∧ ¬ x₇) ∨ (x₆ ∧ x₇ ∧ x₉ ∧ ¬ x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₃ ∧ ¬ x₈) ∨ (x₁₀ ∧ x₅ ∧ ¬ x₁ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₃ ∧ ¬ x₇ ∧ ¬ x₈) ∨ (x₃ ∧ x₆ ∧ x₈ ∧ ¬ x₁₀ ∧ ¬ x₁₁ ∧ ¬ x₁₂ ∧ ¬ x₄ ∧ ¬ x₇) ∨ (x₁₁ ∧ x₃ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₂ ∧ ¬ x₄ ∧ ¬ x₅ ∧ ¬ x₆ ∧ ¬ x₇ ∧ ¬ x₈)
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4: (x₈ ∧ ¬ x₄ ∧ ¬ x₅) ∨ (x₁₀ ∧ x₃ ∧ x₉ ∧ ¬ x₁₁) ∨ (¬ x₁ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₅) ∨ (x₁ ∧ x₃ ∧ x₄ ∧ x₆ ∧ x₉) ∨ (x₁₂ ∧ x₃ ∧ x₈ ∧ ¬ x₅ ∧ ¬ x₆) ∨ (x₁₀ ∧ x₄ ∧ x₅ ∧ x₆ ∧ ¬ x₁₁ ∧ ¬ x₈) ∨ (x₁₁ ∧ x₂ ∧ x₅ ∧ x₇ ∧ x₈ ∧ ¬ x₆) ∨ (x₁₁ ∧ x₈ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₂ ∧ ¬ x₆) ∨ (x₂ ∧ x₆ ∧ x₇ ∧ x₈ ∧ x₉ ∧ ¬ x₅) ∨ (x₁₀ ∧ x₂ ∧ x₃ ∧ x₄ ∧ x₆ ∧ ¬ x₅ ∧ ¬ x₈) ∨ (x₅ ∧ x₆ ∧ ¬ x₁₀ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₄ ∧ ¬ x₇) ∨ (x₁ ∧ x₂ ∧ x₅ ∧ x₆ ∧ ¬ x₁₀ ∧ ¬ x₃ ∧ ¬ x₄ ∧ ¬ x₈) ∨ (x₃ ∧ x₄ ∧ x₆ ∧ x₇ ∧ ¬ x₁ ∧ ¬ x₁₁ ∧ ¬ x₂ ∧ ¬ x₉) ∨ (x₁₁ ∧ x₁₂ ∧ x₅ ∧ x₈ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₄ ∧ ¬ x₆) ∨ (x₄ ∧ x₅ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₂ ∧ ¬ x₃ ∧ ¬ x₇ ∧ ¬ x₈ ∧ ¬ x₉) ∨ (x₁₀ ∧ x₁₁ ∧ x₁₂ ∧ x₂ ∧ x₃ ∧ ¬ x₄ ∧ ¬ x₆ ∧ ¬ x₇ ∧ ¬ x₈ ∧ ¬ x₉)
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5: (x₁₀ ∧ x₆ ∧ x₇ ∧ ¬ x₁) ∨ (x₂ ∧ ¬ x₁₀ ∧ ¬ x₁₁ ∧ ¬ x₄) ∨ (x₉ ∧ ¬ x₁₂ ∧ ¬ x₂ ∧ ¬ x₆) ∨ (x₁₁ ∧ x₅ ∧ x₇ ∧ x₈ ∧ ¬ x₆) ∨ (x₅ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₁₁ ∧ ¬ x₇) ∨ (x₁ ∧ x₁₁ ∧ x₂ ∧ x₄ ∧ x₈ ∧ ¬ x₁₀) ∨ (x₁ ∧ x₁₂ ∧ x₅ ∧ ¬ x₁₀ ∧ ¬ x₆ ∧ ¬ x₈) ∨ (x₁₀ ∧ x₁₁ ∧ x₂ ∧ x₉ ∧ ¬ x₁ ∧ ¬ x₅) ∨ (x₁₀ ∧ x₄ ∧ x₆ ∧ ¬ x₃ ∧ ¬ x₅ ∧ ¬ x₉) ∨ (x₁₂ ∧ x₃ ∧ x₄ ∧ ¬ x₂ ∧ ¬ x₆ ∧ ¬ x₈) ∨ (x₆ ∧ x₇ ∧ ¬ x₁ ∧ ¬ x₁₀ ∧ ¬ x₃ ∧ ¬ x₈) ∨ (x₁ ∧ x₁₀ ∧ x₁₁ ∧ x₁₂ ∧ x₈ ∧ ¬ x₃ ∧ ¬ x₉) ∨ (x₁₁ ∧ x₁₂ ∧ x₃ ∧ x₅ ∧ x₆ ∧ x₈ ∧ ¬ x₁₀) ∨ (x₁₁ ∧ x₅ ∧ x₆ ∧ x₇ ∧ ¬ x₁₀ ∧ ¬ x₁₂ ∧ ¬ x₂) ∨ (x₆ ∧ x₇ ∧ x₈ ∧ x₉ ∧ ¬ x₁₀ ∧ ¬ x₂ ∧ ¬ x₄) ∨ (x₁ ∧ x₁₀ ∧ x₁₂ ∧ x₂ ∧ x₈ ∧ ¬ x₁₁ ∧ ¬ x₃ ∧ ¬ x₇ ∧ ¬ x₉)
+[2013-09-11 17:48:41] PyMTL           DEBUG  :   % of True values in y for each task:
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #0): 0.535
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #1): 0.455
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #2): 0.46
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #3): 0.435
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #4): 0.49
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #5): 0.53
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #6): 0.405
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #7): 0.49
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #8): 0.475
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 1 (learning set #9): 0.535
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #0): 0.5
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #1): 0.435
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #2): 0.455
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #3): 0.495
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #4): 0.5
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #5): 0.515
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #6): 0.46
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #7): 0.53
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #8): 0.475
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 2 (learning set #9): 0.53
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #0): 0.49
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #1): 0.49
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #2): 0.505
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #3): 0.49
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #4): 0.445
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #5): 0.46
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #6): 0.425
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #7): 0.5
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #8): 0.49
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 3 (learning set #9): 0.515
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #0): 0.47
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #1): 0.535
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #2): 0.485
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #3): 0.495
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #4): 0.445
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #5): 0.465
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #6): 0.49
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #7): 0.475
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #8): 0.515
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 4 (learning set #9): 0.485
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #0): 0.455
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #1): 0.51
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #2): 0.475
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #3): 0.515
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #4): 0.475
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #5): 0.465
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #6): 0.425
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #7): 0.485
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #8): 0.495
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 1, task 5 (learning set #9): 0.47
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 1 (learning set #0): 0.375
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 1 (learning set #1): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 1 (learning set #2): 0.405
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 1 (learning set #3): 0.375
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 1 (learning set #4): 0.405
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 1 (learning set #5): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 1 (learning set #6): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 1 (learning set #7): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 1 (learning set #8): 0.335
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 1 (learning set #9): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 2 (learning set #0): 0.375
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 2 (learning set #1): 0.35
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 2 (learning set #2): 0.325
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 2 (learning set #3): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 2 (learning set #4): 0.295
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 2 (learning set #5): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 2 (learning set #6): 0.325
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 2 (learning set #7): 0.34
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 2 (learning set #8): 0.355
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 2 (learning set #9): 0.315
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 3 (learning set #0): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 3 (learning set #1): 0.37
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 3 (learning set #2): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 3 (learning set #3): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 3 (learning set #4): 0.33
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 3 (learning set #5): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 3 (learning set #6): 0.315
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 3 (learning set #7): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 3 (learning set #8): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 3 (learning set #9): 0.37
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 4 (learning set #0): 0.395
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 4 (learning set #1): 0.38
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 4 (learning set #2): 0.355
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 4 (learning set #3): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 4 (learning set #4): 0.445
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 4 (learning set #5): 0.335
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 4 (learning set #6): 0.395
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 4 (learning set #7): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 4 (learning set #8): 0.295
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 4 (learning set #9): 0.295
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 5 (learning set #0): 0.37
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 5 (learning set #1): 0.335
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 5 (learning set #2): 0.285
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 5 (learning set #3): 0.355
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 5 (learning set #4): 0.405
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 5 (learning set #5): 0.375
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 5 (learning set #6): 0.355
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 5 (learning set #7): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 5 (learning set #8): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 2, task 5 (learning set #9): 0.35
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 1 (learning set #0): 0.615
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 1 (learning set #1): 0.56
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 1 (learning set #2): 0.7
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 1 (learning set #3): 0.575
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 1 (learning set #4): 0.58
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 1 (learning set #5): 0.63
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 1 (learning set #6): 0.52
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 1 (learning set #7): 0.63
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 1 (learning set #8): 0.535
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 1 (learning set #9): 0.56
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 2 (learning set #0): 0.61
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 2 (learning set #1): 0.61
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 2 (learning set #2): 0.525
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 2 (learning set #3): 0.55
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 2 (learning set #4): 0.56
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 2 (learning set #5): 0.545
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 2 (learning set #6): 0.525
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 2 (learning set #7): 0.535
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 2 (learning set #8): 0.58
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 2 (learning set #9): 0.62
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 3 (learning set #0): 0.56
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 3 (learning set #1): 0.605
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 3 (learning set #2): 0.63
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 3 (learning set #3): 0.61
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 3 (learning set #4): 0.61
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 3 (learning set #5): 0.52
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 3 (learning set #6): 0.56
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 3 (learning set #7): 0.55
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 3 (learning set #8): 0.61
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 3 (learning set #9): 0.545
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 4 (learning set #0): 0.515
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 4 (learning set #1): 0.5
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 4 (learning set #2): 0.485
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 4 (learning set #3): 0.56
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 4 (learning set #4): 0.485
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 4 (learning set #5): 0.59
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 4 (learning set #6): 0.555
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 4 (learning set #7): 0.56
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 4 (learning set #8): 0.555
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 4 (learning set #9): 0.605
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 5 (learning set #0): 0.545
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 5 (learning set #1): 0.665
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 5 (learning set #2): 0.565
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 5 (learning set #3): 0.5
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 5 (learning set #4): 0.545
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 5 (learning set #5): 0.56
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 5 (learning set #6): 0.585
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 5 (learning set #7): 0.53
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 5 (learning set #8): 0.605
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 3, task 5 (learning set #9): 0.59
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 1 (learning set #0): 0.295
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 1 (learning set #1): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 1 (learning set #2): 0.325
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 1 (learning set #3): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 1 (learning set #4): 0.31
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 1 (learning set #5): 0.35
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 1 (learning set #6): 0.4
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 1 (learning set #7): 0.285
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 1 (learning set #8): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 1 (learning set #9): 0.285
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 2 (learning set #0): 0.3
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 2 (learning set #1): 0.28
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 2 (learning set #2): 0.31
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 2 (learning set #3): 0.29
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 2 (learning set #4): 0.335
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 2 (learning set #5): 0.375
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 2 (learning set #6): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 2 (learning set #7): 0.375
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 2 (learning set #8): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 2 (learning set #9): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 3 (learning set #0): 0.355
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 3 (learning set #1): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 3 (learning set #2): 0.26
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 3 (learning set #3): 0.3
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 3 (learning set #4): 0.26
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 3 (learning set #5): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 3 (learning set #6): 0.28
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 3 (learning set #7): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 3 (learning set #8): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 3 (learning set #9): 0.355
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 4 (learning set #0): 0.34
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 4 (learning set #1): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 4 (learning set #2): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 4 (learning set #3): 0.385
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 4 (learning set #4): 0.385
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 4 (learning set #5): 0.305
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 4 (learning set #6): 0.315
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 4 (learning set #7): 0.24
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 4 (learning set #8): 0.325
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 4 (learning set #9): 0.295
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 5 (learning set #0): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 5 (learning set #1): 0.315
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 5 (learning set #2): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 5 (learning set #3): 0.28
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 5 (learning set #4): 0.325
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 5 (learning set #5): 0.34
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 5 (learning set #6): 0.33
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 5 (learning set #7): 0.35
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 5 (learning set #8): 0.3
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 4, task 5 (learning set #9): 0.34
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 1 (learning set #0): 0.285
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 1 (learning set #1): 0.33
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 1 (learning set #2): 0.285
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 1 (learning set #3): 0.315
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 1 (learning set #4): 0.35
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 1 (learning set #5): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 1 (learning set #6): 0.33
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 1 (learning set #7): 0.35
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 1 (learning set #8): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 1 (learning set #9): 0.295
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 2 (learning set #0): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 2 (learning set #1): 0.285
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 2 (learning set #2): 0.285
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 2 (learning set #3): 0.395
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 2 (learning set #4): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 2 (learning set #5): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 2 (learning set #6): 0.385
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 2 (learning set #7): 0.38
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 2 (learning set #8): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 2 (learning set #9): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 3 (learning set #0): 0.34
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 3 (learning set #1): 0.3
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 3 (learning set #2): 0.345
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 3 (learning set #3): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 3 (learning set #4): 0.37
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 3 (learning set #5): 0.3
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 3 (learning set #6): 0.26
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 3 (learning set #7): 0.33
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 3 (learning set #8): 0.3
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 3 (learning set #9): 0.3
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 4 (learning set #0): 0.305
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 4 (learning set #1): 0.325
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 4 (learning set #2): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 4 (learning set #3): 0.315
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 4 (learning set #4): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 4 (learning set #5): 0.42
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 4 (learning set #6): 0.315
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 4 (learning set #7): 0.36
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 4 (learning set #8): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 4 (learning set #9): 0.355
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 5 (learning set #0): 0.285
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 5 (learning set #1): 0.355
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 5 (learning set #2): 0.3
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 5 (learning set #3): 0.35
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 5 (learning set #4): 0.32
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 5 (learning set #5): 0.395
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 5 (learning set #6): 0.31
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 5 (learning set #7): 0.315
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 5 (learning set #8): 0.285
+[2013-09-11 17:48:41] PyMTL           DEBUG  :    - Group 5, task 5 (learning set #9): 0.315
+[2013-09-11 17:48:41] PyMTL           DEBUG  :   Average % of True values in y (across all tasks): 0.41164
+[2013-09-11 17:48:41] PyMTL           DEBUG  : Computing candidate pairs for merging (300 pairs)
+[2013-09-11 17:50:41] PyMTL           DEBUG  : Processing 52 candidate pairs for merging
+[2013-09-11 18:01:04] PyMTL           DEBUG  : Finished repetition: 0, base learner: svm_poly3, learner: ERM in 721.17s
+[2013-09-11 18:01:08] PyMTL           DEBUG  : Finished repetition: 0, base learner: svm_poly3, learner: NoMerging in 3.73s
+[2013-09-11 18:01:08] PyMTL           DEBUG  : Merged data has 12 attributes and 5000 examples.
+[2013-09-11 18:01:42] PyMTL           DEBUG  : Finished repetition: 0, base learner: svm_poly3, learner: MergeAll in 33.37s
+[2013-09-11 18:01:50] PyMTL           DEBUG  : Finished repetition: 0, base learner: svm_poly3, learner: Oracle in 7.07s
+[2013-09-11 18:01:50] PyMTL           DEBUG  : Computing candidate pairs for merging (300 pairs)
+[2013-09-11 18:03:48] PyMTL           DEBUG  : Processing 52 candidate pairs for merging
+[2013-09-11 18:14:34] PyMTL           DEBUG  : Finished repetition: 1, base learner: svm_poly3, learner: ERM in 745.77s
+[2013-09-11 18:14:38] PyMTL           DEBUG  : Finished repetition: 1, base learner: svm_poly3, learner: NoMerging in 3.71s
+[2013-09-11 18:14:38] PyMTL           DEBUG  : Merged data has 12 attributes and 5000 examples.
+[2013-09-11 18:15:12] PyMTL           DEBUG  : Finished repetition: 1, base learner: svm_poly3, learner: MergeAll in 33.60s
+[2013-09-11 18:15:20] PyMTL           DEBUG  : Finished repetition: 1, base learner: svm_poly3, learner: Oracle in 7.06s
+[2013-09-11 18:15:20] PyMTL           DEBUG  : Computing candidate pairs for merging (300 pairs)
+[2013-09-11 18:17:16] PyMTL           DEBUG  : Processing 55 candidate pairs for merging
+[2013-09-11 18:27:23] PyMTL           DEBUG  : Finished repetition: 2, base learner: svm_poly3, learner: ERM in 704.44s
+[2013-09-11 18:27:26] PyMTL           DEBUG  : Finished repetition: 2, base learner: svm_poly3, learner: NoMerging in 3.70s
+[2013-09-11 18:27:26] PyMTL           DEBUG  : Merged data has 12 attributes and 5000 examples.
+[2013-09-11 18:28:01] PyMTL           DEBUG  : Finished repetition: 2, base learner: svm_poly3, learner: MergeAll in 33.32s
+[2013-09-11 18:28:08] PyMTL           DEBUG  : Finished repetition: 2, base learner: svm_poly3, learner: Oracle in 7.06s
+[2013-09-11 18:28:08] PyMTL           DEBUG  : Computing candidate pairs for merging (300 pairs)
+[2013-09-11 18:30:06] PyMTL           DEBUG  : Processing 50 candidate pairs for merging
+[2013-09-11 18:40:13] PyMTL           DEBUG  : Finished repetition: 3, base learner: svm_poly3, learner: ERM in 707.94s
+[2013-09-11 18:40:17] PyMTL           DEBUG  : Finished repetition: 3, base learner: svm_poly3, learner: NoMerging in 3.72s
+[2013-09-11 18:40:17] PyMTL           DEBUG  : Merged data has 12 attributes and 5000 examples.
+[2013-09-11 18:40:51] PyMTL           DEBUG  : Finished repetition: 3, base learner: svm_poly3, learner: MergeAll in 33.19s
+[2013-09-11 18:40:58] PyMTL           DEBUG  : Finished repetition: 3, base learner: svm_poly3, learner: Oracle in 7.13s
+[2013-09-11 18:40:58] PyMTL           DEBUG  : Computing candidate pairs for merging (300 pairs)
+[2013-09-11 18:42:59] PyMTL           DEBUG  : Processing 52 candidate pairs for merging
+[2013-09-11 18:53:24] PyMTL           DEBUG  : Finished repetition: 4, base learner: svm_poly3, learner: ERM in 725.65s
+[2013-09-11 18:53:28] PyMTL           DEBUG  : Finished repetition: 4, base learner: svm_poly3, learner: NoMerging in 3.72s
+[2013-09-11 18:53:28] PyMTL           DEBUG  : Merged data has 12 attributes and 5000 examples.
+[2013-09-11 18:54:01] PyMTL           DEBUG  : Finished repetition: 4, base learner: svm_poly3, learner: MergeAll in 33.15s
+[2013-09-11 18:54:08] PyMTL           DEBUG  : Finished repetition: 4, base learner: svm_poly3, learner: Oracle in 6.99s
+[2013-09-11 18:54:08] PyMTL           DEBUG  : Computing candidate pairs for merging (300 pairs)
+[2013-09-11 18:56:07] PyMTL           DEBUG  : Processing 51 candidate pairs for merging
+[2013-09-11 19:06:39] PyMTL           DEBUG  : Finished repetition: 5, base learner: svm_poly3, learner: ERM in 732.31s
+[2013-09-11 19:06:42] PyMTL           DEBUG  : Finished repetition: 5, base learner: svm_poly3, learner: NoMerging in 3.75s
+[2013-09-11 19:06:42] PyMTL           DEBUG  : Merged data has 12 attributes and 5000 examples.
+[2013-09-11 19:07:17] PyMTL           DEBUG  : Finished repetition: 5, base learner: svm_poly3, learner: MergeAll in 34.08s
+[2013-09-11 19:07:24] PyMTL           DEBUG  : Finished repetition: 5, base learner: svm_poly3, learner: Oracle in 7.22s
+[2013-09-11 19:07:24] PyMTL           DEBUG  : Computing candidate pairs for merging (300 pairs)
+[2013-09-11 19:09:21] PyMTL           DEBUG  : Processing 52 candidate pairs for merging
+[2013-09-11 19:19:38] PyMTL           DEBUG  : Finished repetition: 6, base learner: svm_poly3, learner: ERM in 714.01s
+[2013-09-11 19:19:42] PyMTL           DEBUG  : Finished repetition: 6, base learner: svm_poly3, learner: NoMerging in 3.70s
+[2013-09-11 19:19:42] PyMTL           DEBUG  : Merged data has 12 attributes and 5000 examples.
+[2013-09-11 19:20:14] PyMTL           DEBUG  : Finished repetition: 6, base learner: svm_poly3, learner: MergeAll in 31.09s
+[2013-09-11 19:20:21] PyMTL           DEBUG  : Finished repetition: 6, base learner: svm_poly3, learner: Oracle in 7.04s
+[2013-09-11 19:20:21] PyMTL           DEBUG  : Computing candidate pairs for merging (300 pairs)
+[2013-09-11 19:22:21] PyMTL           DEBUG  : Processing 52 candidate pairs for merging
+[2013-09-11 19:32:46] PyMTL           DEBUG  : Finished repetition: 7, base learner: svm_poly3, learner: ERM in 725.85s
+[2013-09-11 19:32:50] PyMTL           DEBUG  : Finished repetition: 7, base learner: svm_poly3, learner: NoMerging in 3.73s
+[2013-09-11 19:32:50] PyMTL           DEBUG  : Merged data has 12 attributes and 5000 examples.
+[2013-09-11 19:33:25] PyMTL           DEBUG  : Finished repetition: 7, base learner: svm_poly3, learner: MergeAll in 33.97s
+[2013-09-11 19:33:32] PyMTL           DEBUG  : Finished repetition: 7, base learner: svm_poly3, learner: Oracle in 7.23s
+[2013-09-11 19:33:32] PyMTL           DEBUG  : Computing candidate pairs for merging (300 pairs)
+[2013-09-11 19:35:29] PyMTL           DEBUG  : Processing 52 candidate pairs for merging
+[2013-09-11 19:45:37] PyMTL           DEBUG  : Finished repetition: 8, base learner: svm_poly3, learner: ERM in 708.17s
+[2013-09-11 19:45:41] PyMTL           DEBUG  : Finished repetition: 8, base learner: svm_poly3, learner: NoMerging in 3.69s
+[2013-09-11 19:45:41] PyMTL           DEBUG  : Merged data has 12 attributes and 5000 examples.
+[2013-09-11 19:46:15] PyMTL           DEBUG  : Finished repetition: 8, base learner: svm_poly3, learner: MergeAll in 33.40s
+[2013-09-11 19:46:22] PyMTL           DEBUG  : Finished repetition: 8, base learner: svm_poly3, learner: Oracle in 6.88s
+[2013-09-11 19:46:22] PyMTL           DEBUG  : Computing candidate pairs for merging (300 pairs)
+[2013-09-11 19:48:21] PyMTL           DEBUG  : Processing 51 candidate pairs for merging
+[2013-09-11 19:58:39] PyMTL           DEBUG  : Finished repetition: 9, base learner: svm_poly3, learner: ERM in 715.46s
+[2013-09-11 19:58:42] PyMTL           DEBUG  : Finished repetition: 9, base learner: svm_poly3, learner: NoMerging in 3.69s
+[2013-09-11 19:58:42] PyMTL           DEBUG  : Merged data has 12 attributes and 5000 examples.
+[2013-09-11 19:59:16] PyMTL           DEBUG  : Finished repetition: 9, base learner: svm_poly3, learner: MergeAll in 33.17s
+[2013-09-11 19:59:23] PyMTL           DEBUG  : Finished repetition: 9, base learner: svm_poly3, learner: Oracle in 6.88s
+[2013-09-11 19:59:23] PyMTL           DEBUG  : Successfully pickled the results of base learner: svm_poly3 to file: /home/tadej/Apps/PyMTL/results/synthetic_data/changing_n/bool_func-a12d6n200g5tg5nse0.0rs15nls10-seed51-complete_test/bl-svm_poly3.pkl
