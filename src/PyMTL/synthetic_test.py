@@ -26,10 +26,11 @@ from PyMTL.util import logger, configure_logger, unpickle_obj
 from PyMTL.learning import prefiltering, learning
 from PyMTL.test import test_tasks, log_base_learner_info, LEARNERS_TO_COLORS
 from PyMTL.plotting import LinePlotDesc, plot_multiple_separate
+from PyMTL.stat import convert_std_to_ci95
 
 
 def combine_experiment_results(results_path_fmt, chan_par_values,
-                               file_name_fmt, title="", xlabel=""):
+        file_name_fmt, repeats, error_measure="std", title="", xlabel=""):
     """Combine the results of experiments matching the given results_path_fmt,
     where the value of a particular parameter changes according to the given
     chan_par_values list.
@@ -49,6 +50,12 @@ def combine_experiment_results(results_path_fmt, chan_par_values,
         Template for the paths where to save the drawn plots. It must contain
         exactly one pair of braces ({}) where the base learner's name will be
         put.
+    repeats : int
+        Number of repetitions of each experiment.
+    error_measure : string
+        Indicator of which measure to use for plots' error bars.
+        Currently, only "std" (standard deviation) and "95ci" (95% confidence
+        intervals) are supported.
     title : string (optinal)
         The title of each plot.
     xlabel : string (optinal)
@@ -58,6 +65,21 @@ def combine_experiment_results(results_path_fmt, chan_par_values,
     # key for extracting the AUC results from the pickled dictionaries
     AUC_STRING = ("Results for AUC (weighting method: all_equal, error margin "
                   "measure: std)")
+    
+    ERROR_MEASURE_TO_PRINT = {"std" : "std. dev.",
+                              "95ci" : "95% conf. intervals"}
+    
+    def _convert_error(err):
+        """Convert the given error value according to the error_measure
+        parameter.
+        
+        """
+        if error_measure == "std":
+            return err
+        elif error_measure == "95ci":
+            return convert_std_to_ci95(err, repeats)
+        else:
+            raise ValueError("Unknown error measure: {}".format(error_measure))
     
     res = dict()
     # unpickle the results
@@ -93,7 +115,7 @@ def combine_experiment_results(results_path_fmt, chan_par_values,
                 x_points[bl][l].append(v)
                 avg, err = res_auc[bl][l]
                 avgs[bl][l].append(avg)
-                errs[bl][l].append(err)
+                errs[bl][l].append(_convert_error(err))
     
     # generate the plot description objects
     plot_desc = OrderedDict()
@@ -105,9 +127,15 @@ def combine_experiment_results(results_path_fmt, chan_par_values,
                 ecolor=LEARNERS_TO_COLORS[l]))
     
     # draw and save the plots
+    
+    if title == "":
+        title = "Error bars show {}".format(ERROR_MEASURE_TO_PRINT[
+                                            error_measure])
+    else:
+        title = title + " (error bars show {})".format(ERROR_MEASURE_TO_PRINT[
+                                                        error_measure])
     plot_multiple_separate(plot_desc, file_name_fmt,
-        title="Avg. results for tasks (error bars show std. dev.)",
-        xlabel=xlabel, ylabel="AUC",
+        title=title, xlabel=xlabel, ylabel="AUC",
         x_tick_points=chan_par_values,
         ylim_bottom=0, ylim_top=1, error_bars=True)
 
@@ -161,7 +189,12 @@ if __name__ == "__main__":
     # (only applies to testing configurations 41 -- 44):
     # run -- run the experiments
     # combine -- combine the results of the experiments
-    mode = ["run", "combine"]
+    mode = ["combine"]
+    
+    # string indicating the measure to use when plotting error bars:
+    # std -- standard deviation
+    # 95ci -- 95% confidence intervals
+    error_measure = "95ci"
     
     # boolean indicating whether to perform the tests on the MTL problem
     test = True
@@ -510,9 +543,11 @@ if __name__ == "__main__":
                                separate_figs=True, cfg_logger=False)
             if "combine" in mode:
                 combine_experiment_results(results_path_fmt,
-                    tasks_per_group_values, results_path_fmt.format(
-                    tasks_per_group_values) + "-{}.pdf",
-                    title="Avg. results for tasks (error bars show std. dev.)",
+                    tasks_per_group_values,
+                    (results_path_fmt.format(tasks_per_group_values) +
+                     "-{}-{{}}.pdf".format(error_measure)),
+                    n_learning_sets, error_measure=error_measure,
+                    title="Avg. results for tasks",
                     xlabel="# of tasks per group")
         
         if test_config == 42:
@@ -564,9 +599,11 @@ if __name__ == "__main__":
                                separate_figs=True, cfg_logger=False)
             if "combine" in mode:
                 combine_experiment_results(results_path_fmt,
-                    task_groups_values, results_path_fmt.format(
-                    task_groups_values) + "-{}.pdf",
-                    title="Avg. results for tasks (error bars show std. dev.)",
+                    task_groups_values,
+                    (results_path_fmt.format(task_groups_values) + 
+                     "-{}-{{}}.pdf".format(error_measure)),
+                    n_learning_sets, error_measure=error_measure,
+                    title="Avg. results for tasks",
                     xlabel="# of task groups")
     
         if test_config == 43:
@@ -618,9 +655,11 @@ if __name__ == "__main__":
                                separate_figs=True, cfg_logger=False)
             if "combine" in mode:
                 combine_experiment_results(results_path_fmt,
-                    n_values, results_path_fmt.format(
-                    n_values) + "-{}.pdf",
-                    title="Avg. results for tasks (error bars show std. dev.)",
+                    n_values,
+                    (results_path_fmt.format(n_values) +
+                     "-{}-{{}}.pdf".format(error_measure)),
+                    n_learning_sets, error_measure=error_measure,
+                    title="Avg. results for tasks",
                     xlabel="# of examples")
         
         if test_config == 44:
@@ -673,8 +712,8 @@ if __name__ == "__main__":
                                separate_figs=True, cfg_logger=False)
             if "combine" in mode:
                 combine_experiment_results(results_path_fmt,
-                    noise_values, results_path_fmt.format(
-                    noise_values) + "-{}.pdf",
-                    title="Avg. results for tasks (error bars show std. dev.)",
-                    xlabel="% of noise")
-        
+                    noise_values,
+                    (results_path_fmt.format(noise_values) +
+                     "-{}-{{}}.pdf".format(error_measure)),
+                    n_learning_sets, error_measure=error_measure,
+                    title="Avg. results for tasks", xlabel="% of noise")
