@@ -68,8 +68,12 @@ def generate_boolean_function(a, d=8, random_seed=0):
                     disjunct.append(attr)
                 else:
                     disjunct.append(Not(attr))
-        disjunct = And(*disjunct)
-        function.append(disjunct)
+        # Note: Empty disjuncts are discarded since expression 'And(*disjunct)'
+        # would return value True for them and consequentially, the whole
+        # Boolean function would simplify to the value True.
+        if len(disjunct) > 0:
+            disjunct = And(*disjunct)
+            function.append(disjunct)
     return attributes, Or(*function)
 
 
