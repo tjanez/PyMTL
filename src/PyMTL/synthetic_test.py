@@ -145,6 +145,290 @@ def pprint_iter(it):
     return ",".join([str(v) for v in it])
 
 
+def _test_config_41(data_rnd_seed_values, tasks_per_group_values,
+                    results_dir="results/synthetic_data"):
+    """Testing configuration for the changing number of tasks per group
+    experiment.
+    
+    Parameters
+    ----------
+    data_rnd_seed_values : list
+        Values of data_rnd_seed for which to repeat the experiment.
+    tasks_per_group_values : list
+        Values of the number of tasks per group for which to repeat the
+        experiment.
+    results_dir : str
+        Directory in which to put the chaning_tasks_per_group directory with the
+        relevant experiment results.
+    
+    """
+    # parameters of the synthetic Boolean MTL problem
+    attributes = 12
+    disjunct_degree = 6
+    n = 50
+    task_groups = 5
+    noise = 0.0
+    n_learning_sets = 10
+    # parameters of the MTL problem tester
+    rnd_seed = 51
+    
+    for data_rnd_seed in data_rnd_seed_values:
+        results_path_fmt = os.path.join(path_prefix, results_dir,
+            "changing_tasks_per_group/bool_func-a{}d{}"
+            "n{}g{}tg{{}}nse{}rs{}nls{}-seed{}-complete_test".format(
+            attributes, disjunct_degree, n, task_groups, noise,
+            data_rnd_seed, n_learning_sets, rnd_seed))
+        if "run" in mode:
+            for tasks_per_group in tasks_per_group_values:
+                # prepare directories and loggers
+                results_path = results_path_fmt.format(tasks_per_group)
+                if not os.path.exists(results_path):
+                    os.makedirs(results_path)
+                log_file = os.path.join(results_path, "run-{}.log".\
+                            format(time.strftime("%Y%m%d_%H%M%S")))
+                configure_logger(logger, console_level=logging.INFO,
+                                 file_name=log_file)
+                log_base_learner_info(logger, base_learners_bool)
+                # generate boolean data with complete test sets
+                funcs_pickle_path = os.path.join(results_path,
+                                                 "boolean_funcs.pkl")
+                tasks_data, tasks_complete_test_sets = \
+                    synthetic_data.generate_boolean_data_with_complete_test_sets(
+                        attributes, disjunct_degree, n, task_groups,
+                        tasks_per_group, noise,
+                        random_seed=data_rnd_seed,
+                        n_learning_sets=n_learning_sets,
+                        funcs_pickle_path=funcs_pickle_path)
+                # test the generated MTL problem
+                test_tasks(tasks_data, results_path, base_learners_bool,
+                           measures_clas, learners, "pre-prepared_test",
+                           rnd_seed=rnd_seed, test=test,
+                           unpickle=unpickle, visualize=visualize,
+                           preprepared_test_sets=tasks_complete_test_sets,
+                           separate_figs=True, cfg_logger=False)
+        if "combine" in mode:
+            combine_experiment_results(results_path_fmt,
+                tasks_per_group_values,
+                (results_path_fmt.format(pprint_iter(
+                tasks_per_group_values)) + "-{}-{{}}.pdf".format(
+                error_measure)),
+                n_learning_sets, error_measure=error_measure,
+                title="Avg. results for tasks",
+                xlabel="# of tasks per group")
+
+
+def _test_config_42(data_rnd_seed_values, task_groups_values,
+                    results_dir="results/synthetic_data"):
+    """Testing configuration for the changing number of tasks groups experiment.
+    
+    Parameters
+    ----------
+    data_rnd_seed_values : list
+        Values of data_rnd_seed for which to repeat the experiment.
+    task_groups_values : list
+        Values of the number of task groups for which to repeat the experiment.
+    results_dir : str
+        Directory in which to put the chaning_task_groups directory with the
+        relevant experiment results.
+    
+    """
+    # parameters of the synthetic Boolean MTL problem
+    attributes = 12
+    disjunct_degree = 6
+    n = 50
+    tasks_per_group = 5
+    noise = 0.0
+    n_learning_sets = 10
+    # parameters of the MTL problem tester
+    rnd_seed = 51    
+    
+    for data_rnd_seed in data_rnd_seed_values:
+        results_path_fmt = os.path.join(path_prefix, results_dir,
+            "changing_task_groups/bool_func-a{}d{}n{}"
+            "g{{}}tg{}nse{}rs{}nls{}-seed{}-complete_test".format(
+            attributes, disjunct_degree, n, tasks_per_group, noise,
+            data_rnd_seed, n_learning_sets, rnd_seed))
+        if "run" in mode:
+            for task_groups in task_groups_values:
+                # prepare directories and loggers
+                results_path = results_path_fmt.format(task_groups)
+                if not os.path.exists(results_path):
+                    os.makedirs(results_path)
+                log_file = os.path.join(results_path, "run-{}.log".\
+                            format(time.strftime("%Y%m%d_%H%M%S")))
+                configure_logger(logger, console_level=logging.INFO,
+                                 file_name=log_file)
+                log_base_learner_info(logger, base_learners_bool)
+                # generate boolean data with complete test sets
+                funcs_pickle_path = os.path.join(results_path,
+                                                 "boolean_funcs.pkl")
+                tasks_data, tasks_complete_test_sets = \
+                    synthetic_data.generate_boolean_data_with_complete_test_sets(
+                        attributes, disjunct_degree, n, task_groups,
+                        tasks_per_group, noise,
+                        random_seed=data_rnd_seed,
+                        n_learning_sets=n_learning_sets,
+                        funcs_pickle_path=funcs_pickle_path)
+                # test the generated MTL problem
+                test_tasks(tasks_data, results_path, base_learners_bool,
+                           measures_clas, learners, "pre-prepared_test",
+                           rnd_seed=rnd_seed, test=test,
+                           unpickle=unpickle, visualize=visualize,
+                           preprepared_test_sets=tasks_complete_test_sets,
+                           separate_figs=True, cfg_logger=False)
+        if "combine" in mode:
+            combine_experiment_results(results_path_fmt,
+                task_groups_values,
+                (results_path_fmt.format(pprint_iter(
+                task_groups_values)) + "-{}-{{}}.pdf".format(
+                error_measure)),
+                n_learning_sets, error_measure=error_measure,
+                title="Avg. results for tasks",
+                xlabel="# of task groups")
+
+
+def _test_config_43(data_rnd_seed_values, n_values,
+                    results_dir="results/synthetic_data"):
+    """Testing configuration for the changing number of examples per task
+    experiment.
+    
+    Parameters
+    ----------
+    data_rnd_seed_values : list
+        Values of data_rnd_seed for which to repeat the experiment.
+    n_values : list
+        Values of the number of examples per task for which to repeat the
+        experiment.
+    results_dir : str
+        Directory in which to put the chaning_n directory with the relevant
+        experiment results.
+    
+    """
+    # parameters of the synthetic Boolean MTL problem
+    attributes = 12
+    disjunct_degree = 6
+    task_groups = 5
+    tasks_per_group = 5
+    noise = 0.0
+    n_learning_sets = 10
+    # parameters of the MTL problem tester
+    rnd_seed = 51
+    
+    for data_rnd_seed in data_rnd_seed_values:
+        results_path_fmt = os.path.join(path_prefix, results_dir,
+            "changing_n/bool_func-a{}d{}n{{}}g{}tg{}"
+            "nse{}rs{}nls{}-seed{}-complete_test".format(attributes,
+            disjunct_degree, task_groups, tasks_per_group, noise,
+            data_rnd_seed, n_learning_sets, rnd_seed))
+        if "run" in mode:
+            for n in n_values:
+                # prepare directories and loggers
+                results_path = results_path_fmt.format(n)
+                if not os.path.exists(results_path):
+                    os.makedirs(results_path)
+                log_file = os.path.join(results_path, "run-{}.log".\
+                            format(time.strftime("%Y%m%d_%H%M%S")))
+                configure_logger(logger, console_level=logging.INFO,
+                                 file_name=log_file)
+                log_base_learner_info(logger, base_learners_bool)
+                # generate boolean data with complete test sets
+                funcs_pickle_path = os.path.join(results_path,
+                                                 "boolean_funcs.pkl")
+                tasks_data, tasks_complete_test_sets = \
+                    synthetic_data.generate_boolean_data_with_complete_test_sets(
+                        attributes, disjunct_degree, n, task_groups,
+                        tasks_per_group, noise,
+                        random_seed=data_rnd_seed,
+                        n_learning_sets=n_learning_sets,
+                        funcs_pickle_path=funcs_pickle_path)
+                # test the generated MTL problem
+                test_tasks(tasks_data, results_path, base_learners_bool,
+                           measures_clas, learners, "pre-prepared_test",
+                           rnd_seed=rnd_seed, test=test,
+                           unpickle=unpickle, visualize=visualize,
+                           preprepared_test_sets=tasks_complete_test_sets,
+                           separate_figs=True, cfg_logger=False)
+        if "combine" in mode:
+            combine_experiment_results(results_path_fmt,
+                n_values,
+                (results_path_fmt.format(pprint_iter(n_values)) +
+                 "-{}-{{}}.pdf".format(error_measure)),
+                n_learning_sets, error_measure=error_measure,
+                title="Avg. results for tasks",
+                xlabel="# of examples")
+
+
+def _test_config_44(data_rnd_seed_values, noise_values,
+                    results_dir="results/synthetic_data"):
+    """Testing configuration for the changing amount of noise experiment.
+    
+    Parameters
+    ----------
+    data_rnd_seed_values : list
+        Values of data_rnd_seed for which to repeat the experiment.
+    noise_values : list
+        Values of the amount of noise for which to repeat the experiment.
+    results_dir : str
+        Directory in which to put the chaning_noise directory with the relevant
+        experiment results.
+    
+    """
+    # parameters of the synthetic Boolean MTL problem
+    attributes = 12
+    disjunct_degree = 6
+    n = 50
+    task_groups = 5
+    tasks_per_group = 5
+    noise = 0.0
+    n_learning_sets = 10
+    # parameters of the MTL problem tester
+    rnd_seed = 51
+    
+    # dynamic parameters of the synthetic Boolean MTL problem
+    
+    
+    for data_rnd_seed in data_rnd_seed_values:
+        results_path_fmt = os.path.join(path_prefix, results_dir,
+            "changing_noise/bool_func-a{}d{}n{}g{}tg{}"
+            "nse{{}}rs{}nls{}-seed{}-complete_test".format(attributes,
+            disjunct_degree, n, task_groups, tasks_per_group,
+            data_rnd_seed, n_learning_sets, rnd_seed))
+        if "run" in mode:
+            for noise in noise_values:
+                # prepare directories and loggers
+                results_path = results_path_fmt.format(noise)
+                if not os.path.exists(results_path):
+                    os.makedirs(results_path)
+                log_file = os.path.join(results_path, "run-{}.log".\
+                            format(time.strftime("%Y%m%d_%H%M%S")))
+                configure_logger(logger, console_level=logging.INFO,
+                                 file_name=log_file)
+                log_base_learner_info(logger, base_learners_bool)
+                # generate boolean data with complete test sets
+                funcs_pickle_path = os.path.join(results_path,
+                                                 "boolean_funcs.pkl")
+                tasks_data, tasks_complete_test_sets = \
+                    synthetic_data.generate_boolean_data_with_complete_test_sets(
+                        attributes, disjunct_degree, n, task_groups,
+                        tasks_per_group, noise,
+                        random_seed=data_rnd_seed,
+                        n_learning_sets=n_learning_sets,
+                        funcs_pickle_path=funcs_pickle_path)
+                # test the generated MTL problem
+                test_tasks(tasks_data, results_path, base_learners_bool,
+                           measures_clas, learners, "pre-prepared_test",
+                           rnd_seed=rnd_seed, test=test,
+                           unpickle=unpickle, visualize=visualize,
+                           preprepared_test_sets=tasks_complete_test_sets,
+                           separate_figs=True, cfg_logger=False)
+        if "combine" in mode:
+            combine_experiment_results(results_path_fmt,
+                noise_values,
+                (results_path_fmt.format(pprint_iter(noise_values)) +
+                 "-{}-{{}}.pdf".format(error_measure)),
+                n_learning_sets, error_measure=error_measure,
+                title="Avg. results for tasks", xlabel="% of noise")
+
 if __name__ == "__main__":
     # find out the current file's location so it can be used to compute the
     # location of other files/directories
@@ -188,7 +472,7 @@ if __name__ == "__main__":
     # 5 -- Boolean problem (5 groups, 5 tasks per group; comparison of different
     #                       polynomial SVMs)
     # 6 -- Boolean problem (10 groups, 10 tasks per group)
-    test_configs = [41, 42, 43, 44]
+    test_configs = [50]#[41, 42, 43, 44]
     
     # list of strings indicating in which mode the script is to be run
     # (only applies to testing configurations 41 -- 44):
@@ -500,235 +784,45 @@ if __name__ == "__main__":
                        separate_figs=True)
             
         if test_config == 41:
-            # parameters of the synthetic Boolean MTL problem
-            attributes = 12
-            disjunct_degree = 6
-            n = 50
-            task_groups = 5
-            noise = 0.0
-            n_learning_sets = 10
-            # parameters of the MTL problem tester
-            rnd_seed = 51
-            
-            # dynamic parameters of the synthetic Boolean MTL problem
-            data_rnd_seed_values = range(15, 19)
-            tasks_per_group_values = [1, 2, 5, 10, 20]
-            
-            for data_rnd_seed in data_rnd_seed_values:
-                results_path_fmt = os.path.join(path_prefix, "results/"
-                    "synthetic_data/changing_tasks_per_group/bool_func-a{}d{}"
-                    "n{}g{}tg{{}}nse{}rs{}nls{}-seed{}-complete_test".format(
-                    attributes, disjunct_degree, n, task_groups, noise,
-                    data_rnd_seed, n_learning_sets, rnd_seed))
-                if "run" in mode:
-                    for tasks_per_group in tasks_per_group_values:
-                        # prepare directories and loggers
-                        results_path = results_path_fmt.format(tasks_per_group)
-                        if not os.path.exists(results_path):
-                            os.makedirs(results_path)
-                        log_file = os.path.join(results_path, "run-{}.log".\
-                                    format(time.strftime("%Y%m%d_%H%M%S")))
-                        configure_logger(logger, console_level=logging.INFO,
-                                         file_name=log_file)
-                        log_base_learner_info(logger, base_learners_bool)
-                        # generate boolean data with complete test sets
-                        funcs_pickle_path = os.path.join(results_path,
-                                                         "boolean_funcs.pkl")
-                        tasks_data, tasks_complete_test_sets = \
-                            synthetic_data.generate_boolean_data_with_complete_test_sets(
-                                attributes, disjunct_degree, n, task_groups,
-                                tasks_per_group, noise,
-                                random_seed=data_rnd_seed,
-                                n_learning_sets=n_learning_sets,
-                                funcs_pickle_path=funcs_pickle_path)
-                        # test the generated MTL problem
-                        test_tasks(tasks_data, results_path, base_learners_bool,
-                                   measures_clas, learners, "pre-prepared_test",
-                                   rnd_seed=rnd_seed, test=test,
-                                   unpickle=unpickle, visualize=visualize,
-                                   preprepared_test_sets=tasks_complete_test_sets,
-                                   separate_figs=True, cfg_logger=False)
-                if "combine" in mode:
-                    combine_experiment_results(results_path_fmt,
-                        tasks_per_group_values,
-                        (results_path_fmt.format(pprint_iter(
-                        tasks_per_group_values)) + "-{}-{{}}.pdf".format(
-                        error_measure)),
-                        n_learning_sets, error_measure=error_measure,
-                        title="Avg. results for tasks",
-                        xlabel="# of tasks per group")
+            _test_config_41(data_rnd_seed_values=range(15, 19),
+                            tasks_per_group_values=[1, 2, 5, 10, 20])
         
         if test_config == 42:
-            # parameters of the synthetic Boolean MTL problem
-            attributes = 12
-            disjunct_degree = 6
-            n = 50
-            tasks_per_group = 5
-            noise = 0.0
-            n_learning_sets = 10
-            # parameters of the MTL problem tester
-            rnd_seed = 51
-            
-            # dynamic parameters of the synthetic Boolean MTL problem
-            data_rnd_seed_values = range(15, 19)
-            task_groups_values = [1, 2, 5, 10, 20]
-            
-            for data_rnd_seed in data_rnd_seed_values:
-                results_path_fmt = os.path.join(path_prefix, "results/"
-                    "synthetic_data/changing_task_groups/bool_func-a{}d{}n{}"
-                    "g{{}}tg{}nse{}rs{}nls{}-seed{}-complete_test".format(
-                    attributes, disjunct_degree, n, tasks_per_group, noise,
-                    data_rnd_seed, n_learning_sets, rnd_seed))
-                if "run" in mode:
-                    for task_groups in task_groups_values:
-                        # prepare directories and loggers
-                        results_path = results_path_fmt.format(task_groups)
-                        if not os.path.exists(results_path):
-                            os.makedirs(results_path)
-                        log_file = os.path.join(results_path, "run-{}.log".\
-                                    format(time.strftime("%Y%m%d_%H%M%S")))
-                        configure_logger(logger, console_level=logging.INFO,
-                                         file_name=log_file)
-                        log_base_learner_info(logger, base_learners_bool)
-                        # generate boolean data with complete test sets
-                        funcs_pickle_path = os.path.join(results_path,
-                                                         "boolean_funcs.pkl")
-                        tasks_data, tasks_complete_test_sets = \
-                            synthetic_data.generate_boolean_data_with_complete_test_sets(
-                                attributes, disjunct_degree, n, task_groups,
-                                tasks_per_group, noise,
-                                random_seed=data_rnd_seed,
-                                n_learning_sets=n_learning_sets,
-                                funcs_pickle_path=funcs_pickle_path)
-                        # test the generated MTL problem
-                        test_tasks(tasks_data, results_path, base_learners_bool,
-                                   measures_clas, learners, "pre-prepared_test",
-                                   rnd_seed=rnd_seed, test=test,
-                                   unpickle=unpickle, visualize=visualize,
-                                   preprepared_test_sets=tasks_complete_test_sets,
-                                   separate_figs=True, cfg_logger=False)
-                if "combine" in mode:
-                    combine_experiment_results(results_path_fmt,
-                        task_groups_values,
-                        (results_path_fmt.format(pprint_iter(
-                        task_groups_values)) + "-{}-{{}}.pdf".format(
-                        error_measure)),
-                        n_learning_sets, error_measure=error_measure,
-                        title="Avg. results for tasks",
-                        xlabel="# of task groups")
+            _test_config_42(data_rnd_seed_values=range(15, 19),
+                            task_groups_values=[1, 2, 5, 10, 20])
     
         if test_config == 43:
-            # parameters of the synthetic Boolean MTL problem
-            attributes = 12
-            disjunct_degree = 6
-            task_groups = 5
-            tasks_per_group = 5
-            noise = 0.0
-            n_learning_sets = 10
-            # parameters of the MTL problem tester
-            rnd_seed = 51
-            
-            # dynamic parameters of the synthetic Boolean MTL problem
-            data_rnd_seed_values = range(12, 20)
-            n_values = [10, 20, 50, 100, 200]
-            
-            for data_rnd_seed in data_rnd_seed_values:
-                results_path_fmt = os.path.join(path_prefix, "results/"
-                    "synthetic_data/changing_n/bool_func-a{}d{}n{{}}g{}tg{}"
-                    "nse{}rs{}nls{}-seed{}-complete_test".format(attributes,
-                    disjunct_degree, task_groups, tasks_per_group, noise,
-                    data_rnd_seed, n_learning_sets, rnd_seed))
-                if "run" in mode:
-                    for n in n_values:
-                        # prepare directories and loggers
-                        results_path = results_path_fmt.format(n)
-                        if not os.path.exists(results_path):
-                            os.makedirs(results_path)
-                        log_file = os.path.join(results_path, "run-{}.log".\
-                                    format(time.strftime("%Y%m%d_%H%M%S")))
-                        configure_logger(logger, console_level=logging.INFO,
-                                         file_name=log_file)
-                        log_base_learner_info(logger, base_learners_bool)
-                        # generate boolean data with complete test sets
-                        funcs_pickle_path = os.path.join(results_path,
-                                                         "boolean_funcs.pkl")
-                        tasks_data, tasks_complete_test_sets = \
-                            synthetic_data.generate_boolean_data_with_complete_test_sets(
-                                attributes, disjunct_degree, n, task_groups,
-                                tasks_per_group, noise,
-                                random_seed=data_rnd_seed,
-                                n_learning_sets=n_learning_sets,
-                                funcs_pickle_path=funcs_pickle_path)
-                        # test the generated MTL problem
-                        test_tasks(tasks_data, results_path, base_learners_bool,
-                                   measures_clas, learners, "pre-prepared_test",
-                                   rnd_seed=rnd_seed, test=test,
-                                   unpickle=unpickle, visualize=visualize,
-                                   preprepared_test_sets=tasks_complete_test_sets,
-                                   separate_figs=True, cfg_logger=False)
-                if "combine" in mode:
-                    combine_experiment_results(results_path_fmt,
-                        n_values,
-                        (results_path_fmt.format(pprint_iter(n_values)) +
-                         "-{}-{{}}.pdf".format(error_measure)),
-                        n_learning_sets, error_measure=error_measure,
-                        title="Avg. results for tasks",
-                        xlabel="# of examples")
+            _test_config_43(data_rnd_seed_values=range(12, 20),
+                            n_values=[10, 20, 50, 100, 200])
         
         if test_config == 44:
-            # parameters of the synthetic Boolean MTL problem
-            attributes = 12
-            disjunct_degree = 6
-            n = 50
-            task_groups = 5
-            tasks_per_group = 5
-            noise = 0.0
-            n_learning_sets = 10
-            # parameters of the MTL problem tester
-            rnd_seed = 51
-            
-            # dynamic parameters of the synthetic Boolean MTL problem
-            data_rnd_seed_values = range(12, 20)
-            noise_values = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
-            
-            for data_rnd_seed in data_rnd_seed_values:
-                results_path_fmt = os.path.join(path_prefix, "results/"
-                    "synthetic_data/changing_noise/bool_func-a{}d{}n{}g{}tg{}"
-                    "nse{{}}rs{}nls{}-seed{}-complete_test".format(attributes,
-                    disjunct_degree, n, task_groups, tasks_per_group,
-                    data_rnd_seed, n_learning_sets, rnd_seed))
-                if "run" in mode:
-                    for noise in noise_values:
-                        # prepare directories and loggers
-                        results_path = results_path_fmt.format(noise)
-                        if not os.path.exists(results_path):
-                            os.makedirs(results_path)
-                        log_file = os.path.join(results_path, "run-{}.log".\
-                                    format(time.strftime("%Y%m%d_%H%M%S")))
-                        configure_logger(logger, console_level=logging.INFO,
-                                         file_name=log_file)
-                        log_base_learner_info(logger, base_learners_bool)
-                        # generate boolean data with complete test sets
-                        funcs_pickle_path = os.path.join(results_path,
-                                                         "boolean_funcs.pkl")
-                        tasks_data, tasks_complete_test_sets = \
-                            synthetic_data.generate_boolean_data_with_complete_test_sets(
-                                attributes, disjunct_degree, n, task_groups,
-                                tasks_per_group, noise,
-                                random_seed=data_rnd_seed,
-                                n_learning_sets=n_learning_sets,
-                                funcs_pickle_path=funcs_pickle_path)
-                        # test the generated MTL problem
-                        test_tasks(tasks_data, results_path, base_learners_bool,
-                                   measures_clas, learners, "pre-prepared_test",
-                                   rnd_seed=rnd_seed, test=test,
-                                   unpickle=unpickle, visualize=visualize,
-                                   preprepared_test_sets=tasks_complete_test_sets,
-                                   separate_figs=True, cfg_logger=False)
-                if "combine" in mode:
-                    combine_experiment_results(results_path_fmt,
-                        noise_values,
-                        (results_path_fmt.format(pprint_iter(noise_values)) +
-                         "-{}-{{}}.pdf".format(error_measure)),
-                        n_learning_sets, error_measure=error_measure,
-                        title="Avg. results for tasks", xlabel="% of noise")
+            _test_config_44(data_rnd_seed_values=range(12, 20),
+                            noise_values=[0.0, 0.1, 0.2, 0.3, 0.4, 0.5])
+        
+        if test_config == 50:
+            base_learners = OrderedDict()
+#            base_learners["svm_poly3"] = SVC(kernel="poly", coef0=1, degree=3,
+#                                             probability=True)
+            from PyMTL.orange_utils import OrangeClassifierWrapper
+            from Orange.classification.tree import TreeLearner
+            base_learners["orange_tree_pruned"] = OrangeClassifierWrapper(
+                TreeLearner(min_instances=10, same_majority_pruning=True,
+                            store_instances=True))
+            results_dir_prefix = "results/synthetic_data/changing_base_learner"
+            data_rnd_seed_values=[16]
+            for bl in base_learners:
+                base_learners_bool = OrderedDict()
+                base_learners_bool[bl] = base_learners[bl]
+                results_dir = os.path.join(results_dir_prefix, bl)
+                _test_config_41(data_rnd_seed_values=data_rnd_seed_values,
+                                tasks_per_group_values=[1, 2, 5, 10, 20],
+                                results_dir=results_dir)
+                _test_config_42(data_rnd_seed_values=data_rnd_seed_values,
+                                task_groups_values=[1, 2, 5, 10, 20],
+                                results_dir=results_dir)
+                _test_config_43(data_rnd_seed_values=data_rnd_seed_values,
+                                n_values=[10, 20, 50, 100, 200],
+                                results_dir=results_dir)
+                _test_config_44(data_rnd_seed_values=data_rnd_seed_values,
+                                noise_values=[0.0, 0.1, 0.2, 0.3, 0.4, 0.5],
+                                results_dir=results_dir)
