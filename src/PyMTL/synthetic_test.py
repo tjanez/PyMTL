@@ -140,6 +140,11 @@ def combine_experiment_results(results_path_fmt, chan_par_values,
         ylim_bottom=0, ylim_top=1, error_bars=True)
 
 
+def pprint_iter(it):
+    """Pretty-print the given iterable."""
+    return ",".join([str(v) for v in it])
+
+
 if __name__ == "__main__":
     # find out the current file's location so it can be used to compute the
     # location of other files/directories
@@ -506,8 +511,8 @@ if __name__ == "__main__":
             rnd_seed = 51
             
             # dynamic parameters of the synthetic Boolean MTL problem
-            data_rnd_seed_values = range(12, 20)
-            tasks_per_group_values = [1, 2, 5, 10]
+            data_rnd_seed_values = range(15, 19)
+            tasks_per_group_values = [1, 2, 5, 10, 20]
             
             for data_rnd_seed in data_rnd_seed_values:
                 results_path_fmt = os.path.join(path_prefix, "results/"
@@ -546,8 +551,9 @@ if __name__ == "__main__":
                 if "combine" in mode:
                     combine_experiment_results(results_path_fmt,
                         tasks_per_group_values,
-                        (results_path_fmt.format(tasks_per_group_values) +
-                         "-{}-{{}}.pdf".format(error_measure)),
+                        (results_path_fmt.format(pprint_iter(
+                        tasks_per_group_values)) + "-{}-{{}}.pdf".format(
+                        error_measure)),
                         n_learning_sets, error_measure=error_measure,
                         title="Avg. results for tasks",
                         xlabel="# of tasks per group")
@@ -564,8 +570,8 @@ if __name__ == "__main__":
             rnd_seed = 51
             
             # dynamic parameters of the synthetic Boolean MTL problem
-            data_rnd_seed_values = range(12, 20)
-            task_groups_values = [1, 2, 5, 10]
+            data_rnd_seed_values = range(15, 19)
+            task_groups_values = [1, 2, 5, 10, 20]
             
             for data_rnd_seed in data_rnd_seed_values:
                 results_path_fmt = os.path.join(path_prefix, "results/"
@@ -604,8 +610,9 @@ if __name__ == "__main__":
                 if "combine" in mode:
                     combine_experiment_results(results_path_fmt,
                         task_groups_values,
-                        (results_path_fmt.format(task_groups_values) + 
-                         "-{}-{{}}.pdf".format(error_measure)),
+                        (results_path_fmt.format(pprint_iter(
+                        task_groups_values)) + "-{}-{{}}.pdf".format(
+                        error_measure)),
                         n_learning_sets, error_measure=error_measure,
                         title="Avg. results for tasks",
                         xlabel="# of task groups")
@@ -662,7 +669,7 @@ if __name__ == "__main__":
                 if "combine" in mode:
                     combine_experiment_results(results_path_fmt,
                         n_values,
-                        (results_path_fmt.format(n_values) +
+                        (results_path_fmt.format(pprint_iter(n_values)) +
                          "-{}-{{}}.pdf".format(error_measure)),
                         n_learning_sets, error_measure=error_measure,
                         title="Avg. results for tasks",
@@ -721,7 +728,7 @@ if __name__ == "__main__":
                 if "combine" in mode:
                     combine_experiment_results(results_path_fmt,
                         noise_values,
-                        (results_path_fmt.format(noise_values) +
+                        (results_path_fmt.format(pprint_iter(noise_values)) +
                          "-{}-{{}}.pdf".format(error_measure)),
                         n_learning_sets, error_measure=error_measure,
                         title="Avg. results for tasks", xlabel="% of noise")
