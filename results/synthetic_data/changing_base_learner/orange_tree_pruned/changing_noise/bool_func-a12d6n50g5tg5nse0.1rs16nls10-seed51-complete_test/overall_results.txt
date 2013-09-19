@@ -1,0 +1,16 @@
+Results for CA (weighting method: all_equal, error margin measure: std)
+-----------------------------------------------------------------------
+  - Base learner: orange_tree_pruned
+      * ERM                 0.74 +/- 0.04
+      * NoMerging           0.70 +/- 0.01
+      * MergeAll            0.58 +/- 0.01
+      * Oracle              0.82 +/- 0.01
+
+Results for AUC (weighting method: all_equal, error margin measure: std)
+------------------------------------------------------------------------
+  - Base learner: orange_tree_pruned
+      * ERM                 0.79 +/- 0.04
+      * NoMerging           0.73 +/- 0.01
+      * MergeAll            0.62 +/- 0.01
+      * Oracle              0.87 +/- 0.01
+
