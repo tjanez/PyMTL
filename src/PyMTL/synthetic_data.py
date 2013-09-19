@@ -440,6 +440,20 @@ if __name__ == "__main__":
     svc_lin = SVC(kernel="poly", coef0=1, degree=5)
     print "SVM (poly.) scores: ", cross_validation.cross_val_score(svc_lin, X,
                                                                    y, cv=5)
+    from sklearn.linear_model import SGDClassifier
+    sgd = SGDClassifier(loss="hinge", penalty="l2")
+    print "SGD classifier scores: ", cross_validation.cross_val_score(sgd, X, y,
+                                                                      cv=5)
+    from sklearn import grid_search
+    sgd_gs = grid_search.GridSearchCV(estimator=sgd,
+                    param_grid={"alpha" : [10**-i for i in np.arange(1, 7)]},
+                    scoring="accuracy")
+    print "SGD classifier (with grid search for alpha) scores: ", \
+        cross_validation.cross_val_score(sgd_gs, X, y, cv=5)
+    
+    from sklearn.neighbors import KNeighborsClassifier
+    knn = KNeighborsClassifier(n_neighbors=15)
+    print "k-NN scores: ", cross_validation.cross_val_score(knn, X, y, cv=5)
     
     # generate a PDF with the learned decision tree model
 #    dt = DecisionTreeClassifier()
