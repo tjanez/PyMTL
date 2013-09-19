@@ -478,7 +478,7 @@ if __name__ == "__main__":
     # (only applies to testing configurations 41 -- 44):
     # run -- run the experiments
     # combine -- combine the results of the experiments
-    mode = ["run", "combine"]
+    mode = ["combine"]
     
     # string indicating the measure to use when plotting error bars:
     # std -- standard deviation
@@ -811,7 +811,7 @@ if __name__ == "__main__":
 #            from Orange.classification.bayes import NaiveLearner
 #            base_learners["bayes"] = OrangeClassifierWrapper(NaiveLearner())
             from sklearn.neighbors import KNeighborsClassifier
-            base_learners["knn"] = KNeighborsClassifier(n_neighbors=15)
+            base_learners["knn"] = KNeighborsClassifier(n_neighbors=10)
             results_dir_prefix = "results/synthetic_data/changing_base_learner"
             data_rnd_seed_values=[16]
             for bl in base_learners:
