@@ -478,7 +478,7 @@ if __name__ == "__main__":
     # (only applies to testing configurations 41 -- 44):
     # run -- run the experiments
     # combine -- combine the results of the experiments
-    mode = ["combine"]
+    mode = ["run", "combine"]
     
     # string indicating the measure to use when plotting error bars:
     # std -- standard deviation
@@ -803,11 +803,15 @@ if __name__ == "__main__":
             base_learners = OrderedDict()
 #            base_learners["svm_poly3"] = SVC(kernel="poly", coef0=1, degree=3,
 #                                             probability=True)
-            from PyMTL.orange_utils import OrangeClassifierWrapper
-            from Orange.classification.tree import TreeLearner
-            base_learners["orange_tree_pruned"] = OrangeClassifierWrapper(
-                TreeLearner(min_instances=10, same_majority_pruning=True,
-                            store_instances=True))
+#            from PyMTL.orange_utils import OrangeClassifierWrapper
+#            from Orange.classification.tree import TreeLearner
+#            base_learners["orange_tree_pruned"] = OrangeClassifierWrapper(
+#                TreeLearner(min_instances=10, same_majority_pruning=True,
+#                            store_instances=True))
+#            from Orange.classification.bayes import NaiveLearner
+#            base_learners["bayes"] = OrangeClassifierWrapper(NaiveLearner())
+            from sklearn.neighbors import KNeighborsClassifier
+            base_learners["knn"] = KNeighborsClassifier(n_neighbors=15)
             results_dir_prefix = "results/synthetic_data/changing_base_learner"
             data_rnd_seed_values=[16]
             for bl in base_learners:
